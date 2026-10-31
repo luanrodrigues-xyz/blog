@@ -1,0 +1,122 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'Assigning 140 to PlaybackVolume.level sends 140 to the computed setter. The setter clamps it to 100 and stores 100 in storedLevel. The getter reads storedLevel and returns 100. level has no separate stored value.';
+---
+
+<div class="setter-path">
+  {[true, false].map((wide) => {
+    const height = wide ? 890 : 1750;
+    const width = wide ? 420 : 936;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          <div class="no txt heading" style={`--x:32;--y:24;--w:936;--h:${wide ? 60 : 120}`}>
+            Assigning through level
+          </div>
+          <div class="no nodo centered" style={`--x:32;--y:${wide ? 150 : 200};--w:${width};--h:${wide ? 110 : 180}`}>
+            <span class="pq">Caller</span>
+            <span class="t4">level = 140</span>
+          </div>
+          <div
+            class="no nodo centered"
+            style={`--x:${wide ? 548 : 32};--y:${wide ? 150 : 550};--w:${width};--h:${wide ? 110 : 210}`}
+          >
+            <span class="pq">Setter clamps newValue</span>
+            <span class="t4">140 → 100</span>
+          </div>
+          <div
+            class="no nodo centered"
+            style={`--x:${wide ? 548 : 32};--y:${wide ? 408 : 940};--w:${width};--h:${wide ? 130 : 180}`}
+          >
+            <span class="pq">Stored property</span>
+            <span class="t4">storedLevel = 100</span>
+          </div>
+          <div class="no nodo centered" style={`--x:32;--y:${wide ? 680 : 1470};--w:${width};--h:${wide ? 110 : 180}`}>
+            <span class="pq">Caller reads level</span>
+            <span class="t4">100</span>
+          </div>
+          <div
+            class="no t4 centered"
+            style={`--x:${wide ? 480 : 32};--y:${wide ? 556 : 1230};--w:${wide ? 260 : 650};--h:${wide ? 70 : 120}`}
+          >
+            {'get { storedLevel }'}
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            <Seta
+              tipo="neutra"
+              x1={wide ? 452 : 500}
+              y1={wide ? 205 : 380}
+              x2={wide ? 546 : 500}
+              y2={wide ? 205 : 548}
+            />
+            <Seta
+              tipo="neutra"
+              x1={wide ? 758 : 500}
+              y1={wide ? 260 : 760}
+              x2={wide ? 758 : 500}
+              y2={wide ? 406 : 938}
+            />
+            <line
+              class="connector"
+              x1={wide ? 758 : 820}
+              y1={wide ? 538 : 1120}
+              x2={wide ? 758 : 820}
+              y2={wide ? 632 : 1450}
+            />
+            {wide && <line class="connector" x1="758" y1="632" x2="500" y2="632" />}
+            {wide && <line class="connector" x1="500" y1="632" x2="500" y2="735" />}
+            <Seta
+              tipo="neutra"
+              x1={wide ? 500 : 820}
+              y1={wide ? 735 : 1450}
+              x2={wide ? 454 : 820}
+              y2={wide ? 735 : 1468}
+            />
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .setter-path {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading,
+  .centered {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  .centered {
+    justify-content: center;
+    text-align: center;
+  }
+  .connector {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .stacked .connector {
+    stroke-width: 6;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

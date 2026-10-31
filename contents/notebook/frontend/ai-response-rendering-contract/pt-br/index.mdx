@@ -1,0 +1,353 @@
+---
+title: 'A IA pediu uma tabela. Quem decide o que aparece na tela?'
+description: 'Uma consulta sobre a reforma tributária pode virar tabela, resumo ou texto. Como validar essa escolha e renderizar componentes locais com os dados da fonte oficial?'
+date: '2026-10-04'
+updated: '2026-10-10'
+topic: 'frontend'
+readingOrder: 10
+draft: false
+tags: ['React', 'TypeScript', 'IA', 'Contratos', 'Acessibilidade', 'Design systems']
+language: 'pt-BR'
+cover: 'ai-response-rendering-contract.png'
+coverAlt: 'Um plano com o campo type seleciona uma tabela já definida, enquanto outra representação permitida permanece disponível.'
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import AIRepresentationBoundary from '../../../../../src/components/diagramas/AIRepresentationBoundary.astro';
+import tableDesktop from './classification-table-desktop.png';
+import tableMobile from './classification-table-mobile.png';
+import invalidResponse from './invalid-response.png';
+
+Em uma aplicação de gestão, a pessoa escreve “Mostre as classificações da reforma tributária com código começando em 200”. O resultado precisa aparecer em uma tabela em que a pessoa consiga conferir códigos e descrições.
+
+Eu começaria limitando o que o modelo pode escolher. O modelo seleciona uma representação entre opções conhecidas e informa o filtro. A aplicação valida essa escolha, consulta os dados oficiais e renderiza componentes que já controla. Não pediria à IA que devolvesse os registros tributários nem que escolhesse quais componentes React importar.
+
+O exemplo usa respostas simuladas, sem chamar um modelo. Assim podemos testar como a aplicação trata uma resposta válida e o que acontece quando chegam tipos desconhecidos, campos extras ou texto com HTML.
+
+## Escolher uma representação não é gerar um componente
+
+Para essa consulta, eu usaria três variantes. Tabela e resumo recebem apenas um filtro. O texto do assistente fica separado dos valores vindos da fonte oficial.
+
+```ts
+type AIResponse =
+  | { type: 'classification_table'; codePrefix: string | null }
+  | { type: 'classification_summary'; codePrefix: string | null }
+  | { type: 'text'; content: string };
+```
+
+`type` permite ao TypeScript distinguir os campos de cada variante. `codePrefix: null` significa consultar sem esse filtro. Para a pergunta inicial, esperamos este plano completo:
+
+```json
+{
+  "schemaVersion": 1,
+  "response": {
+    "type": "classification_table",
+    "codePrefix": "200"
+  }
+}
+```
+
+Se o modelo pedir um resumo, a aplicação filtra os registros consultados e calcula a contagem. O modelo não fornece um `total` que a interface aceita sem conferir.
+
+Um plano pode ter o formato certo e ainda partir de uma interpretação errada da pergunta. `classification_summary` com `codePrefix: null` também passa pelo schema que vamos construir, mas não atende ao pedido inicial. Validar o contrato e avaliar a interpretação são tarefas diferentes.
+
+Esse recorte costuma aparecer sob o nome de generative UI. A [documentação de interfaces generativas do AI SDK](https://ai-sdk.dev/docs/ai-sdk-ui/generative-user-interfaces) mostra resultados de ferramentas sendo associados a componentes React. O que interessa aqui é essa associação controlada. Não precisamos adotar o SDK para implementá-la.
+
+## Os dados vêm da API oficial
+
+A Calculadora de Tributos mantém um [Swagger público](https://consumo.tributos.gov.br/servico/calcular-tributos-consumo/api/swagger-ui/index.html). Entre os endpoints de dados abertos está a consulta de classificações CBS/IBS, marcada como beta no contrato consultado.
+
+```http
+
+GET https://consumo.tributos.gov.br/servico/calcular-tributos-consumo/api/calculadora/dados-abertos/classificacoes-tributarias/cbs-ibs?data=2026-10-10
+```
+
+O parâmetro `data` é obrigatório e pertence ao contexto da aplicação. Nesta demonstração, a data está fixada em `2026-10-10` no script de captura. Como a pergunta inicial não informa um período, a aplicação usa essa data. O plano de apresentação não permite que o modelo altere essa data.
+
+Em um produto com consulta histórica, eu pediria que a pessoa escolhesse ou confirmasse a data em um controle da aplicação. O backend validaria o período e consultaria a fonte com esse valor. Se o sistema adotar uma data padrão, a tela precisa informar isso, sem dar a entender que a pessoa a escolheu.
+
+A consulta retornou 161 registros para essa data. É o tamanho da captura, não um limite da API.
+
+Estes são alguns campos de um dos registros retornados. O objeto também contém outros indicadores.
+
+```json
+{
+  "codigo": "000001",
+  "descricao": "Situações tributadas integralmente pelo IBS e CBS.",
+  "tipoAliquota": "Padrão",
+  "descricaoTratamentoTributario": "Tributação integral",
+  "dataAtualizacao": "2025-12-15"
+}
+```
+
+`codigo` permanece uma string. Convertê-lo para número apagaria os zeros à esquerda. A interface também conserva a descrição oficial, em vez de pedir à IA uma versão que será apresentada como se fosse o texto da fonte.
+
+Data de referência, instante da captura e atualização de cada registro têm significados diferentes. Uma captura feita hoje pode conter um registro cuja última atualização é anterior. A tela deve deixar claro qual recorte está mostrando, especialmente quando trabalha com uma cópia em cache.
+
+Na implementação usada para este artigo, um script consulta a API e salva `snapshot.json`. A demonstração lê essa captura local validada. Isso permite reproduzir a mesma tela e testar falhas sem consultar o serviço público a cada clique. Em uma aplicação real, eu consultaria a API e gerenciaria o cache no servidor, preservando a data de referência. Não pressuporia que qualquer API pública aceita requisições diretas do navegador.
+
+Há um caso real próximo desse fluxo. A [documentação da Senior para importação de tabelas da reforma tributária](https://documentacao.senior.com.br/goup/5.10.4/menu_cadastros/f051irt.htm) descreve uma tela que consulta a API oficial, apresenta registros para conferência e permite a gravação após seleção. O exemplo aqui usa a mesma fonte de dados, com outra interface.
+
+A nossa tela apenas consulta classificações. Encontrar um código não prova que ele se aplica a uma operação específica. Determinar enquadramento e calcular tributos exigem outros dados e regras que não fazem parte desta demonstração.
+
+## O tipo estático não valida a resposta recebida
+
+Esta linha deixa o compilador satisfeito sem conferir o JSON:
+
+```ts
+const response = JSON.parse(rawText) as AIResponse;
+```
+
+Ela não verifica se `type` existe, se o filtro é uma string ou se apareceu uma variante que esta versão do frontend desconhece. Uma assertion não executa validação em runtime, como explica o [Handbook do TypeScript](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions).
+
+Eu receberia esse valor como `unknown` e o validaria antes de entregá-lo ao componente. No exemplo, o schema usa Zod 4. O tipo TypeScript passa a ser inferido do mesmo schema que faz a validação.
+
+```ts
+import { z } from 'zod';
+const codeFilter = z
+  .string()
+  .regex(/^\d{3}$/)
+  .nullable();
+export const AIResponseSchema = z.discriminatedUnion('type', [
+  z.strictObject({
+    type: z.literal('classification_table'),
+    codePrefix: codeFilter,
+  }),
+  z.strictObject({
+    type: z.literal('classification_summary'),
+    codePrefix: codeFilter,
+  }),
+  z.strictObject({
+    type: z.literal('text'),
+    content: z.string().trim().min(1).max(2000),
+  }),
+]);
+export type AIResponse = z.infer<typeof AIResponseSchema>;
+const EnvelopeSchema = z.strictObject({
+  schemaVersion: z.literal(1),
+  response: AIResponseSchema,
+});
+```
+
+Usei `strictObject` porque não quero que o modelo acrescente propriedades que o frontend desconhece. Se devolver `component`, `onClick` ou uma lista de registros, a validação falha. A regex aceita um prefixo de três dígitos, mas não comprova que existam códigos com esse prefixo na fonte.
+
+Já nos registros da API, uso `z.object` para validar os campos consumidos pela tela e descartar os demais.
+
+Coloquei `schemaVersion` no envelope para poder mudar esse formato sem depender da versão do modelo. Este frontend aceita a versão 1. Se o produtor enviar a versão 2, o decoder rejeita a resposta.
+
+```ts
+export type DecodeResult = { ok: true; response: AIResponse } | { ok: false; reason: 'invalid_response' };
+export function decodeAIResponse(input: unknown): DecodeResult {
+  const result = EnvelopeSchema.safeParse(input);
+  return result.success ? { ok: true, response: result.data.response } : { ok: false, reason: 'invalid_response' };
+}
+```
+
+O renderer só recebe respostas que passaram pelo `safeParse`. Se o transporte entregar texto que não seja JSON válido, o adaptador precisa tratar o erro de parsing antes de chamar o decoder.
+
+Um provedor com structured output pode restringir a forma da geração. Isso ajuda a reduzir respostas incompatíveis, mas não demonstra que um código existe, que uma contagem está correta ou que a pessoa tem permissão para acessar determinada informação. No [AI SDK, a geração estruturada](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data) também trata validação e falhas de geração. O exemplo mantém a validação na aplicação, sem depender de um provedor específico.
+
+O plano e os registros oficiais entram por validações separadas. O primeiro seleciona a apresentação. Os segundos fornecem os valores da tabela e do resumo.
+
+<AIRepresentationBoundary rotulo="A IA fornece apenas um plano de representação. A aplicação valida o plano e os registros da API oficial separadamente. Somente planos aceitos chegam aos componentes locais. Planos inválidos seguem para uma mensagem de recuperação, sem renderização arbitrária." />
+
+Os registros oficiais também entram como dados externos. O exemplo exige código de seis dígitos, descrições presentes e códigos únicos. Uma resposta de erro com outro formato não pode virar uma tabela vazia por conveniência.
+
+Eu manteria a origem da consulta configurada na aplicação. Passar pela validação do schema não basta para confiar nos dados de qualquer servidor.
+
+Neste recorte, o filtro procura os três primeiros dígitos de `codigo`. É uma seleção literal de códigos, não uma classificação fiscal inferida da pergunta.
+
+```ts
+export function selectRows(rows: readonly Classification[], codePrefix: string | null) {
+  return rows
+    .filter((row) => codePrefix === null || row.codigo.startsWith(codePrefix))
+    .sort((a, b) => a.codigo.localeCompare(b.codigo));
+}
+```
+
+`Classification` é inferido do schema dos campos consumidos da API. `filter` cria um novo array, então a ordenação não altera a captura original. A contagem do resumo é calculada a partir desse mesmo conjunto filtrado. Se a consulta retornar zero registros, a tela diz que não encontrou classificações naquele recorte. Isso é diferente de não conseguir consultar a fonte.
+
+Para uma fonte privada, validar um filtro não concede autorização. O servidor deve restringir a consulta à sessão e ao escopo permitido, independentemente do que o modelo pediu. No exemplo público, essa fronteira não exige autenticação da pessoa.
+
+## O catálogo de componentes fica no código
+
+O renderer usa um `switch` explícito. Cada caso faz a associação entre uma variante do contrato e um componente local.
+
+```tsx
+export function AIResponseView({
+  response,
+  rows,
+  queryIdentity,
+}: {
+  response: AIResponse;
+  rows: readonly Classification[];
+  queryIdentity: string;
+}) {
+  switch (response.type) {
+    case 'classification_table':
+      return (
+        <ClassificationTable
+          key={`${queryIdentity}:${response.codePrefix ?? 'all'}`}
+          rows={selectRows(rows, response.codePrefix)}
+        />
+      );
+    case 'classification_summary':
+      return <ClassificationSummary rows={selectRows(rows, response.codePrefix)} />;
+    case 'text':
+      return (
+        <div>
+          <p>Texto do assistente — não é um registro da tabela oficial.</p>
+          <p>{response.content}</p>
+        </div>
+      );
+    default:
+      return assertNever(response);
+  }
+}
+function assertNever(value: never): never {
+  throw new Error('Unhandled response variant');
+}
+```
+
+Se eu adicionar uma variante à união e esquecer de tratá-la no `switch`, o TypeScript acusa o problema em `assertNever`. Respostas desconhecidas recebidas pela rede são rejeitadas antes, pelo decoder.
+
+Deixei a associação com os componentes nesse `switch`. Não usaria o nome recebido para resolver um import nem espalharia o payload nas props. Cada variante passa apenas os valores de que o componente precisa.
+
+A página atual fica no estado local de `ClassificationTable`. Sua chave combina o filtro com `queryIdentity`, que no exemplo identifica a data de referência e a captura carregada. Trocar o filtro, a data ou a captura reinicia a paginação. As linhas usam `codigo` como chave, validado como único naquele conjunto.
+
+Em um produto com design system, eu montaria `ClassificationTable` com a tabela, os botões e a tipografia já usados nas outras telas. Colunas, estados vazios e paginação continuam definidos no componente, mesmo quando a IA escolhe exibi-lo.
+
+O [A2UI do Google](https://developers.googleblog.com/introducing-a2ui-an-open-project-for-agent-driven-interfaces/) também trabalha com mensagens declarativas e componentes disponíveis no cliente. É uma proposta mais ampla que este exemplo, que só permite selecionar uma representação por vez.
+
+## A tabela continua sendo responsabilidade do frontend
+
+Mostrar todos os registros não precisa significar montar todas as linhas ao mesmo tempo. O exemplo mantém os 161 registros da captura na memória, filtra e ordena localmente, e mostra dez por página. O tamanho da página pode mudar conforme a tarefa.
+
+<picture class="article-screenshot">
+
+  <source media="(max-width: 480px)" srcset={tableMobile.src} />
+  <img src={tableDesktop.src} width={tableDesktop.width} height={tableDesktop.height} alt="Consulta controlada mostrando a tabela CBS/IBS com 161 registros no recorte, códigos com zeros à esquerda, descrições oficiais, dez linhas por página e acesso à fonte consultada." loading="lazy" />
+</picture>
+
+Paginar no cliente reduz as linhas presentes no DOM. Não reduz o download da captura inteira, seu parsing ou a memória usada pelo conjunto. Se a fonte crescer para um volume que justifique paginação no servidor, o contrato precisa carregar filtro, ordenação, identidade da consulta e metadados da página. Um resumo do total não pode ser calculado contando apenas a página recebida.
+
+Eu começaria medindo antes de acrescentar virtualização. Virtualizar linhas pode reduzir o trabalho de renderização, mas exige verificar navegação, foco, leitura da tabela e acesso ao conteúdo que saiu do DOM. A quantidade de registros, sozinha, não basta para escolher a solução.
+
+Os códigos são dados tabulares, então o componente usa uma tabela HTML com `caption`, cabeçalhos de coluna e cabeçalhos de linha. Essa relação entre cabeçalhos e células tem significado para tecnologias assistivas, conforme o [tutorial de tabelas da W3C](https://www.w3.org/WAI/tutorials/tables/).
+
+```tsx
+<table>
+  <caption>Classificações CBS/IBS</caption>
+  <thead>
+    <tr>
+      <th scope="col">Código</th>
+      <th scope="col">Descrição oficial</th>
+    </tr>
+  </thead>
+  <tbody>
+    {visible.map((row) => (
+      <tr key={row.codigo}>
+        <th scope="row">
+          <code>{row.codigo}</code>
+        </th>
+        <td>{row.descricao}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+```
+
+Esse trecho destaca a estrutura semântica. A implementação completa também mostra tratamento e tipo de alíquota. No mobile, a tabela rola dentro de uma região identificada e focável. Isso evita que a página inteira fique mais larga que a tela. Descrições longas podem quebrar linha, sem truncar e esconder parte da informação.
+
+A paginação usa botões nativos, indicação da página atual e uma mensagem curta de status. A IA não escolhe remover cabeçalhos nem trocar o comportamento de teclado por um visual diferente.
+
+## Texto, respostas inválidas e recuperação
+
+A variante `text` renderiza uma string como conteúdo de um elemento React. Na demonstração, enviar `<img src=x onerror=alert(1)>` mostra esse texto, sem criar uma imagem. Isso não equivale a aceitar HTML ou Markdown arbitrário. A [documentação do React](https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html) destaca o risco de inserir HTML não confiável com `dangerouslySetInnerHTML`.
+
+Escapar HTML não torna o texto verdadeiro. O schema aceitaria “A classificação 200001 tem alíquota de 12%”, mesmo que a afirmação fosse falsa. O aviso ao lado do texto só identifica sua origem. Ele não confirma se a informação está correta.
+
+Eu manteria mensagens livres do assistente em um canal separado da consulta oficial. Se o produto exigir que toda resposta tributária esteja apoiada na fonte, removeria o texto livre desse fluxo e usaria mensagens locais ou conteúdo cuja relação com a fonte possa ser verificada. Esse contrato, sozinho, só garante a forma e a renderização permitida.
+
+Uma resposta incompatível não deve cair silenciosamente em `text`. O componente abaixo trata o resultado do decoder antes de chamar o renderer. Quando há falha, oferece a consulta manual aos mesmos registros.
+
+```tsx
+export function ResultView({
+  result,
+  rows,
+  queryIdentity,
+  onManualSearch,
+}: {
+  result: DecodeResult;
+  rows: readonly Classification[];
+  queryIdentity: string;
+  onManualSearch: () => void;
+}) {
+  if (!result.ok) {
+    return (
+      <div className="error">
+        <h3>Formato de resposta não suportado</h3>
+        <p>O conteúdo não foi renderizado. Você pode consultar a tabela sem usar a resposta da IA.</p>
+        <button onClick={onManualSearch}>Abrir consulta manual</button>
+      </div>
+    );
+  }
+  return <AIResponseView response={result.response} rows={rows} queryIdentity={queryIdentity} />;
+}
+```
+
+<img
+  class="article-screenshot"
+  src={invalidResponse.src}
+  width={invalidResponse.width}
+  height={invalidResponse.height}
+  alt="Resposta com tipo não permitido é rejeitada. A interface informa que o conteúdo não foi renderizado e oferece o botão Abrir consulta manual."
+  loading="lazy"
+/>
+
+A aplicação diferencia carregamento, falha ao obter os dados, consulta sem resultados e resposta inválida da IA. Não transforma esses casos em “nenhum registro encontrado”. Se um provedor recusar uma solicitação ou interromper a geração, seu adaptador deve representar esse resultado antes de tentar decodificá-lo como conteúdo.
+
+Mantive uma região de status montada para anunciar quando a resposta fica disponível. Ela recebe uma mensagem curta, sem repetir o conteúdo inteiro da tabela a cada alteração. A [documentação da W3C sobre mensagens de status](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html) explica como anunciar essas mudanças sem mover o foco.
+
+Neste fluxo, eu manteria o foco no controle usado para solicitar a resposta. A pessoa pode seguir para o resultado e percorrer os controles. A estrutura semântica e os testes de navegação por teclado ajudam a verificar esse fluxo, mas não substituem uma avaliação com leitor de tela.
+
+## Quando a resposta chega em partes
+
+A demonstração recebe respostas completas. Não faria uma assertion para transformar `{"type":"classification_table"` em `AIResponse` enquanto o restante ainda está chegando. O adaptador deve distinguir geração em andamento, conclusão, erro e cancelamento, e só entregar um plano completo ao decoder.
+
+Em 2023, a [Shopify descreveu como o Sidekick usava buffering de Markdown e resolvia o conteúdo dos cards de forma assíncrona](https://shopify.engineering/sidekicks-improved-streaming). Aqui, eu começaria sem atualizações parciais. Streaming exigiria outro fluxo, incluindo a identidade da solicitação para impedir que uma resposta atrasada substitua a consulta atual.
+
+## O que os testes precisam proteger
+
+Nos testes de contrato, quero conferir o que o decoder aceita e o que rejeita. Em `ResultView`, verifico que uma falha oferece a consulta manual sem renderizar os registros. Isso inclui tipos desconhecidos, filtros inválidos, versões incompatíveis e propriedades que o contrato não permite.
+
+Também verifico que HTML aparece como texto, que os códigos mantêm os zeros à esquerda e que a paginação percorre a captura inteira sem perder registros.
+
+```ts
+it('rejects rows supplied by the model', () => {
+  const result = decodeAIResponse({
+    schemaVersion: 1,
+    response: {
+      type: 'classification_table',
+      codePrefix: null,
+      rows: [{ codigo: '999999', descricao: 'Invented row' }],
+    },
+  });
+  expect(result.ok).toBe(false);
+});
+```
+
+Na implementação, também mantive casos para um plano válido que não atende à pergunta e para texto com uma afirmação tributária não verificada. Ambos passam pelo decoder, mostrando os limites da validação estrutural.
+
+Os testes no navegador verificam a paginação, a recuperação após falhas e a navegação por teclado. Já avaliar se a pergunta inicial produz tabela e prefixo `200` exige testar a integração com o modelo. As respostas simuladas deste exemplo não medem essa qualidade.
+
+<FontesDoArtigo>
+
+- [Calculadora de Tributos — contrato público da API](https://consumo.tributos.gov.br/servico/calcular-tributos-consumo/api/swagger-ui/index.html)
+- [Senior — importação de tabelas da reforma tributária](https://documentacao.senior.com.br/goup/5.10.4/menu_cadastros/f051irt.htm)
+- [Shopify — experiência de streaming do Sidekick](https://shopify.engineering/sidekicks-improved-streaming)
+- [Google — A2UI e componentes do cliente](https://developers.googleblog.com/introducing-a2ui-an-open-project-for-agent-driven-interfaces/)
+- [Zod — definição de schemas](https://zod.dev/api)
+- [TypeScript — narrowing e exaustividade](https://www.typescriptlang.org/docs/handbook/2/narrowing.html)
+
+</FontesDoArtigo>

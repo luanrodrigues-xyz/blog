@@ -1,0 +1,83 @@
+---
+import type { Topic } from '../../lib/topics';
+import { interfaceLanguage, ui } from '../../config/site';
+import CategoryBadge from './CategoryBadge.astro';
+
+interface Props {
+  categories: { topic: Topic; count: number }[];
+  active?: string;
+  showAll?: boolean;
+  allActive?: boolean;
+  /** Jump to the matching section on this same page instead of navigating to the category page. */
+  anchors?: boolean;
+}
+
+const { categories, active, showAll = false, allActive = false, anchors = false } = Astro.props;
+const text = ui;
+---
+
+<nav aria-label={text.categories} lang={interfaceLanguage}>
+  <ul class="category-links" role="list">
+    {showAll && (
+      <li class="category-item">
+        <a class="category-all" href={text.articlesUrl} aria-current={allActive ? 'page' : undefined}>
+          All
+        </a>
+      </li>
+    )}
+    {categories.map(({ topic, count }) => (
+      <li class="category-item">
+        <CategoryBadge
+          topic={topic}
+          active={topic.slug === active}
+          muted={Boolean(active) && topic.slug !== active}
+          count={count}
+          href={anchors ? `#${topic.slug}` : undefined}
+        />
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .category-all {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--fill);
+    color: var(--fg);
+    font: 600 0.8125rem/1.2 var(--font-ui);
+    text-decoration: none;
+  }
+  .category-all:hover {
+    background: color-mix(in srgb, var(--apple-gray) 20%, var(--fill));
+    text-decoration: none;
+  }
+  .category-all[aria-current='page'] {
+    outline: 1px solid var(--fg-muted);
+    outline-offset: 1px;
+  }
+  .category-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+
+    padding: 0;
+    margin: 0;
+
+    list-style: none;
+  }
+
+  .category-item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (max-width: 680px) {
+    .category-links {
+      gap: 0.625rem;
+    }
+  }
+</style>

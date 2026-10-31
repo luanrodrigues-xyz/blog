@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  capturas: { titulo: string; imagem: ImageMetadata; alt: string }[];
+}
+
+const { capturas } = Astro.props;
+---
+
+<div class="comparacao-interface">
+  {capturas.map(({ titulo, imagem, alt }) => (
+    <figure class="captura-interface">
+      <figcaption>{titulo}</figcaption>
+      <Image src={imagem} alt={alt} widths={[420, 840]} sizes="(max-width: 599px) 100vw, 350px" />
+    </figure>
+  ))}
+</div>
+
+<style>
+  .comparacao-interface {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.5rem;
+    margin-block: 1.5rem;
+  }
+
+  .comparacao-interface > .captura-interface {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .captura-interface > figcaption {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .captura-interface > img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+  }
+
+  @media (max-width: 599px) {
+    .comparacao-interface {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .comparacao-interface > .captura-interface {
+      width: 100%;
+      max-width: 420px;
+      margin-inline: auto;
+    }
+  }
+</style>

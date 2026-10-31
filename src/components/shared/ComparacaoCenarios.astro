@@ -1,0 +1,57 @@
+---
+interface Props {
+  titulo: string;
+  fundo?: boolean;
+  tom?: 'azul' | 'indigo';
+}
+
+const { titulo, fundo = false, tom = 'azul' } = Astro.props;
+---
+
+<section class:list={['comparacao-cenarios', { 'com-fundo': fundo }]} data-tom={tom} aria-label={titulo}>
+  <h3>{titulo}</h3>
+  <slot />
+</section>
+
+<style>
+  .comparacao-cenarios {
+    margin-block: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--border);
+    overflow-wrap: anywhere;
+  }
+
+  .comparacao-cenarios > h3 {
+    margin-block: 0 1rem;
+    font-size: 1.1em;
+  }
+
+  .comparacao-cenarios.com-fundo {
+    --cenario-cor: var(--apple-blue);
+    --cenario-tinta: var(--apple-blue-text);
+    --cenario-linha: color-mix(in srgb, var(--cenario-cor) 22%, var(--canvas));
+    --cenario-destaque: color-mix(in srgb, var(--cenario-cor) 11%, var(--canvas));
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border: 1px solid var(--cenario-linha);
+    border-block-start: 3px solid var(--cenario-tinta);
+    border-radius: var(--radius-l);
+    background: color-mix(in srgb, var(--cenario-cor) 5%, var(--canvas));
+  }
+
+  .comparacao-cenarios.com-fundo[data-tom='indigo'] {
+    --cenario-cor: var(--apple-indigo);
+    --cenario-tinta: var(--apple-indigo-text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .comparacao-cenarios.com-fundo {
+      background: color-mix(in srgb, var(--cenario-cor) 12%, var(--canvas));
+      --cenario-destaque: color-mix(in srgb, var(--cenario-cor) 21%, var(--canvas));
+      --cenario-linha: color-mix(in srgb, var(--cenario-cor) 35%, var(--canvas));
+    }
+  }
+
+  .comparacao-cenarios :global(p:last-child) {
+    margin-block-end: 0;
+  }
+</style>

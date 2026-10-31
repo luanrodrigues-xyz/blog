@@ -1,0 +1,210 @@
+---
+title: "Opcionais. Limite zero não é limite ausente"
+description: "Um cartão recém-emitido, com o limite ainda em análise, aparece como 'Limite esgotado'. O código fez exatamente o que ?? 0 manda."
+date: "2023-02-16"
+topic: "swift"
+readingOrder: 4
+draft: false
+cover: "opcionais-em-swift.png"
+coverAlt: "Com ?? 0, a ausência e o limite zero seguem para o mesmo resultado. Com guard let, os dois estados permanecem separados."
+tags: ["Swift", "Optional", "guard", "Fundamentals"]
+language: "pt-BR"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import DoisCasosDoLimite from '../../../../../src/components/diagramas/DoisCasosDoLimite.astro';
+
+Um cartão acabou de ser emitido e o limite ainda está em análise. Mesmo assim, a tela mostra “Limite esgotado”. O problema está na função que calcula o limite disponível: ela substitui a ausência do limite por zero antes de fazer a conta.
+
+Neste exemplo, os valores são inteiros em centavos. `limiteTotal` representa o limite concedido ao cartão, `valorUtilizado` representa a parte já comprometida desse limite e `nil` indica que o limite ainda não foi definido. É uma regra simplificada para observar o comportamento dos opcionais, sem considerar outras particularidades do cálculo de limite de um cartão real.
+
+```swift
+func mensagemComPadrao(
+    _ limiteTotal: Int?,
+    valorUtilizado: Int
+) -> String {
+    let disponivel = (limiteTotal ?? 0) - valorUtilizado
+
+    return disponivel > 0
+        ? "Disponível: \(disponivel)"
+        : "Limite esgotado"
+}
+
+print(mensagemComPadrao(nil, valorUtilizado: 0)) // Limite esgotado
+print(mensagemComPadrao(0, valorUtilizado: 0))   // Limite esgotado
+```
+
+`limiteTotal ?? 0` substitui `nil` por zero. Isso permite que a subtração aconteça, mas também faz duas situações diferentes produzirem a mesma mensagem. Um cartão cujo limite ainda está em análise passa a ser tratado como um cartão com limite definido em zero.
+
+O compilador não encontra nenhum problema nessa operação. O código está correto para os tipos envolvidos, mas a regra da interface perdeu uma informação que deveria ter sido preservada.
+
+## `nil` é ausência, não zero
+
+`Int?` é a forma curta de `Optional<Int>`, um enum com dois casos. `.none`, representado por `nil`, indica ausência de valor. `.some(valor)` indica que existe um valor armazenado.
+
+Quando escrevemos `let limite: Int? = 0`, o Swift representa esse valor como `.some(0)`. Já `nil` corresponde a `.none`. Ambos pertencem ao mesmo tipo, mas representam situações diferentes.
+
+```swift
+let semLimiteDefinido: Int? = nil
+let limiteZero: Int? = 0
+
+print(semLimiteDefinido == limiteZero) // false
+print(semLimiteDefinido == .none)      // true
+print(limiteZero == .some(0))         // true
+
+// print(limiteZero - 100)
+// Erro: Int? precisa ser desembrulhado.
+```
+
+O operador `-` espera um `Int`, mas `limiteZero` tem o tipo `Int?`. Mesmo sabendo que atribuímos zero à variável, o compilador exige que tratemos a possibilidade de ausência antes de realizar a subtração.
+
+O operador `??` resolve essa exigência escolhendo um valor alternativo quando o optional é `nil`. O problema aparece quando esse valor alternativo não representa corretamente a situação original.
+
+Também existe uma diferença entre o que `nil` representa no Swift e o significado que atribuímos a ele na aplicação. Para o tipo, `nil` significa apenas que não existe um valor. No exemplo do cartão, decidimos que essa ausência corresponde a um limite ainda em análise. Essa interpretação pertence à regra de negócio, não ao funcionamento de `Optional`.
+
+## Um caminho para cada caso
+
+Se a ausência do limite tem um significado próprio, podemos tratá-la antes do cálculo. Assim, a função só subtrai o valor utilizado quando existe um limite definido.
+
+```swift
+func mensagemDeLimite(
+    _ limiteTotal: Int?,
+    valorUtilizado: Int
+) -> String {
+    guard let limiteTotal else {
+        return "Limite em análise"
+    }
+
+    let disponivel = limiteTotal - valorUtilizado
+
+    return disponivel > 0
+        ? "Disponível: \(disponivel)"
+        : "Limite esgotado"
+}
+
+print(mensagemDeLimite(nil, valorUtilizado: 0))
+// Limite em análise
+
+print(mensagemDeLimite(0, valorUtilizado: 0))
+// Limite esgotado
+
+print(mensagemDeLimite(500_000, valorUtilizado: 120_000))
+// Disponível: 380000
+```
+
+`guard let limiteTotal` faz *optional binding*. Quando existe um valor, o Swift cria uma constante `limiteTotal` do tipo `Int`, que passa a ser utilizada depois do `guard`. Essa constante tem o mesmo nome do parâmetro original, que continua sendo `Int?`, mas fica oculto nesse escopo.
+
+Se o optional for `nil`, o bloco `else` precisa sair do escopo que contém o `guard`. Neste exemplo, usamos `return` para encerrar a função e devolver “Limite em análise”.
+
+A sintaxe curta `guard let limiteTotal` está disponível desde o Swift 5.7 e equivale a `guard let limiteTotal = limiteTotal`.
+
+<DoisCasosDoLimite rotulo="Com limiteTotal ?? 0, nil e 0 levam à mesma mensagem, Limite esgotado. Com guard let, nil leva a Limite em análise e 0 leva a Limite esgotado.">
+
+O valor utilizado é zero nas duas comparações. As setas mostram onde as entradas se juntam com `??` e onde permanecem separadas com `guard let`.
+
+</DoisCasosDoLimite>
+
+A diferença está no momento em que cada função toma uma decisão. Na primeira, substituímos `nil` por zero antes de verificar o resultado. Na segunda, tratamos a ausência separadamente e só calculamos o valor disponível quando temos um `Int`.
+
+## Quando entradas diferentes produzem o mesmo `nil`
+
+O mesmo cuidado aparece quando um optional é o resultado de outra operação. Às vezes, entradas diferentes acabam produzindo a mesma ausência, e depois não conseguimos mais descobrir o motivo apenas olhando para o optional retornado.
+
+Imagine um campo que recebe valores inteiros em centavos, sem separador decimal. O inicializador `Int(_:)` tenta converter o texto para um inteiro e retorna `nil` quando a conversão não é possível.
+
+```swift
+print(Int("1250") == 1250)  // true
+print(Int("12,50") == nil)  // true
+print(Int("") == nil)       // true
+print(Int("   ") == nil)    // true
+```
+
+`Int(_:)` devolve `nil` nos três últimos casos, mas a interface pode precisar apresentar mensagens diferentes. Um campo vazio indica que a pessoa ainda não informou um valor. Já `"12,50"` contém uma entrada que não corresponde ao formato inteiro esperado pelo parser.
+
+Uma string formada apenas por espaços também não contém um valor útil para esse campo, embora não esteja tecnicamente vazia. Se verificarmos apenas `texto.isEmpty`, ela passará pela primeira validação e falhará na conversão.
+
+Depois que `Int(_:)` retorna `nil`, não temos mais a causa dessa falha no resultado. Se a tela precisa distinguir essas situações, a validação deve acontecer antes da conversão.
+
+```swift
+func avisoDoValor(_ texto: String) -> String {
+    let entrada = texto.trimmingCharacters(
+        in: .whitespacesAndNewlines
+    )
+
+    if entrada.isEmpty {
+        return "Informe o valor"
+    }
+
+    guard let centavos = Int(entrada) else {
+        return "Digite só números"
+    }
+
+    return "Valor: \(centavos)"
+}
+
+print(avisoDoValor(""))
+// Informe o valor
+
+print(avisoDoValor("   "))
+// Informe o valor
+
+print(avisoDoValor("12,50"))
+// Digite só números
+
+print(avisoDoValor("1250"))
+// Valor: 1250
+```
+
+`trimmingCharacters(in:)`, disponibilizado por `Foundation`, remove os espaços em branco e as quebras de linha das extremidades da string. Assim, uma entrada formada apenas por esses caracteres é tratada como vazia antes da tentativa de conversão.
+
+O `guard let centavos = Int(entrada)` fica responsável pelo próximo caso: existe um texto, mas ele não pode ser interpretado como um inteiro no formato esperado. Quando a conversão funciona, `centavos` passa a ser um `Int` e pode ser utilizado normalmente.
+
+Aqui, `nil` continua tendo o mesmo significado para o tipo: não existe um inteiro resultante da conversão. A distinção entre campo vazio e formato inválido foi uma decisão tomada antes, enquanto ainda tínhamos acesso ao texto original.
+
+## Quando a ausência pode virar um valor padrão
+
+Nem toda ausência precisa seguir um caminho separado. Existem situações em que substituir `nil` por um valor padrão representa exatamente o comportamento esperado.
+
+Considere uma regra simples de desconto. Neste exemplo, `nil` significa que nenhum desconto foi informado. Para calcular o total, isso tem o mesmo efeito de um desconto igual a zero.
+
+```swift
+func totalComDesconto(_ valor: Int, desconto: Int?) -> Int {
+    valor - (desconto ?? 0)
+}
+
+print(totalComDesconto(10_000, desconto: nil)) // 10000
+print(totalComDesconto(10_000, desconto: 0))   // 10000
+print(totalComDesconto(10_000, desconto: 500)) // 9500
+```
+
+Antes de escrever `??`, eu pergunto se o padrão significa a mesma coisa que a ausência para aquela operação. No desconto, significa. No limite do cartão, não: um limite ainda em análise não deveria produzir a mensagem de limite esgotado.
+
+O operador `??` não tem nada de errado. Ele faz exatamente o que sua definição promete. A decisão que precisamos avaliar é se podemos perder a distinção entre um valor ausente e o valor escolhido como substituto.
+
+## E o force unwrap?
+
+Existe também a possibilidade de acessar diretamente o valor armazenado em um optional usando `!`. Mas isso não resolve o problema da ausência. O *force unwrap* parte da suposição de que existe um valor e falha em tempo de execução se encontrar `nil`.
+
+```swift
+let limite: Int? = nil
+
+// print(limite! - 120_000)
+// Falha em tempo de execução ao desembrulhar nil.
+```
+
+Se executarmos a linha comentada, o programa falha com uma mensagem semelhante a `Unexpectedly found nil while unwrapping an Optional value`.
+
+Diferentemente de `??`, o force unwrap não oferece um valor alternativo. E, ao contrário de `guard let`, também não permite tratar a ausência como um caminho normal da execução.
+
+Eu reservaria `!` para situações em que existe uma garantia real de que o valor está presente e encontrar `nil` representa uma violação dessa garantia. Um limite ainda em análise é uma ausência esperada, então não existe motivo para usar force unwrap nesse caso.
+
+No exemplo do cartão, a solução continua sendo tratar `nil` antes do cálculo. O optional já representa a possibilidade de ausência no tipo; cabe à regra decidir o que essa ausência significa e o que deve acontecer quando ela aparece.
+
+<FontesDoArtigo>
+
+- [The Basics](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics/)
+- [Basic Operators](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/basicoperators/)
+- [Control Flow](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow/)
+- [SE-0345](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0345-if-let-shorthand.md)
+
+</FontesDoArtigo>

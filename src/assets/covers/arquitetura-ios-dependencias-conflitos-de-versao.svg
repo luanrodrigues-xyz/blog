@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><style>svg{--f:#F2F2F7;--c:#fff;--n:#E5E5EA;--p:#CB30E0;--pt:#F3D8F7;--t:#9E2AAF;--tn:#636366}@media(prefers-color-scheme:dark){svg{--f:#1C1C1E;--c:#2C2C2E;--n:#3A3A3C;--p:#DB34F2;--pt:color-mix(in srgb,var(--p) 28%,var(--c));--t:#E25DF5;--tn:#AEAEB2}.s{filter:none}}.f{fill:var(--f)}.c{fill:var(--c)}.n{fill:var(--n)}.p{fill:var(--p)}.pt{fill:var(--pt)}.t{fill:var(--t)}.tn{fill:var(--tn)}.l{fill:none;stroke:var(--p);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.pontilhado{fill:none;stroke:var(--tn);stroke-width:3;stroke-linecap:round;stroke-dasharray:0.1 12}.anel{fill:none;stroke:var(--tn);stroke-width:3}.s{filter:url(#s)}</style><defs><filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity=".07"/></filter></defs><rect class="f" width="1200" height="630"/>
+<!-- app: o pacote que depende das duas features. -->
+<rect class="c s" x="500" y="140" width="200" height="110" rx="28"/>
+<rect class="pt" x="540" y="174" width="120" height="14" rx="7"/>
+<text class="t" x="600" y="220" text-anchor="middle" font-family="SF Mono,ui-monospace,Menlo,monospace" font-size="21" font-weight="600">app</text>
+<!-- O tronco se divide: cada feature pede uma faixa de versao do mesmo Core. -->
+<path class="l" d="M600 250V290"/>
+<path class="l" d="M405 290H795"/>
+<path class="l" d="M405 290V384"/>
+<path class="p" d="M395 384 405 400 415 384Z"/>
+<path class="l" d="M795 290V384"/>
+<path class="p" d="M785 384 795 400 805 384Z"/>
+<!-- As duas faixas de Core: uma pede a partir de 2.0, a outra fica abaixo disso. -->
+<rect class="c s" x="305" y="400" width="200" height="110" rx="28"/>
+<rect class="c s" x="695" y="400" width="200" height="110" rx="28"/>
+<rect class="pt" x="345" y="434" width="120" height="14" rx="7"/>
+<rect class="pt" x="735" y="434" width="120" height="14" rx="7"/>
+<text class="t" x="405" y="480" text-anchor="middle" font-family="SF Mono,ui-monospace,Menlo,monospace" font-size="21" font-weight="600">&#8805; 2.0</text>
+<text class="t" x="795" y="480" text-anchor="middle" font-family="SF Mono,ui-monospace,Menlo,monospace" font-size="21" font-weight="600">&lt; 2.0</text>
+<!-- As faixas nao se cruzam: nenhuma versao atende as duas ao mesmo tempo. -->
+<path class="pontilhado" d="M505 455H578"/>
+<path class="pontilhado" d="M622 455H695"/>
+<circle class="anel" cx="600" cy="455" r="20"/>
+<path class="anel" d="M593 448 607 462M607 448 593 462"/>
+</svg>

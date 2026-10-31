@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#0088FF; --tinta:#D6EAFF; --destaque:#FF8D28; --texto:#005FB3; }
+    @media (prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#35A4FF; --tinta:color-mix(in srgb,var(--principal) 30%,var(--card)); --destaque:#FF9230; --texto:#B8DEFF; }
+      .sombreado {filter:none}
+    }
+    .fundo {fill:var(--fundo)} .card {fill:var(--card)} .neutro {fill:var(--neutro)}
+    .principal {fill:var(--principal)} .destaque {fill:var(--destaque)}
+    text {fill:var(--texto);font-family:SF Mono,ui-monospace,Menlo,monospace;font-weight:600;font-size:24px;text-anchor:middle}
+    .caminho {fill:none;stroke:var(--principal);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- try? collapses distinct failures into one absence. -->
+  <text x="440" y="160">try?</text>
+  <rect class="principal" x="320" y="208" width="64" height="14" rx="7"/>
+  <rect class="destaque" x="320" y="288" width="64" height="14" rx="7"/>
+  <rect class="principal" x="320" y="368" width="64" height="14" rx="7"/>
+  <path class="caminho" d="M396 216L464 272M396 296H464M396 376L464 320"/>
+  <path class="principal" d="M460 264L476 280L454 278ZM464 288L480 296L464 304ZM454 314L476 312L460 328Z"/>
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="496" y="240" width="72" height="112" rx="24"/>
+  </g>
+  <text x="532" y="304">nil</text>
+  <!-- Specific catches preserve separate responses to the failures. -->
+  <text x="760" y="160">catch</text>
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="656" y="192" width="232" height="64" rx="24"/>
+    <rect class="card" x="656" y="272" width="232" height="64" rx="24"/>
+    <rect class="card" x="656" y="352" width="232" height="64" rx="24"/>
+  </g>
+  <rect class="principal" x="680" y="216" width="112" height="14" rx="7"/>
+  <rect class="destaque" x="680" y="296" width="112" height="14" rx="7"/>
+  <rect class="principal" x="680" y="376" width="112" height="14" rx="7"/>
+</svg>

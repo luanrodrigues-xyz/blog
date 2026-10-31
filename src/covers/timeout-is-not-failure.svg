@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #FF383C; --principal-texto: #C61226; --sobre-principal: #fff;
+      --destaque: #FF8D28; --destaque-texto: #A74700; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #FF4245; --principal-texto: #FF686A; --sobre-principal: #fff;
+        --destaque: #FF9230; --destaque-texto: #FF9230; --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .principal { fill: var(--principal); }
+    .destaque { fill: var(--destaque); }
+    .vazio { fill: none; stroke: var(--neutro); stroke-width: 5; stroke-dasharray: 1 9; stroke-linecap: round; }
+    .ligacao { fill: none; stroke: var(--neutro); stroke-width: 4; stroke-dasharray: 1 9; stroke-linecap: round; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- Server side: the booking's slot is already filled, committed before any response left. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="390" y="160" width="420" height="112" rx="32"/>
+  </g>
+  <rect class="principal" x="540" y="196" width="120" height="40" rx="20"/>
+
+  <!-- The response leaves the filled slot, traveling down toward the client. -->
+  <path class="ligacao" d="M600 236V283"/>
+
+  <!-- The timeout: the client gives up here, independent of what already happened above it. -->
+  <circle class="destaque" cx="600" cy="315" r="32"/>
+  <path d="M600 315V296M600 315 616 324" fill="none" stroke="var(--sobre-destaque)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Client side: the same slot stays empty. No response ever reached it. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="390" y="358" width="420" height="112" rx="32"/>
+  </g>
+  <rect class="vazio" x="540" y="394" width="120" height="40" rx="20"/>
+</svg>

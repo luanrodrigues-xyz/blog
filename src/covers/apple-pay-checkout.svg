@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#34C759; --tinta:#DCF5E3; --texto:#00742B; --destaque:#FF8D28; }
+    @media (prefers-color-scheme:dark) { svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#30D158; --tinta:color-mix(in srgb,var(--principal) 22%,var(--card)); --texto:#30D158; --destaque:#FF9230; } .sombreado { filter:none; } }
+    .fundo { fill:var(--fundo); } .card { fill:var(--card); } .neutro { fill:var(--neutro); } .tinta { fill:var(--tinta); }
+    .linha { fill:none; stroke:var(--principal); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .principal { fill:var(--principal); } .destaque { fill:var(--destaque); }
+    text { fill:var(--texto); font-family:SF Mono,ui-monospace,Menlo,monospace; font-size:26px; font-weight:600; }
+  </style>
+  <defs><filter id="sombra" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- One order remains pending while its identity is queried. -->
+  <rect class="card sombreado" x="472" y="152" width="256" height="328" rx="32" filter="url(#sombra)"/>
+  <rect class="neutro" x="504" y="184" width="192" height="14" rx="7"/>
+  <rect class="neutro" x="504" y="216" width="128" height="14" rx="7"/>
+  <circle class="tinta" cx="600" cy="304" r="48"/>
+  <path class="linha" d="M584 292a16 16 0 1 1 26 12c-8 5-10 8-10 16"/>
+  <circle class="principal" cx="600" cy="336" r="3"/>
+  <text x="600" y="398" text-anchor="middle">pending</text>
+  <rect class="destaque" x="552" y="432" width="96" height="14" rx="7"/>
+  <!-- Lookup returns to the existing order instead of creating a second one. -->
+  <path class="linha" d="M760 208c64 32 96 92 72 160-16 48-56 80-96 88"/>
+  <polygon class="principal" points="728,456 748,444 748,464"/>
+</svg>

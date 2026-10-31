@@ -1,0 +1,211 @@
+---
+// Retorno e inout lado a lado.
+// O objetivo é comparar quem grava o novo valor em saldo.
+//
+// Azul sólido = valor entrando.
+// Índigo tracejado = resultado voltando.
+
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+const painel = 460;
+const hNo = 64;
+
+const paineis = [
+  {
+    x0: 20,
+    titulo: 'Com retorno',
+    inicial: 'saldo = 150_000',
+    entrada: 'entra como valor',
+    funcao: 'debitado(2_500, de: saldo)',
+    saida: 'retorna 147_500',
+    final: 'saldo = 147_500',
+    nota: 'quem chama atribui',
+  },
+  {
+    x0: 520,
+    titulo: 'Com inout',
+    inicial: 'saldo = 150_000',
+    entrada: '&saldo entra na chamada',
+    funcao: 'debitar(2_500, de: &saldo)',
+    saida: '147_500 volta para saldo',
+    final: 'saldo = 147_500',
+    nota: 'a função atualiza',
+  },
+];
+---
+
+<Diagrama plano rotulo={rotulo} altura={440} minLargura={300}>
+  <slot slot="legenda" />
+
+  {paineis.map((p) => (
+    <>
+      <span
+        class="no txt titulo"
+        style={`
+          --x:${p.x0};
+          --y:20;
+          --w:${painel};
+          --h:38;
+        `}
+      >
+        {p.titulo}
+      </span>
+
+      <span
+        class="no t3 estado"
+        style={`
+          --x:${p.x0};
+          --y:68;
+          --w:${painel};
+          --h:${hNo};
+        `}
+      >
+        {p.inicial}
+      </span>
+
+      <span
+        class="no txt rotulo-seta entrada"
+        style={`
+          --x:${p.x0 + 76};
+          --y:136;
+          --w:${painel - 76};
+          --h:32;
+        `}
+      >
+        {p.entrada}
+      </span>
+
+      <span
+        class="no txt funcao"
+        style={`
+          --x:${p.x0};
+          --y:176;
+          --w:${painel};
+          --h:${hNo};
+        `}
+      >
+        {p.funcao}
+      </span>
+
+      <span
+        class="no txt rotulo-seta saida"
+        style={`
+          --x:${p.x0 + 76};
+          --y:244;
+          --w:${painel - 76};
+          --h:32;
+        `}
+      >
+        {p.saida}
+      </span>
+
+      <span
+        class="no t3 estado final"
+        style={`
+          --x:${p.x0};
+          --y:284;
+          --w:${painel};
+          --h:${hNo};
+        `}
+      >
+        {p.final}
+      </span>
+
+      <span
+        class="no txt nota"
+        style={`
+          --x:${p.x0};
+          --y:360;
+          --w:${painel};
+          --h:44;
+        `}
+      >
+        {p.nota}
+      </span>
+    </>
+  ))}
+
+  <svg
+    class="setas"
+    viewBox="0 0 1000 440"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {paineis.map((p) => (
+      <>
+        <Seta
+          tipo="ida"
+          x1={p.x0 + 50}
+          y1={136}
+          x2={p.x0 + 50}
+          y2={168}
+        />
+
+        <Seta
+          tipo="volta"
+          x1={p.x0 + 50}
+          y1={244}
+          x2={p.x0 + 50}
+          y2={276}
+        />
+      </>
+    ))}
+  </svg>
+</Diagrama>
+
+<style>
+  .titulo,
+  .estado,
+  .funcao,
+  .rotulo-seta,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+
+  .titulo {
+    font-weight: 600;
+    color: var(--d-ink);
+  }
+
+  .estado,
+  .funcao {
+    padding: 0 calc(var(--u) * 18);
+    border: 1px solid var(--d-line);
+  }
+
+  .estado {
+    background: var(--d-card);
+  }
+
+  .funcao {
+    background: var(--d-fill);
+  }
+
+  .final {
+    font-weight: 600;
+  }
+
+  .rotulo-seta {
+    color: var(--d-ink2);
+  }
+
+  .entrada {
+    color: var(--d-blue);
+  }
+
+  .saida {
+    color: var(--d-indigo, var(--d-ink2));
+  }
+
+  .nota {
+    color: var(--d-ink2);
+  }
+</style>

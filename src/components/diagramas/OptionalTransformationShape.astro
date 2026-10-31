@@ -1,0 +1,64 @@
+---
+import Diagrama from './Diagrama.astro';
+const label =
+  'Both map and compactMap convert the same four strings, 180, bad, 0 and 240. map returns four optional positions with nil at index 1. compactMap returns three integers, 180, 0 and 240, omitting only the absent conversion. Zero stays present and moves from index 2 to index 1.';
+const rows = [
+  { title: 'Same input · [String]', values: ['"180"', '"bad"', '"0"', '"240"'] },
+  { title: 'map · [Int?]', values: ['180', 'nil', '0', '240'] },
+  { title: 'compactMap · [Int]', values: ['180', '0', '240'] },
+];
+---
+
+<div class="optional-shape">
+  {[true, false].map((wide) => {
+    const stride = wide ? 260 : 450;
+    const height = wide ? 810 : 1390;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          {rows.map((row, r) => (
+            <>
+              <div class="no txt heading" style={`--x:32;--y:${32 + r * stride};--w:936;--h:${wide ? 70 : 120}`}>
+                {row.title}
+              </div>
+              {row.values.map((value, i) => (
+                <div
+                  class:list={['no', 'nodo', 'entry', { fantasma: value === 'nil' }]}
+                  style={`--x:${32 + i * 240};--y:${(wide ? 128 : 200) + r * stride};--w:216;--h:${wide ? 110 : 220}`}
+                >
+                  <span class="pq">index {i}</span>
+                  <span class="t4">{value}</span>
+                </div>
+              ))}
+            </>
+          ))}
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .optional-shape {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+  .entry {
+    align-items: center;
+    text-align: center;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

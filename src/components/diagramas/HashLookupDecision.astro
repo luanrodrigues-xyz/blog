@@ -1,0 +1,88 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'Schematic lookup for SongID s1. Hashing guides the search to candidates. Even if s1 and s2 collide, comparing the requested ID to s2 returns false and does not match. Comparing it to s1 returns true and matches. Hash equality alone is not key equality.';
+---
+
+<div class="hash-lookup">
+  {[true, false].map((wide) => {
+    const height = wide ? 960 : 1820;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          <div class="no txt heading" style="--x:32;--y:24;--w:936;--h:100">
+            Lookup model
+          </div>
+          <div class="no nodo" style={`--x:32;--y:160;--w:936;--h:${wide ? 120 : 200}`}>
+            <span class="t4">Requested ID = s1</span>
+          </div>
+          <div class="no nodo" style={`--x:32;--y:${wide ? 390 : 560};--w:936;--h:${wide ? 130 : 220}`}>
+            <span class="pq">Hashing guides candidate lookup</span>
+            <span class="pq">Possible collision</span>
+          </div>
+          {[false, true].map((match, i) => (
+            <div
+              class="no nodo"
+              style={`--x:${wide ? 32 + i * 496 : 32};--y:${wide ? 720 : 1020 + i * 430};--w:${wide ? 440 : 936};--h:${wide ? 180 : 250}`}
+            >
+              <span class="t4">{match ? 's1 == s1 → true' : 's1 == s2 → false'}</span>
+              <span class="pq">{match ? 'Matching key' : 'Not a match'}</span>
+            </div>
+          ))}
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            <Seta tipo="neutra" x1={500} y1={wide ? 280 : 360} x2={500} y2={wide ? 388 : 558} />
+            {wide ? (
+              <>
+                <line class="connector" x1="500" y1="520" x2="500" y2="610" />
+                <line class="connector" x1="252" y1="610" x2="748" y2="610" />
+                <Seta tipo="neutra" x1={252} y1={610} x2={252} y2={718} />
+                <Seta tipo="neutra" x1={748} y1={610} x2={748} y2={718} />
+              </>
+            ) : (
+              <>
+                <line class="connector" x1="900" y1="780" x2="900" y2="890" />
+                <line class="connector" x1="16" y1="890" x2="900" y2="890" />
+                <line class="connector" x1="16" y1="890" x2="16" y2="1370" />
+                <Seta tipo="neutra" x1={500} y1={890} x2={500} y2={1018} />
+                <line class="connector" x1="16" y1="1370" x2="500" y2="1370" />
+                <Seta tipo="neutra" x1={500} y1={1370} x2={500} y2={1448} />
+              </>
+            )}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .hash-lookup {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+  .connector {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .stacked .connector,
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

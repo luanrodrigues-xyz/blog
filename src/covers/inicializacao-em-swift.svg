@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#0088FF; --tinta:#D6EAFF; --destaque:#FF8D28; --texto:#005FB3; --sobre:#fff; }
+    @media (prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#35A4FF; --tinta:color-mix(in srgb,var(--principal) 30%,var(--card)); --destaque:#FF9230; --texto:#B8DEFF; --sobre:var(--fundo); }
+      .sombreado {filter:none}
+    }
+    .fundo {fill:var(--fundo)} .card {fill:var(--card)} .neutro {fill:var(--neutro)}
+    .principal {fill:var(--principal)} .tinta {fill:var(--tinta)} .destaque {fill:var(--destaque)}
+    .texto {fill:var(--texto)} .sobre {fill:var(--sobre)}
+    text {font-family:SF Mono,ui-monospace,Menlo,monospace;font-weight:600;font-size:24px;text-anchor:middle}
+    .caminho {fill:none;stroke:var(--principal);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- One input is checked by a failable initializer. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="312" y="264" width="160" height="128" rx="32"/>
+  </g>
+  <rect class="neutro" x="336" y="296" width="112" height="14" rx="7"/>
+  <rect class="neutro" x="336" y="344" width="80" height="14" rx="7"/>
+  <path class="caminho" d="M484 328H496"/>
+  <path class="principal" d="M496 320L512 328L496 336Z"/>
+  <rect class="principal" x="528" y="168" width="112" height="296" rx="24"/>
+  <text class="sobre" x="584" y="336">init?</text>
+  <!-- Initialization either supplies a complete value or yields nil. -->
+  <path class="caminho" d="M652 232H680M652 416H680"/>
+  <path class="principal" d="M680 224L696 232L680 240ZM680 408L696 416L680 424Z"/>
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="712" y="168" width="176" height="128" rx="32"/>
+    <rect class="card" x="712" y="368" width="176" height="96" rx="24"/>
+  </g>
+  <text class="texto" x="800" y="220" style="font-size:21px">Transacao</text>
+  <rect class="principal" x="736" y="248" width="128" height="14" rx="7"/>
+  <text class="texto" x="800" y="424">nil</text>
+</svg>

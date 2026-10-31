@@ -1,0 +1,53 @@
+/* Large-title pages: home, archive, about. */
+.home-intro {
+  padding: var(--section-space) 0 var(--space-8);
+}
+
+.home-intro h1,
+.page-header h1 {
+  font-size: clamp(2.25rem, 7vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+
+.page-header {
+  padding: var(--section-space) 0 var(--space-4);
+}
+
+.page-header .lead {
+  margin-bottom: var(--space-3);
+}
+
+/* Section headings shared by the Home and article catalog. */
+.notes-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 0 var(--space-4);
+}
+
+.notes-head h2 {
+  margin: 0;
+  font: 700 1.3rem/1.2 var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+.notes-head a {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Article catalog and category pages share the same reading width and spacing. */
+.listing-page {
+  margin-bottom: var(--space-16);
+}
+
+.listing-head .eyebrow {
+  margin: 0 0 var(--space-3);
+}
+
+.listing-back {
+  margin: var(--space-10) 0 0;
+}

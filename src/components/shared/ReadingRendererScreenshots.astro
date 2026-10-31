@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import before from '../../../contents/notebook/swiftui/rendering-identity-and-native-design-in-swiftui/pt-br/expanded-before.png';
+import after from '../../../contents/notebook/swiftui/rendering-identity-and-native-design-in-swiftui/pt-br/expanded-after.png';
+---
+<figure class="reading-renderer-result">
+  <div class="comparison">
+    <div><p>Antes da inversão</p><Image src={before} alt="Título, Reading tips aberto, Read article e Save for later, nessa ordem." /></div>
+    <div><p>Depois da inversão</p><Image src={after} alt="Save for later, Read article, Reading tips ainda aberto e o título, nessa ordem." /></div>
+  </div>
+  <figcaption>Recortes do mesmo app no simulador iPhone 18 Pro com iOS 27.0, na mesma escala. O conteúdo de Reading tips permanece visível após inverter a ordem.</figcaption>
+</figure>
+<style>
+  .reading-renderer-result { max-width: var(--width-reading); margin-inline: auto; }
+  .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  .comparison p { font-size: var(--text-sm); margin-block: 0 0.75rem; }
+  .comparison img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: var(--text-sm); color: var(--fg-muted); margin-top: 1rem; }
+  @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+</style>

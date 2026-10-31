@@ -1,0 +1,258 @@
+---
+title: "Enums. Uma forma de pagamento que o switch não deixa esquecer"
+description: "O app ganhou Pix no crédito. Um switch sem default parou de compilar. Dois com default continuaram, e um deles tratou a nova forma como se não usasse limite."
+date: "2023-03-20"
+topic: "swift"
+readingOrder: 6
+draft: false
+cover: "enums-em-swift.png"
+coverAlt: "Um case novo encontra uma posição ainda vazia no switch sem default e é absorvido pelo caminho geral do switch com default."
+tags: ["Swift", "enum", "switch", "Fundamentals", "Pix", "Boleto"]
+language: "pt-BR"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import CasoNovoNosSwitches from '../../../../../src/components/diagramas/CasoNovoNosSwitches.astro';
+
+Uma tela de pagamento aceita Pix para uma chave, crédito em parcelas e boleto com código de barras. Uma forma de representar essas opções seria criar uma `struct` com uma `String` indicando o tipo de pagamento e deixar os demais campos opcionais.
+
+O problema é que essa estrutura permite criar combinações que não fazem parte do fluxo.
+
+```swift
+struct Payment {
+    let type: String
+    let pixKey: String?
+    let installments: Int?
+    let barcode: String?
+}
+
+func description(for payment: Payment) -> String {
+    switch payment.type {
+    case "pix":
+        return "Pix para \(payment.pixKey ?? "?")"
+
+    case "credit":
+        return "Crédito em \(payment.installments ?? 1)x"
+
+    case "boleto":
+        return "Boleto \(payment.barcode ?? "?")"
+
+    default:
+        return "Forma de pagamento desconhecida"
+    }
+}
+
+let pixWithInstallments = Payment(
+    type: "pix",
+    pixKey: nil,
+    installments: 3,
+    barcode: nil
+)
+
+let differentlyTyped = Payment(
+    type: "Pix",
+    pixKey: "ana@exemplo.com",
+    installments: nil,
+    barcode: nil
+)
+
+print(description(for: pixWithInstallments))
+// Pix para ?
+
+print(description(for: differentlyTyped))
+// Forma de pagamento desconhecida
+```
+
+Os dois valores são aceitos pelo tipo. No primeiro, declaramos um Pix convencional sem chave e com três parcelas. Essa combinação não faz parte do fluxo apresentado, mas `Payment` permite criá-la porque não existe uma relação entre `type` e as outras propriedades. `pixKey` continua sendo optional, e o `?? "?"` acaba escondendo a ausência da chave com um texto padrão.
+
+O segundo valor apresenta outro problema. Como `type` é uma `String`, podemos escrever `"Pix"`, `"pix"`, `"PIX"` ou qualquer outro texto. O `switch` reconhece apenas os valores que foram declarados explicitamente e envia os demais para `default`.
+
+Retirar o `default` não resolveria essa modelagem. Um `switch` sobre `String` precisa considerar qualquer texto possível, então ainda seria necessário um caminho para os valores não reconhecidos.
+
+## Cada case carrega o que precisa
+
+Com um `enum`, podemos declarar as formas de pagamento conhecidas e associar a cada uma os dados necessários.
+
+```swift
+enum PaymentMethod {
+    case pix(key: String)
+    case credit(installments: Int)
+    case boleto(barcode: String)
+}
+
+func description(for method: PaymentMethod) -> String {
+    switch method {
+    case .pix(let key):
+        return "Pix para \(key)"
+
+    case .credit(let installments):
+        return "Crédito em \(installments)x"
+
+    case .boleto(let barcode):
+        return "Boleto \(barcode)"
+    }
+}
+
+let purchase = PaymentMethod.credit(installments: 3)
+let anotherPurchase = PaymentMethod.credit(installments: 10)
+
+print(description(for: purchase))
+// Crédito em 3x
+
+print(description(for: anotherPurchase))
+// Crédito em 10x
+
+print(description(for: .pix(key: "ana@exemplo.com")))
+// Pix para ana@exemplo.com
+
+// PaymentMethod.pix(
+//     key: "ana@exemplo.com",
+//     installments: 3
+// )
+// Erro: .pix não recebe installments.
+```
+
+Agora, `.pix` exige uma chave e não aceita parcelas. Para representar um Pix no crédito, precisaríamos declarar outro case ou alterar o modelo. O compilador impede que passemos dados que não fazem parte da assinatura daquele case.
+
+Cada instância de `PaymentMethod` representa um dos cases declarados, com os dados associados a ele. Em `case .pix(let key)`, o `switch` identifica o case e extrai sua chave para uma constante local. Como `key` é uma `String`, não precisamos mais usar `?? "?"` para tratar uma chave ausente.
+
+Isso não significa que todos os dados estejam automaticamente validados. O enum ainda permite uma chave vazia, um código de barras inválido ou um número negativo de parcelas. Os *associated values* definem quais dados pertencem a cada case, mas as regras sobre o conteúdo desses dados precisam ser implementadas separadamente.
+
+`key`, `installments` e `barcode` são associated values. Duas instâncias podem pertencer ao mesmo case `.credit` e carregar quantidades diferentes de parcelas. Esses valores pertencem a cada instância, diferentemente dos *raw values*, que são definidos na declaração do enum e associados aos próprios cases.
+
+O `Optional` do [artigo sobre opcionais](/articles/pt/opcionais-em-swift/) segue uma ideia semelhante. `.some(value)` carrega um valor, enquanto `.none` representa sua ausência.
+
+## Quando aparece um quarto case
+
+A função `description(for:)` conhece as três formas de pagamento e trata cada uma explicitamente. Como todos os cases foram considerados, o `switch` é *exhaustive*.
+
+Isso significa que ele cobre todos os valores possíveis do enum. Um `default` também poderia tornar o `switch` exaustivo, mas faria isso agrupando todos os casos não tratados individualmente.
+
+Agora imagine que o produto ganhou Pix no crédito. A pessoa continua informando uma chave Pix, mas o pagamento utiliza o limite do cartão e pode ser parcelado.
+
+```swift
+enum PaymentMethod {
+    case pix(key: String)
+    case credit(installments: Int)
+    case boleto(barcode: String)
+    case pixOnCredit(key: String, installments: Int)
+}
+```
+
+Depois de adicionar `.pixOnCredit`, a implementação anterior de `description(for:)` deixa de ser exaustiva. O compilador encontra um valor possível de `PaymentMethod` que não está sendo tratado e exige que a função considere esse novo case.
+
+A mensagem exata pode variar conforme a versão do compilador, mas o problema é o mesmo: existe uma possibilidade que aquele `switch` ainda não cobre.
+
+Podemos corrigir a função adicionando o tratamento para Pix no crédito.
+
+```swift
+func description(for method: PaymentMethod) -> String {
+    switch method {
+    case .pix(let key):
+        return "Pix para \(key)"
+
+    case .credit(let installments):
+        return "Crédito em \(installments)x"
+
+    case .boleto(let barcode):
+        return "Boleto \(barcode)"
+
+    case .pixOnCredit(let key, let installments):
+        return "Pix no crédito para \(key) em \(installments)x"
+    }
+}
+```
+
+O que eu gosto nesse comportamento é que o case novo aparece justamente nos `switch` que decidiram tratar explicitamente as possibilidades conhecidas. Se uma nova modalidade for adicionada, esses pontos precisam ser revisados antes de o código voltar a compilar.
+
+Isso não garante que toda parte do projeto que depende de `PaymentMethod` produzirá um erro. Um `switch` com `default`, um `if case` ou uma condição que verifica apenas determinados cases pode continuar válido. A verificação de exaustividade ajuda nos lugares em que decidimos cobrir todas as possibilidades, mas não consegue avaliar se nossas regras de negócio continuam corretas.
+
+## O `default` que continuou compilando
+
+Nem todo `switch` precisa tratar os cases separadamente. Às vezes, vários deles realmente compartilham a mesma resposta.
+
+Considere duas funções que trabalham com formas de pagamento. Uma verifica se a modalidade possui código de barras. A outra verifica se utiliza o limite do cartão.
+
+```swift
+enum PaymentMethod {
+    case pix(key: String)
+    case credit(installments: Int)
+    case boleto(barcode: String)
+    case pixOnCredit(key: String, installments: Int)
+}
+
+func hasBarcode(_ method: PaymentMethod) -> Bool {
+    switch method {
+    case .boleto:
+        return true
+
+    default:
+        return false
+    }
+}
+
+func usesCardLimit(_ method: PaymentMethod) -> Bool {
+    switch method {
+    case .credit:
+        return true
+
+    default:
+        return false
+    }
+}
+
+let pixOnCredit = PaymentMethod.pixOnCredit(
+    key: "ana@exemplo.com",
+    installments: 4
+)
+
+print(hasBarcode(pixOnCredit))   // false
+print(usesCardLimit(pixOnCredit)) // false
+```
+
+As duas funções compilam normalmente, mesmo com o novo case.
+
+Para `.pixOnCredit`, `hasBarcode(_:)` devolve `false`, o que está correto para a regra deste exemplo. Pix no crédito não utiliza um código de barras.
+
+Já `usesCardLimit(_:)` também devolve `false`, mas essa resposta está errada. O pagamento utiliza o limite do cartão, então a função deveria retornar `true`.
+
+Se a tela dependesse dessa função para decidir se precisa validar o limite disponível antes de confirmar o pagamento, receberia uma informação incorreta. O problema não aparece como erro de compilação porque o `default` já cobre o novo case.
+
+<CasoNovoNosSwitches rotulo="Quando o enum ganha pixOnCredit, description, sem default, deixa de compilar e pede o case novo. hasBarcode e usesCardLimit, com default, continuam compilando e devolvem false. Para este exemplo, false continua correto em hasBarcode e fica errado em usesCardLimit.">
+
+Os contornos identificam os três resultados. “Não compila” se refere à versão de `description(for:)` anterior ao tratamento do novo case. As outras funções continuam compilando, mas apenas `hasBarcode(_:)` devolve a resposta esperada para Pix no crédito.
+
+</CasoNovoNosSwitches>
+
+Para as modalidades que conhecemos agora, qualquer case diferente de `.boleto` não possui código de barras. Por isso, o `default` de `hasBarcode(_:)` ainda representa corretamente a regra. Mas ele também aceitará automaticamente qualquer case adicionado depois. Se o produto ganhar outra modalidade com código de barras, essa função poderá começar a responder incorretamente sem que o compilador avise.
+
+Em `usesCardLimit(_:)`, isso já aconteceu. O `default` foi escrito considerando que apenas `.credit` utilizava limite. Quando `.pixOnCredit` apareceu, a função continuou tratando todas as outras modalidades como se não utilizassem o cartão.
+
+Eu prefiro listar os cases explicitamente quando a resposta depende de uma característica que pode mudar conforme novas formas de pagamento são adicionadas.
+
+```swift
+func usesCardLimit(_ method: PaymentMethod) -> Bool {
+    switch method {
+    case .credit, .pixOnCredit:
+        return true
+
+    case .pix, .boleto:
+        return false
+    }
+}
+```
+
+Agora, se outro case for acrescentado a esse enum, o `switch` deixará de ser exaustivo. Quem implementar a nova modalidade precisará decidir se ela utiliza o limite do cartão.
+
+Isso não impede que a regra seja implementada incorretamente, mas evita que uma nova forma de pagamento receba silenciosamente a resposta do `default`.
+
+Para decidir quando usar `default`, eu faço um teste mental simples. Tento imaginar um case que ainda não existe e pergunto se ele deveria receber automaticamente a mesma resposta.
+
+Se a regra realmente for “qualquer outro case recebe esta resposta”, `default` faz sentido. Se eu precisar conhecer a nova modalidade antes de decidir, prefiro listar os cases e deixar o compilador me incomodar quando o enum crescer.
+
+<FontesDoArtigo>
+
+- [Enumerations](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/enumerations/)
+- [Control Flow](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/controlflow/)
+
+</FontesDoArtigo>

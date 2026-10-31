@@ -1,0 +1,134 @@
+---
+// Duas faixas de tempo (cliente e servidor) para o artigo timeout-is-not-failure.
+// O ponto central: a reserva pode já estar persistida no servidor no instante em que o
+// cliente desiste de esperar. A ordem vem do raciocínio do artigo (esquemática, sem
+// medir duração real); a seta tracejada mostra a resposta tentando alcançar o cliente
+// depois que ele já decidiu que o resultado é desconhecido.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+
+const ALTURA = 580;
+const LINHA_CLIENTE = 100;
+const LINHA_SERVIDOR = 380;
+const ALTURA_FAIXA = 110;
+const DEADLINE_X = 560;
+
+const cliente = {
+  envia: { x: 20, w: 160, titulo: 'Envia a reserva' },
+  aguarda: { x: 200, w: 350, titulo: 'Aguarda a resposta', detalhe: 'janela de timeoutInterval' },
+  timeout: { x: 570, w: 160, titulo: 'Timeout', detalhe: '.timedOut' },
+  desconhecido: { x: 750, w: 220, titulo: 'Resultado desconhecido', detalhe: '.unknownOutcome' },
+};
+
+const servidor = {
+  recebe: { x: 130, w: 170, titulo: 'Recebe a requisição' },
+  persiste: { x: 400, w: 210, titulo: 'Persiste a reserva', detalhe: 'já persistida' },
+  responde: { x: 650, w: 230, titulo: 'Escreve e envia a resposta' },
+};
+
+const cyCliente = LINHA_CLIENTE + ALTURA_FAIXA / 2;
+const cyServidor = LINHA_SERVIDOR + ALTURA_FAIXA / 2;
+---
+
+<Diagrama plano rotulo={rotulo} altura={ALTURA}>
+  <slot slot="legenda" />
+
+  <span class="no cab" style={pos(20, 56, 300, 30)}>Cliente</span>
+  <span class="no cab" style={pos(20, 336, 300, 30)}>Servidor</span>
+
+  <!-- Faixa do cliente -->
+  <span class="no nodo etapa" style={pos(cliente.envia.x, LINHA_CLIENTE, cliente.envia.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{cliente.envia.titulo}</span>
+  </span>
+  <span class="no nodo fantasma etapa" style={pos(cliente.aguarda.x, LINHA_CLIENTE, cliente.aguarda.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{cliente.aguarda.titulo}</span>
+    <span class="pq ink2">{cliente.aguarda.detalhe}</span>
+  </span>
+  <span class="no nodo etapa timeout" style={pos(cliente.timeout.x, LINHA_CLIENTE, cliente.timeout.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{cliente.timeout.titulo}</span>
+    <span class="t4">{cliente.timeout.detalhe}</span>
+  </span>
+  <span class="no nodo fantasma etapa" style={pos(cliente.desconhecido.x, LINHA_CLIENTE, cliente.desconhecido.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{cliente.desconhecido.titulo}</span>
+    <span class="t4">{cliente.desconhecido.detalhe}</span>
+  </span>
+
+  <!-- Faixa do servidor -->
+  <span class="no nodo etapa" style={pos(servidor.recebe.x, LINHA_SERVIDOR, servidor.recebe.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{servidor.recebe.titulo}</span>
+  </span>
+  <span class="no nodo etapa processado" style={pos(servidor.persiste.x, LINHA_SERVIDOR, servidor.persiste.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{servidor.persiste.titulo}</span>
+    <span class="pq ink2">{servidor.persiste.detalhe}</span>
+  </span>
+  <span class="no nodo etapa" style={pos(servidor.responde.x, LINHA_SERVIDOR, servidor.responde.w, ALTURA_FAIXA)}>
+    <span class="txt forte">{servidor.responde.titulo}</span>
+  </span>
+
+  <!-- Linha do tempo em que o cliente desiste de esperar, atravessando as duas faixas -->
+  <svg class="setas limite" viewBox={`0 0 1000 ${ALTURA}`} aria-hidden="true" focusable="false">
+    <line x1={DEADLINE_X} y1="40" x2={DEADLINE_X} y2={ALTURA - 30} />
+  </svg>
+  <span class="no pq ink2" style={pos(DEADLINE_X + 16, 36, 320, 24)}>o cliente desiste de esperar aqui</span>
+
+  <svg class="setas" viewBox={`0 0 1000 ${ALTURA}`} aria-hidden="true" focusable="false">
+    <Seta tipo="neutra" x1={cliente.envia.x + cliente.envia.w} y1={cyCliente} x2={cliente.aguarda.x} y2={cyCliente} />
+    <Seta tipo="neutra" x1={cliente.aguarda.x + cliente.aguarda.w} y1={cyCliente} x2={cliente.timeout.x} y2={cyCliente} />
+    <Seta tipo="neutra" x1={cliente.timeout.x + cliente.timeout.w} y1={cyCliente} x2={cliente.desconhecido.x} y2={cyCliente} />
+
+    <Seta tipo="neutra" x1={servidor.recebe.x + servidor.recebe.w} y1={cyServidor} x2={servidor.persiste.x} y2={cyServidor} />
+    <Seta tipo="neutra" x1={servidor.persiste.x + servidor.persiste.w} y1={cyServidor} x2={servidor.responde.x} y2={cyServidor} />
+
+    <Seta
+      tipo="volta"
+      x1={800}
+      y1={LINHA_SERVIDOR}
+      x2={800}
+      y2={LINHA_CLIENTE + ALTURA_FAIXA}
+    />
+  </svg>
+  <span class="no pq ink2" style={pos(660, 290, 260, 24)}>a resposta chega tarde</span>
+</Diagrama>
+
+<style>
+  .cab {
+    display: flex;
+    align-items: center;
+  }
+
+  .etapa {
+    align-items: flex-start;
+  }
+
+  .forte {
+    font-weight: 600;
+  }
+
+  .etapa :global(.t4) {
+    overflow-wrap: anywhere;
+  }
+
+  .limite line {
+    stroke: var(--d-ink3);
+    stroke-width: 2;
+    stroke-dasharray: 2 8;
+    stroke-linecap: round;
+  }
+
+  :global(.diagrama.plano) .nodo.timeout {
+    background: var(--d-laranja-tint);
+    border: 2px solid var(--d-laranja);
+  }
+
+  :global(.diagrama.plano) .nodo.processado {
+    background: var(--d-blue-tint);
+    border: 2px solid var(--d-blue);
+  }
+</style>

@@ -1,0 +1,157 @@
+---
+// Quem constrói e quem usa (artigo arquitetura-ios-injecao-de-dependencias). A composição do app entrega
+// o relógio e o calendário do aparelho à tela, que chama agrupar; o teste chama agrupar com um instante e
+// um calendário fixos. As setas mostram quem entrega os valores a quem, não dependências entre módulos.
+// Duas composições: as duas origens lado a lado (680px) ou empilhadas, com a regra no meio.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+
+type Caixa = { x: number; y: number; w: number; h: number };
+type No = Caixa & { nome: string; linhas: string[]; tipo: 'origem' | 'consumidor' | 'regra' };
+type Rotulo = Caixa & { texto: string };
+type Composicao = {
+  altura: number;
+  minLargura: number;
+  nos: No[];
+  rotulos: Rotulo[];
+  setas: [number, number, number, number][];
+};
+
+const app = { nome: 'ExtratoArquiteturaApp', linhas: ['agora: { .now }', 'calendario: .current'], tipo: 'origem' } as const;
+const teste = {
+  nome: 'AgrupamentoTests',
+  linhas: ['agora: 28/09, 23h55 ou 29/09, 0h05', 'calendario: São Paulo ou Lisboa'],
+  tipo: 'origem',
+} as const;
+const tela = { nome: 'Extrato', linhas: ['lê agora() a cada body'], tipo: 'consumidor' } as const;
+const regra = { nome: 'agrupar(_:agora:calendario:)', linhas: [], tipo: 'regra' } as const;
+
+const largo: Composicao = {
+  altura: 450,
+  minLargura: 680,
+  nos: [
+    { ...app, x: 20, y: 20, w: 460, h: 140 },
+    { ...teste, x: 520, y: 20, w: 460, h: 140 },
+    { ...tela, x: 20, y: 220, w: 460, h: 90 },
+    { ...regra, x: 270, y: 370, w: 460, h: 60 },
+  ],
+  rotulos: [
+    { texto: 'constrói', x: 262, y: 172, w: 200, h: 36 },
+    { texto: 'chama', x: 762, y: 250, w: 200, h: 36 },
+    { texto: 'chama', x: 410, y: 318, w: 120, h: 36 },
+  ],
+  setas: [
+    [250, 160, 250, 220],
+    [750, 160, 620, 370],
+    [250, 310, 400, 370],
+  ],
+};
+
+const estreito: Composicao = {
+  altura: 1050,
+  minLargura: 300,
+  nos: [
+    { ...app, x: 20, y: 20, w: 960, h: 210 },
+    { ...tela, x: 20, y: 300, w: 960, h: 150 },
+    { ...regra, x: 20, y: 530, w: 960, h: 100 },
+    { ...teste, x: 20, y: 680, w: 960, h: 310 },
+  ],
+  rotulos: [
+    { texto: 'constrói', x: 530, y: 240, w: 300, h: 50 },
+    { texto: 'chama', x: 530, y: 465, w: 300, h: 50 },
+    { texto: 'chama', x: 530, y: 650, w: 300, h: 50 },
+  ],
+  setas: [
+    [500, 230, 500, 300],
+    [500, 450, 500, 530],
+    [500, 680, 500, 630],
+  ],
+};
+
+const composicoes = [
+  ['largo', largo],
+  ['estreito', estreito],
+] as const;
+const pos = (c: Caixa) => `--x:${c.x}; --y:${c.y}; --w:${c.w}; --h:${c.h}`;
+---
+
+<div class="quem-escolhe">
+  {
+    composicoes.map(([nome, c]) => (
+      <div class={`composicao ${nome}`}>
+        <Diagrama plano rotulo={rotulo} altura={c.altura} minLargura={c.minLargura}>
+          <slot slot="legenda" />
+          {c.nos.map((n) => (
+            <span class={`no bloco ${n.tipo}`} style={pos(n)}>
+              <span class:list={[n.tipo === 'regra' ? 't4' : 'txt', 'nome']}>{n.nome}</span>
+              {n.linhas.map((linha) => (
+                <span class="pq linha">{linha}</span>
+              ))}
+            </span>
+          ))}
+          {c.rotulos.map((r) => (
+            <span class="no pq rotulo-seta" style={pos(r)}>
+              {r.texto}
+            </span>
+          ))}
+          <svg class="setas" viewBox={`0 0 1000 ${c.altura}`} aria-hidden="true" focusable="false">
+            {c.setas.map(([x1, y1, x2, y2]) => (
+              <Seta tipo="neutra" x1={x1} y1={y1} x2={x2} y2={y2} />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .quem-escolhe {
+    container-type: inline-size;
+  }
+  .composicao.estreito {
+    display: none;
+  }
+  @container (max-width: 679px) {
+    .composicao.largo {
+      display: none;
+    }
+    .composicao.estreito {
+      display: block;
+    }
+  }
+  .bloco {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 16);
+    text-align: center;
+    border: 1px solid var(--d-line);
+    background: var(--d-card);
+  }
+  .bloco.origem {
+    border: 2px solid var(--d-blue);
+  }
+  .bloco.regra {
+    background: var(--d-bg);
+    border: 1.5px solid var(--d-ink2);
+  }
+  .nome {
+    font-weight: 600;
+  }
+  .linha {
+    font-family: var(--d-mono);
+    color: var(--d-ink2);
+  }
+  .rotulo-seta {
+    display: flex;
+    align-items: center;
+    color: var(--d-ink2);
+  }
+</style>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #FF2D55; --principal-tinta: #FFE0E7;
+      --destaque: #0088FF; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #FF375F; --principal-tinta: color-mix(in srgb, var(--principal) 30%, var(--card));
+        --destaque: #0091FF; --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .destaque { fill: var(--destaque); }
+    .linha { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .fechar { fill: none; stroke: var(--sobre-destaque); stroke-width: 4; stroke-linecap: round; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- The same reading sheet in two system bar arrangements. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="312" y="176" width="248" height="280" rx="32"/>
+    <rect class="card" x="640" y="176" width="248" height="280" rx="32"/>
+  </g>
+
+  <!-- Horizontal bar: Close belongs to the bar, above the reading content. -->
+  <rect class="principal-tinta" x="336" y="200" width="200" height="56" rx="24"/>
+  <rect class="principal" x="352" y="220" width="88" height="14" rx="7"/>
+  <circle class="destaque" cx="512" cy="228" r="16"/>
+  <path class="fechar" d="M507 223 517 233M517 223 507 233"/>
+  <rect class="neutro" x="336" y="288" width="176" height="14" rx="7"/>
+  <rect class="neutro" x="336" y="320" width="144" height="14" rx="7"/>
+  <rect class="neutro" x="336" y="352" width="176" height="14" rx="7"/>
+  <rect class="neutro" x="336" y="384" width="112" height="14" rx="7"/>
+
+  <!-- The bar changes axis; content leaves space beside it. -->
+  <path class="linha" d="M584 316H608"/>
+  <polygon class="principal" points="620,316 604,308 604,324"/>
+  <rect class="principal-tinta" x="808" y="200" width="56" height="232" rx="24"/>
+  <circle class="destaque" cx="836" cy="228" r="16"/>
+  <path class="fechar" d="M831 223 841 233M841 223 831 233"/>
+  <rect class="neutro" x="664" y="264" width="120" height="14" rx="7"/>
+  <rect class="neutro" x="664" y="296" width="96" height="14" rx="7"/>
+  <rect class="neutro" x="664" y="328" width="120" height="14" rx="7"/>
+  <rect class="neutro" x="664" y="360" width="80" height="14" rx="7"/>
+</svg>

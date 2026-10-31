@@ -1,0 +1,35 @@
+---
+// Marca, dentro da figura, o que está em escala (contorno sólido) e o que é esquemático (contorno
+// tracejado). Sem cor: o significado vem do traço e do texto. Rótulos curtos (guia: "Escala").
+interface Props {
+  /** Unidades do desenho. `x` padrão 20. */
+  x?: number;
+  y: number;
+  /** O que está em escala, por exemplo "padding de 12 pt". */
+  escala?: string;
+  /** O que é esquemático, por exemplo "tamanho do texto". */
+  esquema?: string;
+}
+const { x = 20, y, escala, esquema } = Astro.props;
+---
+
+<span class="no marca" style={`--x:${x}; --y:${y}; --w:${1000 - x * 2}; --h:34`}>
+  {escala && <span class="cap ref">em escala: {escala}</span>}
+  {esquema && <span class="cap ref tracejada">esquemático: {esquema}</span>}
+</span>
+
+<style>
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--u) * 14);
+  }
+  /* sobrescrevem `.diagrama .cap.ref` da moldura: precisam de seletor mais forte que o escopado.
+     Contorno em --d-ink2 para o sólido e o tracejado continuarem distintos também no escuro. */
+  :global(.diagrama) .marca .cap.ref {
+    border-color: var(--d-ink2);
+  }
+  :global(.diagrama) .marca .cap.ref.tracejada {
+    border-style: dashed;
+  }
+</style>

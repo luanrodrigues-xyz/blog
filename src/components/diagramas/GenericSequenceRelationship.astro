@@ -1,0 +1,85 @@
+---
+import Diagrama from './Diagrama.astro';
+const label =
+  'sameEntries accepts Left as Array of String and Right as ArraySlice of String. Both contain s2 followed by s3. Their container types differ, but both Element types are String and String conforms to Equatable. The same-type and conformance requirements allow element comparison, and these matching values produce true.';
+---
+
+<div class="sequence-types">
+  {[true, false].map((wide) => {
+    const height = wide ? 950 : 1740;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          {[
+            ['Left', 'Array<String>'],
+            ['Right', 'ArraySlice<String>'],
+          ].map(([name, type], i) => (
+            <div
+              class="no nodo"
+              style={`--x:${wide ? 32 + i * 496 : 32};--y:${wide ? 32 : 32 + i * 400};--w:${wide ? 440 : 936};--h:${wide ? 240 : 300}`}
+            >
+              <span class="pq heading">{name}</span>
+              <span class="t4">{type}</span>
+              <span class="t4">["s2", "s3"]</span>
+            </div>
+          ))}
+          <div class="no nodo fantasma" style={`--x:32;--y:${wide ? 450 : 1000};--w:936;--h:${wide ? 190 : 320}`}>
+            <span class="t4">Left.Element == Right.Element</span>
+            <span class="pq">Both are String</span>
+            <span class="t4">String conforms to Equatable</span>
+          </div>
+          <div class="no nodo" style={`--x:32;--y:${wide ? 760 : 1490};--w:936;--h:${wide ? 120 : 180}`}>
+            <span class="t4">sameEntries → true</span>
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {wide ? (
+              <>
+                <line class="connector" x1="252" y1="272" x2="252" y2="360" />
+                <line class="connector" x1="748" y1="272" x2="748" y2="360" />
+                <line class="connector" x1="252" y1="360" x2="748" y2="360" />
+                <line class="connector" x1="500" y1="360" x2="500" y2="450" />
+              </>
+            ) : (
+              <>
+                <line class="connector" x1="968" y1="182" x2="984" y2="182" />
+                <line class="connector" x1="968" y1="582" x2="984" y2="582" />
+                <line class="connector" x1="984" y1="182" x2="984" y2="860" />
+                <line class="connector" x1="500" y1="860" x2="984" y2="860" />
+                <line class="connector" x1="500" y1="860" x2="500" y2="1000" />
+              </>
+            )}
+            <line class="connector" x1="500" y1={wide ? 640 : 1320} x2="500" y2={wide ? 760 : 1490} />
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .sequence-types {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .connector {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .stacked .connector {
+    stroke-width: 6;
+  }
+</style>

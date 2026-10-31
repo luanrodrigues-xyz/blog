@@ -1,0 +1,30 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props { rotulo: string; language?: "en" | "pt-BR"; }
+const { rotulo, language = "en" } = Astro.props;
+const pt = language === "pt-BR";
+---
+<Diagrama plano rotulo={rotulo} altura={1100} minLargura={540}>
+  <div class="no nodo" style="--x:240; --y:40; --w:520; --h:120"><span class="txt strong">AttemptRunner</span><span class="pq">singleton</span></div>
+  <span class="no pq label" style="--x:270; --y:210; --w:240; --h:60">{pt ? "campo captured" : "captured field"}</span>
+  <span class="no pq label" style="--x:520; --y:210; --w:210; --h:60">{pt ? "campo provider" : "provider field"}</span>
+  <div class="no nodo" style="--x:40; --y:330; --w:400; --h:150"><span class="txt strong">DeliveryAttempt</span><span class="pq">{pt ? "uma instância retida" : "one retained instance"}</span></div>
+  <div class="no nodo" style="--x:540; --y:330; --w:420; --h:150"><span class="txt strong">ObjectProvider</span><span class="pq">getObject()</span></div>
+  <span class="no pq label" style="--x:520; --y:530; --w:460; --h:80">{pt ? "duas resoluções de prototype" : "two prototype resolutions"}</span>
+  <div class="no nodo" style="--x:540; --y:690; --w:420; --h:120"><span class="txt">Attempt A</span></div>
+  <div class="no nodo" style="--x:540; --y:920; --w:420; --h:120"><span class="txt">Attempt B</span></div>
+  <svg class="setas" viewBox="0 0 1000 1100" aria-hidden="true" focusable="false">
+    <path class="line" d="M500 160V190H240V325M500 190H750V325M750 480V510H500V980H535" />
+    <Seta tipo="neutra" x1={240} y1={285} x2={240} y2={328} />
+    <Seta tipo="neutra" x1={750} y1={285} x2={750} y2={328} />
+    <Seta x1={500} y1={750} x2={538} y2={750} />
+    <Seta x1={500} y1={980} x2={538} y2={980} />
+  </svg>
+</Diagrama>
+<style>
+.strong { font-weight: 600; }
+.nodo { text-align: center; align-items: center; }
+.label { display: flex; align-items: center; justify-content: center; text-align: center; }
+.line { fill: none; stroke: var(--d-line); stroke-width: 3; }
+</style>

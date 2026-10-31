@@ -1,0 +1,27 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const before = ['heading', 'reading-tips', 'read-button', 'save-button'];
+const after = [...before].reverse();
+---
+<Diagrama plano altura={720} rotulo="Antes da inversão, reading-tips ocupa a segunda posição. Depois, ocupa a terceira. Seu ID continua reading-tips e isExpanded permanece true, com a mesma estrutura de views. Os demais IDs também acompanham os componentes.">
+  <span class="no txt" style="--x:40; --y:40; --w:400; --h:50">Antes</span>
+  <span class="no txt" style="--x:560; --y:40; --w:400; --h:50">Depois de reverse()</span>
+  {before.map((id, index) => (
+    <div class="no nodo" style={`--x:40; --y:${120 + index * 130}; --w:400; --h:100`}>
+      <span class="t4">{id}</span>
+      {id === 'reading-tips' && <span class="pq">isExpanded = true</span>}
+    </div>
+  ))}
+  {after.map((id, index) => (
+    <div class="no nodo" style={`--x:560; --y:${120 + index * 130}; --w:400; --h:100`}>
+      <span class="t4">{id}</span>
+      {id === 'reading-tips' && <span class="pq">isExpanded = true</span>}
+    </div>
+  ))}
+  <svg class="setas" viewBox="0 0 1000 720" aria-hidden="true">
+    <Seta x1={440} y1={300} x2={560} y2={430} tipo="neutra" />
+  </svg>
+  <span class="no pq" style="--x:40; --y:650; --w:920; --h:50">A posição muda. A identidade e o estado continuam.</span>
+  <span slot="legenda">Em telas estreitas, role o diagrama para comparar as duas ordens.</span>
+</Diagrama>

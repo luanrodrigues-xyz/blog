@@ -1,0 +1,58 @@
+---
+import Diagrama from './Diagrama.astro';
+const characters = ['A', 'e\u0301', '🐨', 'Z'];
+const label =
+  'For the four-character name, offsets zero through three reach readable Characters A, accented e, koala and Z. Offset four reaches endIndex, which is a boundary with no Character. A forward offset of five with endIndex as the limit returns nil. Offsets count Characters, not bytes. These offset numbers label the walk and are not String.Index values.';
+---
+
+<div class="string-boundary">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 520 : 1550} minLargura={260}>
+        <span class="no pq" style={`--x:32;--y:24;--w:936;--h:${wide ? 56 : 128}`}>
+          Character offsets from startIndex
+        </span>
+        {characters.map((character, i) => (
+          <div
+            class="no nodo element"
+            style={`--x:${wide ? 32 + i * 180 : 32};--y:${wide ? 132 : 180 + i * 210};--w:${wide ? 156 : 580};--h:${wide ? 150 : 180}`}
+          >
+            <span class="pq">Offset {i}</span>
+            <span class="txt">{character}</span>
+          </div>
+        ))}
+        <div
+          class="no nodo fantasma end"
+          style={`--x:${wide ? 752 : 32};--y:${wide ? 132 : 1040};--w:${wide ? 216 : 936};--h:${wide ? 150 : 200}`}
+        >
+          <span class="pq">Offset 4</span>
+          <span class="t4">endIndex</span>
+        </div>
+        <span class="no pq" style={`--x:32;--y:${wide ? 336 : 1290};--w:936;--h:${wide ? 148 : 220}`}>
+          Offset 4 reaches the boundary. Offset 5 exceeds the limit and returns nil.
+        </span>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .string-boundary {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .element,
+  .end {
+    align-items: center;
+    text-align: center;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  language?: 'en' | 'pt-BR';
+}
+const { language = 'en' } = Astro.props;
+const isPortuguese = language === 'pt-BR';
+const text = {
+  description: isPortuguese
+    ? 'O Apple Pay entrega um token depois da autorização do usuário. O app o envia ao backend e ao provedor. Somente o resultado confirmado por eles permite aprovar o pedido. Uma resposta perdida deixa o pedido pendente, que deve ser consultado com a mesma identidade.'
+    : 'Apple Pay returns a token after user authorization. The app submits it to a backend and payment provider. Only their confirmed result can approve the order. A lost response leaves a pending order that must be queried by the same identity.',
+  sheet: isPortuguese ? 'Folha do Apple Pay' : 'Apple Pay sheet',
+  authorize: isPortuguese ? 'Usuário autoriza a requisição' : 'User authorizes the request',
+  delegate: 'PaymentCoordinator',
+  tokenReceived: isPortuguese ? 'Recebe o token de pagamento' : 'Receives the payment token',
+  backend: isPortuguese ? 'Backend + provedor' : 'Backend + provider',
+  process: isPortuguese ? 'Processam e registram o resultado' : 'Process and record the outcome',
+  pending: isPortuguese ? 'Pedido pendente' : 'Pending order',
+  unknown: isPortuguese ? 'Sem resposta ≠ recusa confirmada' : 'No response ≠ confirmed decline',
+  status: isPortuguese ? 'Estado do pedido' : 'Order status',
+  lookup: isPortuguese ? 'Consulta pela mesma identidade' : 'Query the same order identity',
+  submit: isPortuguese ? 'envio' : 'submit',
+  lost: isPortuguese ? 'resposta perdida' : 'response lost',
+  caption: isPortuguese
+    ? 'Fronteira de produção. Neste exemplo, uma simulação local substitui o backend e o provedor.'
+    : 'Production boundary. The teaching app replaces the backend and provider with a local fake.',
+};
+---
+
+<Diagrama plano altura={620} rotulo={text.description}>
+  <div class="no nodo" style="--x:64; --y:40; --w:380; --h:100">
+    <span class="txt forte">{text.sheet}</span>
+    <span class="pq">{text.authorize}</span>
+  </div>
+  <div class="no nodo" style="--x:64; --y:220; --w:380; --h:100">
+    <span class="txt forte">{text.delegate}</span>
+    <span class="pq">{text.tokenReceived}</span>
+  </div>
+  <div class="no nodo" style="--x:556; --y:220; --w:380; --h:100">
+    <span class="txt forte">{text.backend}</span>
+    <span class="pq">{text.process}</span>
+  </div>
+  <div class="no nodo fantasma" style="--x:64; --y:450; --w:380; --h:108">
+    <span class="txt forte">{text.pending}</span>
+    <span class="pq">{text.unknown}</span>
+  </div>
+  <div class="no nodo" style="--x:556; --y:450; --w:380; --h:108">
+    <span class="txt forte">{text.status}</span>
+    <span class="pq">{text.lookup}</span>
+  </div>
+  <span class="no etq" style="--x:80; --y:156; --w:230; --h:40">
+    token
+  </span>
+  <span class="no etq" style="--x:450; --y:220; --w:100; --h:40">
+    {text.submit}
+  </span>
+  <span class="no etq" style="--x:80; --y:352; --w:310; --h:50">
+    {text.lost}
+  </span>
+  <svg class="setas" viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
+    <Seta x1={254} y1={140} x2={254} y2={218} />
+    <Seta x1={444} y1={270} x2={554} y2={270} />
+    <Seta x1={254} y1={320} x2={254} y2={448} />
+    <Seta x1={444} y1={504} x2={554} y2={504} />
+    <Seta x1={746} y1={450} x2={746} y2={322} />
+  </svg>
+  <p slot="legenda">{text.caption}</p>
+</Diagrama>

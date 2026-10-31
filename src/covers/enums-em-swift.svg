@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #0088FF; --texto: #005FB3; --tinta: #D6EAFF; --destaque: #6155F5;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #35A4FF; --texto: #8CC8FF; --tinta: color-mix(in srgb, var(--principal) 30%, var(--card));
+        --destaque: #6D7CFF;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .tinta { fill: var(--tinta); }
+    .principal { fill: var(--principal); }
+    .destaque { fill: var(--destaque); }
+    .ausente { fill: none; stroke: var(--principal); stroke-width: 4; stroke-dasharray: 8 8; }
+    .texto { fill: var(--texto); font-family: SF Mono, ui-monospace, Menlo, monospace; font-size: 24px; font-weight: 600; }
+    .copia { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- The same new case reaches both switches. -->
+  <rect class="destaque" x="560" y="88" width="80" height="32" rx="16"/>
+  <path class="copia" d="M600 136V184H440V232M600 184H760V232"/>
+  <path class="principal" d="M432 224L440 240L448 224ZM752 224L760 240L768 224Z"/>
+
+  <!-- Explicit cases leave a missing position that needs a decision. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="312" y="256" width="256" height="240" rx="32"/>
+    <rect class="card" x="632" y="256" width="256" height="240" rx="32"/>
+  </g>
+  <rect class="tinta" x="344" y="288" width="192" height="14" rx="7"/>
+  <rect class="tinta" x="344" y="328" width="192" height="14" rx="7"/>
+  <rect class="tinta" x="344" y="368" width="192" height="14" rx="7"/>
+  <rect class="ausente" x="344" y="408" width="192" height="48" rx="24"/>
+
+  <!-- The catch-all already accepts the new case without a separate branch. -->
+  <rect class="tinta" x="664" y="288" width="192" height="14" rx="7"/>
+  <rect class="neutro" x="656" y="328" width="208" height="136" rx="24"/>
+  <rect class="card" x="680" y="352" width="160" height="14" rx="7"/>
+  <rect class="destaque" x="680" y="400" width="160" height="14" rx="7"/>
+  <text class="texto" x="440" y="536" text-anchor="middle">case</text>
+  <text class="texto" x="760" y="536" text-anchor="middle">default</text>
+</svg>

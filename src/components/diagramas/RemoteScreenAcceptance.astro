@@ -1,0 +1,128 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+const englishLabel =
+  'orderScreenState passes the response Data to JSONDecoder. If the version, components, actions, required fields, and section IDs pass the example checks, it returns content with a complete RemoteScreen. Any decoding or contract error returns unavailable for the whole screen. An unknown openCourierMap action therefore prevents even known sections from reaching content.';
+
+interface Props {
+  language?: 'en' | 'pt-BR';
+}
+const { language = 'en' } = Astro.props;
+const portuguese = language === 'pt-BR';
+const label = portuguese
+  ? 'orderScreenState passa o Data da resposta para JSONDecoder. Se a versão, os componentes, as ações, os campos obrigatórios e os IDs das seções passam nas verificações do exemplo, retorna content com uma RemoteScreen completa. Qualquer erro de decodificação ou de contrato retorna unavailable para a tela inteira. Uma ação openCourierMap desconhecida impede, portanto, que até as seções conhecidas cheguem a content.'
+  : englishLabel;
+const text = {
+  "Whole JSON response": "Resposta JSON inteira",
+  "Version, components, actions": "Versão, componentes e ações",
+  "Required fields and section IDs": "Campos obrigatórios e IDs",
+  "All checks pass": "Tudo válido",
+  "Any check fails": "Alguma falha",
+  "Full screen": "Tela completa",
+  "Whole screen": "Tela inteira",
+  "Unknown action": "Ação desconhecida",
+  "One error rejects every section.": "Uma falha rejeita todas as seções."
+};
+const localize = (value: keyof typeof text) => portuguese ? text[value] : value;
+
+---
+
+<div class="screen-acceptance">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 984 : 1552} minLargura={260}>
+        <div class="no nodo" style={`--x:200;--y:32;--w:600;--h:${wide ? 144 : 240}`}>
+          <span class="t4">Data</span>
+          <span class="pq ink2">{localize('Whole JSON response')}</span>
+        </div>
+        <div class="no nodo" style={`--x:80;--y:${wide ? 272 : 352};--w:840;--h:${wide ? 180 : 320}`}>
+          <span class="t4">JSONDecoder</span>
+          <span class="pq">{localize('Version, components, actions')}</span>
+          <span class="pq">{localize('Required fields and section IDs')}</span>
+        </div>
+        <span class="no pq branch" style={`--x:32;--y:${wide ? 520 : 744};--w:420;--h:${wide ? 64 : 96}`}>
+          {localize('All checks pass')}
+        </span>
+        <span class="no pq branch" style={`--x:548;--y:${wide ? 520 : 744};--w:420;--h:${wide ? 64 : 96}`}>
+          {localize('Any check fails')}
+        </span>
+        <div class="no nodo accepted" style={`--x:32;--y:${wide ? 672 : 968};--w:420;--h:${wide ? 144 : 304}`}>
+          <span class="t4">.content</span>
+          <span class="pq">{localize('Full screen')}</span>
+        </div>
+        <div class="no nodo rejected" style={`--x:548;--y:${wide ? 672 : 968};--w:420;--h:${wide ? 144 : 304}`}>
+          <span class="t4">.unavailable</span>
+          <span class="pq">{localize('Whole screen')}</span>
+        </div>
+        <span class="no pq explanation" style={`--x:32;--y:${wide ? 848 : 1320};--w:936;--h:${wide ? 104 : 200}`}>
+          <span>
+            {localize('Unknown action')} <span class="t4">openCourierMap</span>
+          </span>
+          <span>{localize('One error rejects every section.')}</span>
+        </span>
+        <svg class="setas" viewBox={`0 0 1000 ${wide ? 984 : 1552}`} aria-hidden="true" focusable="false">
+          <Seta tipo="neutra" x1={500} y1={wide ? 176 : 272} x2={500} y2={wide ? 272 : 352} />
+          <path
+            class="connector"
+            d={wide ? 'M500 452V500H242V512M500 500H758V512' : 'M500 672V720H242V736M500 720H758V736'}
+          />
+          <Seta tipo="neutra" x1={242} y1={wide ? 600 : 856} x2={242} y2={wide ? 672 : 968} />
+          <Seta tipo="neutra" x1={758} y1={wide ? 600 : 856} x2={758} y2={wide ? 672 : 968} />
+        </svg>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+
+<style>
+  .screen-acceptance {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .branch,
+  .explanation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .explanation {
+    flex-direction: column;
+    gap: calc(var(--u) * 8);
+  }
+  .screen-acceptance :global(.nodo) {
+    align-items: center;
+    text-align: center;
+  }
+  .screen-acceptance :global(.nodo.accepted) {
+    border-color: var(--d-verde);
+  }
+  .screen-acceptance :global(.nodo.rejected) {
+    border-color: var(--d-vermelho);
+  }
+  .connector {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 4;
+  }
+  .screen-acceptance :global(.seta line) {
+    stroke-width: 4;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+    .connector {
+      stroke-width: 6;
+    }
+    .screen-acceptance :global(.seta line) {
+      stroke-width: 6;
+    }
+  }
+</style>

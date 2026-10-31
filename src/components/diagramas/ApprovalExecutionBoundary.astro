@@ -1,0 +1,67 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const nodes = [
+  ['IA', 'cancel_invoice + invoiceId'],
+  ['Aplicação', 'consulta e mostra a proposta'],
+  ['Pessoa', 'confirma aquela revisão'],
+  ['Serviço', 'revalida e executa a operação'],
+];
+---
+
+<div class="desktop">
+  <Diagrama plano rotulo={rotulo} altura={640}>
+    {nodes.map(([title, detail], i) => (
+      <div class="no nodo" style={`--x:${i % 2 === 0 ? 40 : 560};--y:${i < 2 ? 60 : 390};--w:400;--h:180`}>
+        <span class="txt forte">{title}</span>
+        <span class="pq">{detail}</span>
+      </div>
+    ))}
+    <span class="no pq" style="--x:448;--y:240;--w:500;--h:84">
+      a proposta não executa a escrita
+    </span>
+    <svg class="setas" viewBox="0 0 1000 640" aria-hidden="true" focusable="false">
+      <Seta tipo="neutra" x1={440} y1={150} x2={558} y2={150} />
+      <path d="M760 240V340H240V388" />
+      <Seta tipo="neutra" x1={240} y1={360} x2={240} y2={388} />
+      <Seta x1={440} y1={480} x2={558} y2={480} />
+    </svg>
+  </Diagrama>
+</div>
+<div class="mobile">
+  <Diagrama plano rotulo={rotulo} altura={1450} minLargura={270}>
+    {nodes.map(([title, detail], i) => (
+      <div class="no nodo" style={`--x:48;--y:${48 + i * 350};--w:904;--h:220`}>
+        <span class="txt forte">{title}</span>
+        <span class="pq">{detail}</span>
+      </div>
+    ))}
+    <svg class="setas" viewBox="0 0 1000 1450" aria-hidden="true" focusable="false">
+      {[0, 1, 2].map((i) => (
+        <Seta tipo={i === 2 ? 'ida' : 'neutra'} x1={500} y1={268 + i * 350} x2={500} y2={396 + i * 350} />
+      ))}
+    </svg>
+  </Diagrama>
+</div>
+<style>
+  .mobile {
+    display: none;
+  }
+  .setas > path {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  @media (max-width: 680px) {
+    .desktop {
+      display: none;
+    }
+    .mobile {
+      display: block;
+    }
+  }
+</style>

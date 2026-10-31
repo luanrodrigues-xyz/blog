@@ -1,0 +1,54 @@
+---
+import Diagrama from './Diagrama.astro';
+const groups = [
+  { character: 'A', start: 0, bytes: ['41'] },
+  { character: 'e\u0301', start: 1, bytes: ['65', 'CC', '81'] },
+  { character: '🐨', start: 4, bytes: ['F0', '9F', '90', 'A8'] },
+  { character: 'Z', start: 8, bytes: ['5A'] },
+];
+const label =
+  'The string A, e plus a combining acute accent, koala and Z contains four Characters. Their aligned UTF-8 encodings contain one, three, four and one bytes respectively, totaling nine bytes. The accented letter remains one Character across three byte cells. Cell widths represent UTF-8 bytes, not glyph width or an internal memory layout.';
+---
+
+<Diagrama plano rotulo={label} altura={570} minLargura={520}>
+  <span class="no pq" style="--x:32;--y:28;--w:936;--h:56">
+    Four Characters
+  </span>
+  {groups.map(({ character, start, bytes }) => (
+    <div class="no nodo character" style={`--x:${32 + start * 104};--y:108;--w:${bytes.length * 104};--h:132`}>
+      <span class="txt">{character}</span>
+    </div>
+  ))}
+  <span class="no pq" style="--x:32;--y:284;--w:936;--h:56">
+    Nine UTF-8 bytes, shown in hexadecimal
+  </span>
+  {groups.flatMap(({ start, bytes }) =>
+    bytes.map((byte, i) => (
+      <div class="no nodo byte" style={`--x:${32 + (start + i) * 104};--y:364;--w:104;--h:116`}>
+        <span class="t4">{byte}</span>
+      </div>
+    )),
+  )}
+  <svg class="setas" viewBox="0 0 1000 570" aria-hidden="true" focusable="false">
+    {[0, 1, 4, 8, 9].map((boundary) => (
+      <>
+        <line class="guide" x1={32 + boundary * 104} y1="240" x2={32 + boundary * 104} y2="264" />
+        <line class="guide" x1={32 + boundary * 104} y1="340" x2={32 + boundary * 104} y2="364" />
+      </>
+    ))}
+  </svg>
+  <span slot="legenda">
+    Each lower cell is one UTF-8 byte. Scroll horizontally on narrow screens to compare the complete groups.
+  </span>
+</Diagrama>
+<style>
+  .character,
+  .byte {
+    align-items: center;
+    text-align: center;
+  }
+  .guide {
+    stroke: var(--d-line);
+    stroke-width: 3;
+  }
+</style>

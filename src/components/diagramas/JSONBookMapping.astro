@@ -1,0 +1,73 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'Selected fields in the JSON Data pass through JSONDecoder.decode to become BookPayload properties. The external page_count key maps to pageCount with value 128 through the model CodingKeys. The title stays Small Steps. Only relevant fields are shown, and this step does not check the app rules.';
+---
+
+<div class="book-mapping">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 420 : 1220} minLargura={260}>
+        <div class="no nodo" style={`--x:32;--y:32;--w:${wide ? 300 : 936};--h:${wide ? 280 : 360}`}>
+          <span class="pq">Data with JSON</span>
+          <span class="t4">page_count = 128</span>
+          <span class="t4">title =</span>
+          <span class="t4">"Small Steps"</span>
+        </div>
+        <div
+          class="no nodo fantasma operation"
+          style={`--x:${wide ? 399 : 32};--y:${wide ? 82 : 470};--w:${wide ? 202 : 936};--h:180`}
+        >
+          <span class="t4">JSONDecoder</span>
+          <span class="t4">.decode</span>
+        </div>
+        <div
+          class="no nodo"
+          style={`--x:${wide ? 668 : 32};--y:${wide ? 32 : 790};--w:${wide ? 300 : 936};--h:${wide ? 280 : 360}`}
+        >
+          <span class="pq">BookPayload</span>
+          <span class="t4">pageCount = 128</span>
+          <span class="t4">title =</span>
+          <span class="t4">"Small Steps"</span>
+        </div>
+        <svg class="setas" viewBox={`0 0 1000 ${wide ? 420 : 1220}`} aria-hidden="true" focusable="false">
+          {wide ? (
+            <>
+              <Seta x1={332} y1={172} x2={399} y2={172} />
+              <Seta x1={601} y1={172} x2={668} y2={172} />
+            </>
+          ) : (
+            <>
+              <Seta x1={500} y1={392} x2={500} y2={470} />
+              <Seta x1={500} y1={650} x2={500} y2={790} />
+            </>
+          )}
+        </svg>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .book-mapping {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .operation {
+    align-items: center;
+    text-align: center;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

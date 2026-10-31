@@ -1,0 +1,89 @@
+---
+// Uma leitura após a mesma mutação compara referência e valor registrado.
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const paineis = [
+  { nome: 'aberta', campo: 'cartao.limite', valor: '800_000', nota: 'lê o objeto compartilhado' },
+  { nome: 'fechada', campo: 'limiteNoFechamento', valor: '500_000', nota: 'preserva o valor registrado' },
+];
+---
+
+<div class="comparacao">
+  {(['lado', 'pilha'] as const).map((layout) => (
+    <div class={`composicao ${layout}`}>
+      <Diagrama
+        plano
+        rotulo={rotulo}
+        altura={layout === 'lado' ? 370 : 1000}
+        minLargura={layout === 'lado' ? 540 : 260}
+      >
+        <slot slot="legenda" />
+        <div class="no t4 mutacao" style={`--x:20;--y:20;--w:960;--h:${layout === 'lado' ? 70 : 120}`}>
+          cartao.limite = 800_000
+        </div>
+        {paineis.map((p, i) => {
+          const x = layout === 'lado' ? 20 + i * 500 : 20;
+          const y = layout === 'lado' ? 120 : 180 + i * 400;
+          const w = layout === 'lado' ? 460 : 960;
+          return (
+            <>
+              <div class="no caixa" style={`--x:${x};--y:${y};--w:${w};--h:${layout === 'lado' ? 160 : 270}`}>
+                <div class="t4 titulo">{p.nome}</div>
+                <div class="t4">{p.campo}</div>
+                <div class="t3 titulo">{p.valor}</div>
+              </div>
+              <div
+                class="no txt nota"
+                style={`--x:${x};--y:${y + (layout === 'lado' ? 180 : 290)};--w:${w};--h:${layout === 'lado' ? 50 : 90}`}
+              >
+                {p.nota}
+              </div>
+            </>
+          );
+        })}
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .comparacao {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .mutacao,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .caixa {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 20);
+    border: 1px solid var(--d-line);
+    background: var(--d-card);
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .nota {
+    color: var(--d-ink2);
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+</style>

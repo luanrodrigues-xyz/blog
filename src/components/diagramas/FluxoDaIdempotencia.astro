@@ -1,0 +1,179 @@
+---
+// Seção "O caminho completo" do artigo pagamento-duplicado-idempotencia: o mesmo timeout da abertura,
+// agora com a chave de idempotência. A primeira request debita e registra a chave; a resposta se perde;
+// a recuperação consulta a tentativa da chave K (GET) e o servidor devolve o pagamento salvo, sem novo POST.
+// A ordem é a da narrativa (esquemática). Setas azuis sólidas = request; índigo tracejada = resposta.
+// Duas composições: faixas App e Servidor lado a lado com 680px; uma coluna com o lado escrito abaixo disso.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+
+type Lado = 'app' | 'servidor';
+type Etapa = {
+  lado: Lado;
+  titulo: string;
+  detalhe: string;
+  estado?: string;
+};
+
+const etapas: Etapa[] = [
+  { lado: 'app', titulo: 'Toca em Pagar', detalhe: 'cria PaymentIntent com a chave K' },
+  { lado: 'servidor', titulo: 'Chave K é nova', detalhe: 'debita e registra K com o resultado', estado: 'processado' },
+  { lado: 'app', titulo: 'Timeout', detalhe: 'a resposta não chega ao app', estado: 'timeout' },
+  { lado: 'app', titulo: 'Resultado não confirmado', detalhe: 'o app não mostra falha', estado: 'incerto' },
+  { lado: 'app', titulo: 'Verifica o pagamento', detalhe: 'consulta a tentativa da chave K' },
+  { lado: 'servidor', titulo: 'Tentativa K concluída', detalhe: 'devolve o pagamento salvo', estado: 'processado' },
+  { lado: 'app', titulo: 'Mostra o comprovante', detalhe: 'descarta a PaymentIntent' },
+];
+
+// Composição larga: uma faixa por lado; cada etapa ocupa uma linha.
+const largo = { y0: 90, h: 90, passo: 130, w: 420 };
+const xLargo: Record<Lado, number> = { app: 40, servidor: 540 };
+const yLargo = (i: number) => largo.y0 + i * largo.passo;
+// Chegada e saída em alturas diferentes da borda, para a request e a resposta não se tocarem.
+const entradaLargo = (i: number) => yLargo(i) + largo.h * 0.3;
+const saidaLargo = (i: number) => yLargo(i) + largo.h * 0.7;
+const ledger = yLargo(etapas.length - 1);
+const alturaLarga = ledger + largo.h + 30;
+const centroApp = xLargo.app + largo.w / 2;
+const bordaApp = xLargo.app + largo.w;
+const bordaServidor = xLargo.servidor;
+
+// Composição empilhada: largura inteira, o lado como primeira linha de cada etapa.
+const passos = [
+  ...etapas,
+  { lado: 'servidor' as Lado, titulo: 'Um único débito no ledger', detalhe: 'a consulta não cria pagamento', estado: 'unico' },
+];
+const pilha = { x: 20, w: 960, y0: 30, h: 310, passo: 370 };
+const yPilha = (i: number) => pilha.y0 + i * pilha.passo;
+const alturaPilha = yPilha(passos.length - 1) + pilha.h + 30;
+const centroPilha = pilha.x + pilha.w / 2;
+const nomeDoLado: Record<Lado, string> = { app: 'App', servidor: 'Servidor' };
+---
+
+<div class="idempotencia">
+  <div class="composicao lado">
+    <Diagrama plano rotulo={rotulo} altura={alturaLarga}>
+      <span class="no cab titulo" style={pos(xLargo.app, 30, largo.w, 40)}>App</span>
+      <span class="no cab titulo" style={pos(xLargo.servidor, 30, largo.w, 40)}>Servidor</span>
+
+      {etapas.map(({ lado, titulo, detalhe, estado }, i) => (
+        <span class:list={['no nodo etapa', estado]} style={pos(xLargo[lado], yLargo(i), largo.w, largo.h)}>
+          <span class="txt forte">{titulo}</span>
+          <span class="pq ink2">{detalhe}</span>
+        </span>
+      ))}
+
+      <span class="no nodo etapa unico" style={pos(xLargo.servidor, ledger, largo.w, largo.h)}>
+        <span class="txt forte">Um único débito no ledger</span>
+        <span class="pq ink2">a consulta não cria pagamento</span>
+      </span>
+
+      <svg class="setas" viewBox={`0 0 1000 ${alturaLarga}`} aria-hidden="true" focusable="false">
+        <!-- POST e consulta, ambos com a chave K: do app para o servidor. -->
+        <Seta x1={bordaApp} y1={saidaLargo(0)} x2={bordaServidor} y2={entradaLargo(1)} />
+        <Seta x1={bordaApp} y1={saidaLargo(4)} x2={bordaServidor} y2={entradaLargo(5)} />
+        <!-- Só a resposta da consulta chega ao app. -->
+        <Seta tipo="volta" x1={bordaServidor} y1={saidaLargo(5)} x2={bordaApp} y2={entradaLargo(6)} />
+        <!-- Sequência dentro do app. -->
+        <Seta tipo="neutra" x1={centroApp} y1={yLargo(0) + largo.h} x2={centroApp} y2={yLargo(2)} />
+        <Seta tipo="neutra" x1={centroApp} y1={yLargo(2) + largo.h} x2={centroApp} y2={yLargo(3)} />
+        <Seta tipo="neutra" x1={centroApp} y1={yLargo(3) + largo.h} x2={centroApp} y2={yLargo(4)} />
+      </svg>
+    </Diagrama>
+  </div>
+
+  <div class="composicao pilha">
+    <Diagrama plano rotulo={rotulo} altura={alturaPilha} minLargura={272}>
+      {passos.map(({ lado, titulo, detalhe, estado }, i) => (
+        <span class:list={['no nodo etapa', estado]} style={pos(pilha.x, yPilha(i), pilha.w, pilha.h)}>
+          <span class="pq ink2">{nomeDoLado[lado]}</span>
+          <span class="txt forte">{titulo}</span>
+          <span class="pq ink2">{detalhe}</span>
+        </span>
+      ))}
+
+      <svg class="setas" viewBox={`0 0 1000 ${alturaPilha}`} aria-hidden="true" focusable="false">
+        {passos.slice(1).map((_, i) => (
+          <Seta tipo="neutra" x1={centroPilha} y1={yPilha(i) + pilha.h} x2={centroPilha} y2={yPilha(i + 1)} />
+        ))}
+      </svg>
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .idempotencia {
+    container-type: inline-size;
+  }
+
+  /* Composição vertical: acima de ~460px ela só cresceria em altura, sem ganhar legibilidade. */
+  .composicao.pilha {
+    display: none;
+    max-width: 460px;
+    margin-inline: auto;
+  }
+
+  @container (max-width: 679px) {
+    .composicao.lado {
+      display: none;
+    }
+
+    .composicao.pilha {
+      display: block;
+    }
+  }
+
+  .titulo {
+    display: flex;
+    align-items: center;
+  }
+
+  .etapa {
+    align-items: flex-start;
+  }
+
+  /* A base aplica .diagrama.plano .nodo; o prefixo .idempotencia garante que o estado prevaleça. */
+  .idempotencia .nodo.timeout {
+    background: var(--d-laranja-tint);
+    border: 2px solid var(--d-laranja);
+  }
+
+  .idempotencia .nodo.incerto {
+    background: var(--d-laranja-tint);
+    border: 1px solid var(--d-laranja);
+  }
+
+  .idempotencia .nodo.processado {
+    background: var(--d-blue-tint);
+    border: 2px solid var(--d-blue);
+  }
+
+  .idempotencia .nodo.unico {
+    background: var(--d-verde-tint);
+    border: 2px solid var(--d-verde);
+  }
+
+  .forte {
+    font-weight: 600;
+  }
+
+  .setas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* No celular, 1 unidade vale ~0,3px: traço mais grosso para não ficar abaixo de 1,5px. */
+  .pilha :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

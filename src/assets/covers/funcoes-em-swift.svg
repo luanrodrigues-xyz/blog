@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><style>svg{--f:#F2F2F7;--c:#fff;--n:#E5E5EA;--p:#0088FF;--pt:#D6EAFF;--t:#005FB3;--tn:#636366;--ac:#6155F5}@media(prefers-color-scheme:dark){svg{--f:#1C1C1E;--c:#2C2C2E;--n:#3A3A3C;--p:#35A4FF;--pt:color-mix(in srgb,var(--p) 28%,var(--c));--t:#8CC8FF;--tn:#AEAEB2;--ac:#6D7CFF}.s{filter:none}}.f{fill:var(--f)}.c{fill:var(--c)}.n{fill:var(--n)}.p{fill:var(--p)}.pt{fill:var(--pt)}.t{fill:var(--t)}.tn{fill:var(--tn)}.ac{fill:var(--ac)}.caixa{fill:var(--pt);stroke:var(--p)}.l{fill:none;stroke:var(--p);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.sobre{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.s{filter:url(#s)}</style><defs><filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity=".07"/></filter></defs><rect class="f" width="1200" height="630"/>
+<!-- saldo e &saldo: o mesmo estado inicial, com e sem o & na chamada. -->
+<rect class="c s" x="335" y="125" width="190" height="100" rx="28"/>
+<rect class="c s" x="675" y="125" width="190" height="100" rx="28"/>
+<rect class="pt" x="370" y="153" width="120" height="14" rx="7"/>
+<rect class="pt" x="710" y="153" width="120" height="14" rx="7"/>
+<text class="t" x="430" y="199" text-anchor="middle" font-family="SF Mono,ui-monospace,Menlo,monospace" font-size="21" font-weight="600">saldo</text>
+<text class="t" x="770" y="199" text-anchor="middle" font-family="SF Mono,ui-monospace,Menlo,monospace" font-size="21" font-weight="600">&amp;saldo</text>
+<path class="l" d="M430 225V249"/>
+<path class="p" d="M430 265 420 249 440 249Z"/>
+<path class="l" d="M770 225V249"/>
+<path class="p" d="M770 265 760 249 780 249Z"/>
+<!-- A função: card tingido, sem rótulo, o mesmo bloco nos dois casos. -->
+<rect class="caixa s" x="335" y="265" width="190" height="100" rx="28" stroke-width="3"/>
+<rect class="caixa s" x="675" y="265" width="190" height="100" rx="28" stroke-width="3"/>
+<!-- Com retorno, quem chama grava o resultado fora da função. -->
+<path class="l" d="M430 365V450H358"/>
+<path class="p" d="M342 450 358 440 358 460Z"/>
+<circle class="ac" cx="318" cy="450" r="22"/>
+<path class="sobre" d="M310 458 326 442"/>
+<text class="tn" x="318" y="498" text-anchor="middle" font-family="-apple-system,system-ui,Helvetica,sans-serif" font-size="18" font-weight="500">grava</text>
+<!-- Com inout, a própria chamada volta e atualiza o mesmo saldo. -->
+<path class="l" d="M770 365V450H895V175H881"/>
+<path class="p" d="M865 175 881 165 881 185Z"/>
+</svg>

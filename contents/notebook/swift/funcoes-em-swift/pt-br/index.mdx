@@ -1,0 +1,200 @@
+---
+title: "Funções. O que a assinatura promete antes do corpo?"
+description: "debitar(2_500, de: &saldo). Antes de abrir a função, o & já avisa que saldo pode sair dali diferente."
+date: "2023-02-01"
+topic: "swift"
+readingOrder: 3
+draft: false
+cover: "funcoes-em-swift.png"
+coverAlt: "Duas chamadas partem do mesmo saldo. Na primeira, o resultado sai da função e alguém de fora grava. Na segunda, a chamada volta e atualiza o próprio saldo."
+tags: ["Swift", "Funções", "inout", "Fundamentals"]
+language: "pt-BR"
+translationKey: "functions-in-swift"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import QuemGravaOSaldo from '../../../../../src/components/diagramas/QuemGravaOSaldo.astro';
+
+Eu gosto quando uma chamada já entrega parte do que pode acontecer antes de eu precisar abrir a implementação.
+
+```swift fragment
+debitar(2_500, de: &saldo)
+```
+
+`2_500` entra sem rótulo. `de:` dá contexto para o segundo argumento. E o `&` na frente de `saldo` chama mais atenção que os dois.
+
+Ele avisa na própria chamada que aquela variável pode sair dali com outro valor.
+
+## A assinatura por trás da chamada
+
+Swift separa o nome usado na chamada do nome usado dentro da função.
+
+```swift
+func debitar(_ valor: Int, de saldo: inout Int) {
+    saldo -= valor
+}
+
+var saldo = 150_000
+
+debitar(2_500, de: &saldo)
+
+print(saldo) // 147500
+
+// debitar(2_500, de: saldo) // Erro — falta o &
+// debitar(2_500, &saldo) // Erro — falta o rótulo de
+```
+
+Aqui, `de` é o rótulo do argumento e `saldo` é o nome do parâmetro. O `_` do primeiro parâmetro remove o rótulo naquela posição.
+
+Por isso a chamada fica assim
+
+```swift
+debitar(2_500, de: &saldo)
+```
+
+em vez de
+
+```swift
+debitar(valor: 2_500, saldo: &saldo)
+```
+
+Nesse caso eu prefiro a primeira. `debitar(2_500, de: &saldo)` já descreve bem a operação sem precisar abrir o corpo.
+
+`inout` é o que exige o `&`. Sem ele, o compilador recusa a chamada.
+
+```bash
+passing value of type 'Int' to an inout parameter
+requires explicit '&'
+```
+
+Dentro da função, `saldo` pode receber outro valor. Quando a chamada termina, esse resultado é escrito de volta na variável passada por quem chamou.
+
+E é por isso que um `let` não pode ser usado como argumento `inout`.
+
+```swift
+func debitar(_ valor: Int, de saldo: inout Int) {
+    saldo -= valor
+}
+
+let limite = 500_000
+
+// debitar(2_500, de: &limite) // Erro — limite é let
+
+print(limite) // 500000
+```
+
+O compilador não deixa uma chamada furar a garantia feita por `let`.
+
+```bash
+cannot pass immutable value as
+inout argument: 'limite' is a 'let' constant
+```
+
+É a mesma ideia do [artigo sobre let e var](/articles/pt/let-e-var-em-swift/), só que agora aparecendo na fronteira de uma função.
+
+## Sem `inout`, alguém precisa receber o resultado
+
+A mesma operação pode ser escrita sem alterar o argumento.
+
+```swift
+func debitado(_ valor: Int, de saldo: Int) -> Int {
+    return saldo - valor
+}
+
+var saldo = 150_000
+
+saldo = debitado(2_500, de: saldo)
+
+print(saldo) // 147500
+```
+
+Nesse caso, o parâmetro `saldo` não pode ser reatribuído dentro da função.
+
+```swift
+func debitado(_ valor: Int, de saldo: Int) -> Int {
+    // saldo -= valor // Erro
+    return saldo - valor
+}
+```
+
+Parâmetros de função são constantes por padrão. A função recebe o valor, calcula outro e devolve com `-> Int`.
+
+A diferença aparece do lado de fora.
+
+Com retorno
+
+```swift
+saldo = debitado(2_500, de: saldo)
+```
+
+quem chama recebe o novo valor e decide gravá-lo.
+
+Com `inout`
+
+```swift
+debitar(2_500, de: &saldo)
+```
+
+a própria chamada já declara que `saldo` participa da operação como algo que pode ser atualizado.
+
+<QuemGravaOSaldo rotulo="Com retorno, debitado recebe o valor de saldo e devolve 147_500, e quem chama atribui o resultado. Com inout, debitar recebe &saldo e, ao fim da chamada, o novo valor 147_500 volta para saldo.">
+
+As duas versões chegam a `147_500`.
+As setas azuis mostram o valor entrando na função. As tracejadas mostram o resultado voltando.
+O que muda é quem faz a gravação final em `saldo`.
+
+</QuemGravaOSaldo>
+
+## Eu começaria pelo retorno
+
+As duas formas funcionam, mas deixam decisões diferentes com quem chama.
+
+Com retorno, eu consigo calcular um novo saldo sem alterar o original.
+
+```swift
+func debitado(_ valor: Int, de saldo: Int) -> Int {
+    saldo - valor
+}
+
+let saldo = 150_000
+let simulacao = debitado(40_000, de: saldo)
+
+print(simulacao) // 110000
+print(saldo) // 150000
+```
+
+Isso encaixa bem numa tela de confirmação. Eu posso mostrar quanto sobraria depois da compra sem tocar no saldo atual.
+
+Se eu chamar `debitado` e ignorar o resultado, o compilador também chama atenção para isso.
+
+```swift
+debitado(40_000, de: saldo)
+// warning — result of call is unused
+```
+
+No caso de `inout`, a intenção é outra. A função existe justamente para atualizar o valor passado.
+
+```swift
+var saldo = 150_000
+
+debitar(40_000, de: &saldo)
+
+print(saldo) // 110000
+```
+
+As diretrizes de API do Swift usam pares como `sort()` e `sorted()` para separar operações que alteram o próprio valor das que devolvem outro.
+
+Eu seguiria a mesma linha aqui.
+
+Começaria por uma função que retorna o novo valor quando quem chama ainda precisa decidir o que fazer com ele. Usaria `inout` quando atualizar aquela variável fizer parte do contrato da operação.
+
+O detalhe que eu gosto é que isso não fica escondido dentro da função. O `&` aparece justamente no lugar em que o efeito importa, na chamada.
+
+<FontesDoArtigo>
+
+Para quem quiser saber mais:
+
+- [Functions](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/functions/)
+- [API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/)
+
+</FontesDoArtigo>

@@ -1,0 +1,35 @@
+---
+// Referência weak que vira nil (artigo arc-em-swift): a variável `tela` mantém a verificação viva; a
+// verificação guarda o fluxo por weak, que não entra na contagem. `fluxo = nil` tira a única referência
+// forte do fluxo: ele é liberado, e a propriedade weak da tela passa a ser nil.
+import ReferenciasDoLogin, { type Painel } from './ReferenciasDoLogin.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const paineis: Painel[] = [
+  {
+    titulo: 'antes de <code>fluxo = nil</code>',
+    resultado: 'O weak não entra na contagem do fluxo',
+    fluxo: 'aponta',
+    tela: true,
+    objetoFluxo: { vivo: true, linhas: ['referências fortes: 1'] },
+    objetoTela: { vivo: true, linhas: ['referências fortes: 2'] },
+    ida: true,
+    volta: 'weak',
+  },
+  {
+    titulo: 'depois de <code>fluxo = nil</code>',
+    resultado: 'O fluxo foi liberado; a tela continua viva',
+    fluxo: 'nil',
+    tela: true,
+    objetoFluxo: { vivo: false, linhas: ['liberado'] },
+    objetoTela: { vivo: true, linhas: ['referências fortes: 1', '<code>fluxo</code>: nil'] },
+    ida: false,
+  },
+];
+---
+
+<ReferenciasDoLogin rotulo={rotulo} paineis={paineis}>
+  <slot />
+</ReferenciasDoLogin>

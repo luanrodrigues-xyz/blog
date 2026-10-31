@@ -1,0 +1,23 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const rows = [
+  { id: 'heading', before: 140, after: 140 },
+  { id: 'reading-tips', before: 300, after: 460 },
+  { id: 'read-button', before: 460, after: 300 },
+];
+---
+<Diagrama plano altura={790} rotulo="O BFF muda a ordem de heading, reading-tips, read-button para heading, read-button, reading-tips. Os mesmos IDs aparecem nas duas respostas. reading-tips permanece details; seu estado expandido pertence ao app, não ao JSON.">
+  <span class="no txt forte" style="--x:40; --y:40; --w:380; --h:60">original</span>
+  <span class="no txt forte" style="--x:580; --y:40; --w:380; --h:60">reordered</span>
+  {rows.map(({ id, before, after }) => <>
+    <div class="no nodo" style={`--x:40; --y:${before}; --w:380; --h:100`}><span class="t3">{id}</span></div>
+    <div class="no nodo" style={`--x:580; --y:${after}; --w:380; --h:100`}><span class="t3">{id}</span></div>
+  </>)}
+  <svg class="setas" viewBox="0 0 1000 790" aria-hidden="true">
+    <Seta x1={440} y1={70} x2={560} y2={70} tipo="neutra" />
+  </svg>
+  <div class="no nodo fantasma" style="--x:40; --y:640; --w:920; --h:100"><span class="pq">isExpanded é estado local de reading-tips</span><span class="pq ink2">não é enviado nem reordenado pelo BFF</span></div>
+  <span slot="legenda">O BFF troca a posição dos dois últimos componentes e mantém seus IDs. Role horizontalmente em telas estreitas.</span>
+</Diagrama>
+<style>.forte { font-weight: 600; }</style>

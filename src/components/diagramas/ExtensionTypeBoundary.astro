@@ -1,0 +1,81 @@
+---
+import Diagrama from './Diagrama.astro';
+const label =
+  'The struct declaration stores songIDs and an extension declares nextSongID. Both declarations belong to one PlayQueue type. The two regions represent declarations, not separate values or instances.';
+---
+
+<div class="extension-boundary">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 490 : 1120} minLargura={260}>
+        <div class="no limite boundary" style={`--x:24;--y:24;--w:952;--h:${wide ? 442 : 1072}`}></div>
+        <div class="no txt heading" style={`--x:64;--y:48;--w:872;--h:${wide ? 60 : 110}`}>
+          One type · PlayQueue
+        </div>
+        <div
+          class="no regiao"
+          style={`--x:64;--y:${wide ? 132 : 200};--w:${wide ? 416 : 872};--h:${wide ? 230 : 320}`}
+        ></div>
+        <div
+          class="no txt heading"
+          style={`--x:88;--y:${wide ? 156 : 230};--w:${wide ? 368 : 824};--h:${wide ? 60 : 100}`}
+        >
+          Stored data
+        </div>
+        <div
+          class="no t4 centered"
+          style={`--x:88;--y:${wide ? 238 : 360};--w:${wide ? 368 : 824};--h:${wide ? 70 : 100}`}
+        >
+          songIDs: [String]
+        </div>
+        <div
+          class="no regiao"
+          style={`--x:${wide ? 520 : 64};--y:${wide ? 132 : 580};--w:${wide ? 416 : 872};--h:${wide ? 230 : 320}`}
+        ></div>
+        <div
+          class="no txt heading"
+          style={`--x:${wide ? 544 : 88};--y:${wide ? 156 : 610};--w:${wide ? 368 : 824};--h:${wide ? 60 : 100}`}
+        >
+          Added member
+        </div>
+        <div
+          class="no t4 centered"
+          style={`--x:${wide ? 544 : 88};--y:${wide ? 238 : 740};--w:${wide ? 368 : 824};--h:${wide ? 70 : 100}`}
+        >
+          nextSongID: String?
+        </div>
+        <div class="no pq centered" style={`--x:64;--y:${wide ? 382 : 960};--w:872;--h:${wide ? 60 : 110}`}>
+          Source grouping, not two instances
+        </div>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .extension-boundary {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading,
+  .centered {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  .centered {
+    justify-content: center;
+    text-align: center;
+  }
+</style>

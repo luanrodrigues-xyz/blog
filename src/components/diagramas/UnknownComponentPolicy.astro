@@ -1,0 +1,17 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+---
+<Diagrama plano altura={700} rotulo="Na versão 1, video é desconhecido. Com isRequired false, intro-video é omitido e heading e read-button são aceitos. Com isRequired true, a tela inteira é recusada, sem publicar parcialmente os componentes conhecidos.">
+  <div class="no nodo" style="--x:240; --y:40; --w:520; --h:120"><span class="t3">type = "video"</span><span class="pq ink2">cliente sem componente de vídeo</span></div>
+  <div class="no nodo" style="--x:40; --y:280; --w:440; --h:300"><span class="t4">isRequired = false</span><span class="txt result">Omitir intro-video</span><span class="t4">heading</span><span class="t4">read-button</span><span class="pq ink2">componentes aceitos</span></div>
+  <div class="no nodo" style="--x:520; --y:280; --w:440; --h:300"><span class="t4">isRequired = true</span><span class="txt result">Recusar a tela</span><span class="pq ink2">nenhum resultado parcial</span></div>
+  <svg class="setas" viewBox="0 0 1000 700" aria-hidden="true">
+    <Seta x1={400} y1={160} x2={260} y2={280} tipo="neutra" />
+    <Seta x1={600} y1={160} x2={740} y2={280} tipo="neutra" />
+  </svg>
+  <span slot="legenda">As duas respostas diferem na obrigatoriedade do mesmo componente desconhecido. Em telas estreitas, role para comparar os caminhos.</span>
+</Diagrama>
+<style>
+  .result { margin-block: calc(var(--u) * 22); font-weight: 600; }
+</style>

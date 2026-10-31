@@ -1,0 +1,823 @@
+.article-layout {
+  margin-top: var(--section-space);
+}
+
+/* Apple documentation style: breadcrumb above the title. */
+.breadcrumb {
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb li + li::before {
+  content: '›' / '';
+  margin-right: 0.5rem;
+  color: var(--fg-muted);
+}
+
+.breadcrumb a {
+  color: var(--action);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb [aria-current] {
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+
+.article {
+  min-width: 0;
+}
+
+.article-header {
+  margin-bottom: 2.4rem;
+}
+
+.article-header .back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--action);
+}
+
+.article-header h1 {
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  line-height: 1.15;
+}
+
+.article-header .lead {
+  max-width: none;
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
+  line-height: 1.45;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+
+.prose {
+  font: var(--text-body) / 1.7 var(--font-body);
+  overflow-wrap: break-word;
+}
+
+/* Article text: larger, in the manner of Medium. Headings, spacing and code are in em, so they follow the body size. */
+.prose.article-body {
+  font-size: clamp(1.125rem, 1.02rem + 0.4vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.prose.article-body h2 {
+  margin-block: 2.6em 0.6em;
+  font-size: 1.6em;
+  line-height: 1.22;
+}
+
+.prose.article-body h3 {
+  margin-block: 2em 0.5em;
+  font-size: 1.3em;
+  line-height: 1.28;
+}
+
+.prose.article-body p {
+  margin-bottom: 1.35em;
+}
+
+.prose.article-body :is(ul, ol) {
+  margin-bottom: 1.35em;
+}
+
+.prose.article-body li {
+  margin-bottom: 0.5em;
+}
+
+.prose.article-body pre {
+  font-size: 0.75em;
+}
+
+.prose p {
+  margin: 0 0 1.4rem;
+}
+
+.prose h2 {
+  margin: 3rem 0 1rem;
+  font-size: 1.65rem;
+  line-height: 1.25;
+}
+
+/* Section headings fill the column instead of being balanced into two short lines. */
+.prose h2,
+.prose h3 {
+  text-wrap: wrap;
+}
+
+.prose h3 {
+  margin: 2.2rem 0 0.9rem;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.4rem;
+}
+
+.prose blockquote {
+  margin: 2rem 0;
+  border-left: 3px solid var(--border);
+  padding: 0.2rem 0 0.2rem 1.25rem;
+  color: var(--fg-muted);
+}
+
+.prose blockquote p:last-child {
+  margin: 0;
+}
+
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--code-inline-bg);
+  padding: 0.12em 0.35em;
+  border-radius: 0.3125rem;
+  overflow-wrap: anywhere;
+}
+
+.prose pre {
+  font: var(--code-weight) 0.84rem/1.5 var(--font-mono);
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 1.2rem 1.3rem;
+  margin: 1.6rem 0 2rem;
+  border: 1px solid var(--code-line);
+  border-radius: var(--radius-l);
+  corner-shape: squircle;
+  overflow: auto;
+  tab-size: 4;
+}
+
+.prose pre code {
+  font: inherit;
+}
+
+.prose pre ::selection {
+  background: var(--code-selection);
+}
+
+/* Shadows appear only on the side that still has hidden code (background-attachment: local). */
+.prose pre {
+  background:
+    linear-gradient(to right, var(--code-bg) 30%, transparent) 0 0 / 2.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--code-bg) 30%, transparent) 100% 0 / 2.5rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--code-shade), transparent) 0 0 / 0.9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--code-shade), transparent) 100% 0 / 0.9rem 100% no-repeat scroll,
+    var(--code-bg);
+}
+
+/* A bold-only paragraph right before a code block is that block's file label. */
+.prose p:has(> strong:only-child):has(+ pre) {
+  margin: 1.6rem auto 0;
+  padding: 0.5rem 1.3rem;
+  background: var(--code-label-bg);
+  color: var(--fg-on-code);
+  font: 600 0.75rem/1.4 var(--font-mono);
+  border: 1px solid var(--code-line);
+  border-bottom: 0;
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+}
+.prose p:has(> strong:only-child):has(+ pre) strong {
+  font-weight: inherit;
+}
+.prose p:has(> strong:only-child):has(+ pre)::before {
+  content: '';
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-right: 0.6rem;
+  border-radius: 3px;
+  background: var(--swift);
+}
+.prose p:has(> strong:only-child) + pre {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.prose .table-scroll {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  background: var(--surface-alt);
+}
+
+.prose details {
+  margin: 2rem 0;
+  border-block: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.prose summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 2.75rem;
+}
+
+.prose details[open] > summary {
+  margin-bottom: 1rem;
+}
+
+.article-end {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+}
+
+.article-origin {
+  margin: 0 0 var(--space-4);
+}
+
+.article-end > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: 550;
+}
+
+.concept-figure .eyebrow {
+  font-size: 0.75rem;
+}
+
+.prose .concept-figure {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.prose .concept-figure h3 {
+  margin: 0.5rem 0 0;
+}
+
+.prose .concept-figure p {
+  margin-bottom: 0;
+}
+
+.prose .concept-figure code {
+  background: transparent;
+  padding: 0;
+}
+
+.prose .concept-figure figcaption {
+  font-size: 0.9rem;
+}
+
+.concept-figure button {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 700px) {
+  .article-layout {
+    margin-top: 2.5rem;
+  }
+  .article-header h1 {
+    font-size: 2rem;
+  }
+  .prose {
+    font-size: 1.0625rem;
+  }
+  .prose h2 {
+    font-size: 1.55rem;
+  }
+  .prose pre {
+    padding: 1rem;
+    font-size: 0.79rem;
+  }
+}
+
+@media print {
+  .article-end {
+    display: none;
+  }
+  .article-layout {
+    display: block;
+    margin: 0;
+  }
+  .prose pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    background: #f5f5f5;
+    color: #111;
+  }
+  .concept-figure {
+    break-inside: avoid;
+  }
+}
+
+/* Syntax colors from Xcode's Default themes (tokens in base.css). Swift uses the xc-* classes
+   from src/markdown/swift.ts; other languages keep highlight.js classes mapped to the same palette. */
+.xc-keyword,
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color: var(--xc-keyword);
+  font-weight: var(--code-keyword-weight);
+}
+
+.xc-string,
+.hljs-string,
+.hljs-regexp {
+  color: var(--xc-string);
+}
+
+.xc-comment,
+.xc-doc,
+.hljs-comment,
+.hljs-quote {
+  color: var(--xc-comment);
+}
+
+/* Xcode sets documentation comments in the system sans-serif, not in SF Mono. */
+.xc-doc {
+  font-family: var(--font-ui);
+}
+
+.xc-doc-keyword,
+.xc-mark {
+  color: var(--xc-doc-keyword);
+  font-weight: 700;
+}
+
+.xc-number,
+.hljs-number {
+  color: var(--xc-number);
+}
+
+.xc-attribute,
+.hljs-meta {
+  color: var(--xc-attribute);
+}
+
+.xc-preprocessor {
+  color: var(--xc-preprocessor);
+}
+
+.xc-decl-type,
+.hljs-title.class_ {
+  color: var(--xc-decl-type);
+}
+
+.xc-decl-other,
+.hljs-title.function_,
+.hljs-function .hljs-title {
+  color: var(--xc-decl-other);
+}
+
+.xc-type {
+  color: var(--xc-type);
+}
+
+.xc-type-system,
+.hljs-type,
+.hljs-built_in {
+  color: var(--xc-type-system);
+}
+
+.xc-function,
+.xc-variable,
+.hljs-variable,
+.hljs-attr {
+  color: var(--xc-function);
+}
+
+.xc-function-system,
+.xc-variable-system,
+.hljs-property {
+  color: var(--xc-function-system);
+}
+
+/* Text and code share a steady measure; figures and tables can use the full site width.
+   Only direct children break out, preserving each diagram's internal layout. */
+.article-header,
+.article-end {
+  max-width: var(--width-reading);
+  margin-inline: auto;
+}
+.article-body {
+  display: flow-root;
+}
+.prose.article-body > * {
+  max-width: var(--width-reading);
+  margin-inline: auto;
+  min-width: 0;
+}
+.article-body > :is(figure, .table-scroll),
+.article-body > p:has(> img:only-child) {
+  width: 100%;
+  max-width: var(--width-breakout);
+  margin-inline: auto;
+}
+.article-body > figure.diagrama {
+  max-width: var(--width-diagram);
+}
+/* Figures and simulator captures written as Markdown images: centered, with the same frame as the diagrams. */
+.article-body > p > img:only-child,
+.article-body > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: var(--space-8) auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+}
+/* Em .mdx, um <img> solto é filho direto do corpo (em .md ficava dentro de um <p>). A regra
+   `.prose.article-body > *` limita só a largura de leitura; sem isto a imagem não encolhe no celular. */
+.prose.article-body > img {
+  max-width: 100%;
+  height: auto;
+}
+/* Screenshots stay inside the reading column, including responsive picture sources. */
+.prose.article-body > .article-screenshot {
+  display: block;
+  width: auto;
+  max-width: min(100%, var(--width-reading));
+  height: auto;
+  margin: var(--space-8) auto;
+}
+.article-screenshot > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+}
+.prose.article-body > .concept-figure {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin-block: var(--space-10);
+}
+.prose.article-body > .concept-figure > :is(header, figcaption) {
+  max-width: var(--width-reading);
+  margin-inline: auto;
+  padding-inline: 0;
+}
+.prose figure:not(.concept-figure) {
+  margin-block: var(--space-8);
+}
+.prose figcaption {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-3);
+}
+.prose :is(pre, .table-scroll) {
+  min-width: 0;
+  max-width: 100%;
+}
+.prose.article-body > :is(pre, .source-editor) {
+  width: 100%;
+  max-width: var(--width-reading);
+  margin-inline: auto;
+}
+.article-body > blockquote {
+  padding-left: var(--space-6);
+}
+.article-header h1 {
+  overflow-wrap: anywhere;
+}
+/* Cover under the header, in the reading column. */
+/* A capa clara ou escura (<picture>) não cria caixa própria: o layout continua sendo o da <img>. */
+.cover-picture {
+  display: contents;
+}
+.article-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: var(--width-reading);
+  margin: 0 auto var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  corner-shape: squircle;
+  background: #fff;
+}
+/* Asides in the style of Apple's documentation: a bold label, a coloured bar, no icon. */
+.prose .callout {
+  --callout: var(--action);
+  margin-block: 2rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--callout);
+  border-radius: var(--radius-m);
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+
+.prose .callout-run {
+  --callout: var(--tile-green);
+}
+.prose .callout-important {
+  --callout: var(--tile-orange);
+}
+.prose .callout-warning {
+  --callout: var(--tile-red);
+}
+
+.prose .callout-title {
+  margin: 0 0 0.35rem;
+  font: 700 0.95rem/1.3 var(--font-ui);
+}
+
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+.prose .callout code {
+  background: var(--code-inline-bg);
+  color: inherit;
+}
+.mermaid-diagram {
+  background: #fff;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+}
+.mermaid-diagram img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+@media print {
+  .prose.article-body > * {
+    max-width: 100%;
+  }
+}
+
+/* Article end: subjects and the neighbouring articles of the same subject. */
+.article-pager {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+.pager-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+.pager-links a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+.pager-links a[rel='next'] {
+  grid-column: 2;
+  text-align: right;
+}
+.pager-links a span {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+.pager-links a strong {
+  font: 700 1.05rem/1.3 var(--font-heading);
+  letter-spacing: -0.02em;
+}
+.pager-links a:hover strong {
+  color: var(--action);
+  text-decoration: underline;
+}
+@media (max-width: 700px) {
+  .pager-links {
+    grid-template-columns: 1fr;
+  }
+  .pager-links a[rel='next'] {
+    grid-column: 1;
+    text-align: left;
+  }
+}
+@media print {
+  .article-pager {
+    display: none;
+  }
+}
+
+/* Back to top: a round translucent button, like a system control. */
+.to-top {
+  position: fixed;
+  z-index: 40;
+  right: max(var(--gutter), env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--fg);
+  box-shadow: 0 2px 10px #0000001f;
+  cursor: pointer;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .to-top {
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+}
+
+.to-top::before {
+  content: '';
+  width: 1.125rem;
+  height: 1.125rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5.5 11.5 12 5l6.5 6.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5.5 11.5 12 5l6.5 6.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.to-top:hover {
+  background: var(--surface-hover);
+}
+
+@media print {
+  .to-top {
+    display: none;
+  }
+}
+
+/* Fallback for articles without a usable cover: subject color and glyph, no image file. */
+.article-cover.is-fallback {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1200 / 630;
+  background: var(--tile, var(--tile-blue));
+}
+.article-cover.is-fallback .topic-icon {
+  width: 5rem;
+  height: 5rem;
+  background: transparent;
+}
+.article-cover.is-fallback .topic-icon::before {
+  width: 4rem;
+  height: 4rem;
+}
+
+.article-toc {
+  max-width: var(--width-reading);
+  margin: 0 auto var(--space-8);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+}
+.article-toc summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.article-toc ol {
+  margin-bottom: 0;
+  padding-left: 1.5rem;
+}
+.article-toc li {
+  margin-block: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.related-articles {
+  margin-block: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+.related-articles h2 {
+  font-size: 1.25rem;
+}
+.related-articles ul {
+  padding-left: 1.25rem;
+}
+.related-articles li {
+  margin-block: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.prose .code-example {
+  min-width: 0;
+  margin-block: 1.6rem 2rem;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  font: 500 0.8rem/1.4 var(--font-ui);
+}
+.code-toolbar > :first-child {
+  margin-right: auto;
+}
+.code-toolbar .copy-code {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  background: var(--fill);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+}
+.prose .code-example pre {
+  margin: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  font-size: 0.75em;
+}
+.prose p:has(> strong:only-child):has(+ .code-example) {
+  margin-bottom: 0;
+}
+@media print {
+  .code-toolbar {
+    display: none;
+  }
+}
+.article-share {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: var(--space-8);
+}
+.article-share a,
+.article-share button {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  font-weight: 600;
+  color: var(--action);
+  background: color-mix(in srgb, var(--apple-blue) 12%, var(--canvas));
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--apple-blue);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  text-decoration: none;
+}
+.article-share a:hover,
+.article-share button:hover {
+  background: color-mix(in srgb, var(--apple-blue) 22%, var(--canvas));
+  text-decoration: none;
+}
+.article-share button[hidden] {
+  display: none;
+}
+.share-status {
+  font-size: var(--text-sm);
+}
+@media print {
+  .article-share {
+    display: none;
+  }
+}

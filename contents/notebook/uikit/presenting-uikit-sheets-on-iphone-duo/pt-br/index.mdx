@@ -1,0 +1,159 @@
+---
+title: "Apresentando sheets com UIKit no iPhone Duo"
+description: "Testei como o posicionamento e os detents de uma sheet mudam sua apresentação no iPhone Duo, e como o UIKit adapta os controles e a safe area."
+date: "2026-09-20"
+topic: "uikit"
+readingOrder: 1
+draft: false
+tags: ["UIKit", "UISheetPresentationController", "iPhone Duo", "Safe Area", "Adaptive Layout"]
+language: "pt-BR"
+urlSlug: "presenting-uikit-sheets-on-iphone-duo-pt"
+cover: "presenting-uikit-sheets-on-iphone-duo.png"
+coverAlt: "Os controles de uma sheet de leitura passam de uma barra horizontal para uma barra vertical, com o conteúdo se ajustando ao espaço ao lado."
+---
+
+import { Image } from 'astro:assets';
+import ContextoDoExemplo from '../../../../../src/components/shared/ContextoDoExemplo.astro';
+import foldedHorizontal from './duo-dobrado-horizontal.png';
+import SheetPresentationOwner from '../../../../../src/components/diagramas/SheetPresentationOwner.astro';
+import SheetComparison from '../../../../../src/components/shared/ComparacaoInterface.astro';
+import automaticPrimary from '../en/duo-primary-automatic.png';
+import trailingPrimary from '../en/duo-primary-trailing.png';
+import trailingInnerMedium from '../en/duo-inner-trailing-medium.png';
+import trailingInnerLarge from '../en/duo-inner-trailing-large.png';
+
+Em um app de leitura, abrir um detalhe apresenta uma sheet. Há um texto longo, uma ação para fechar e pouco mais. Em um iPhone convencional, essa apresentação é bastante previsível. No iPhone Duo, a posição da sheet e a organização dos controles podem mudar conforme a tela utilizada.
+
+Quis entender até onde o UIKit cuida disso sozinho e o que acontece quando defino o posicionamento com [`UISheetPresentationController`](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller).
+
+<ContextoDoExemplo titulo="Ambiente do teste">
+
+Usei um simulador de iPhone Duo com iOS 27.1 e o SDK 27.1. A Apple explica os requisitos de SDK para essa adaptação em [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/). As capturas mostram os resultados na tela primária, na tela interna e com o aparelho dobrado na horizontal.
+
+</ContextoDoExemplo>
+
+## Apresentando o detalhe
+
+O detalhe fica dentro de um `UINavigationController`, apresentado como `.pageSheet`:
+
+```swift
+func makeReadingSheet() -> UINavigationController {
+    let detail = ReadingDetailViewController()
+    let navigation = UINavigationController(rootViewController: detail)
+    navigation.modalPresentationStyle = .pageSheet
+
+    if let sheet = navigation.sheetPresentationController {
+        sheet.detents = [.medium(), .large()]
+        sheet.selectedDetentIdentifier = .medium
+        sheet.prefersGrabberVisible = true
+    }
+
+    return navigation
+}
+
+func showReadingDetails() {
+    present(makeReadingSheet(), animated: true)
+}
+```
+
+Comecei com `.medium` selecionado para comparar os posicionamentos na mesma altura.
+
+Esses métodos ficam em `LibraryViewController`. Como o controller apresentado é `navigation`, é nele que configuro o `sheetPresentationController`. O `ReadingDetailViewController` fica responsável pelo conteúdo e pelos itens de navegação.
+
+<SheetPresentationOwner language="pt-BR" rotulo="LibraryViewController apresenta um UINavigationController, cujo sheetPresentationController controla os detents e o posicionamento. ReadingDetailViewController é seu controller raiz e fornece os itens de navegação e o layout do conteúdo." />
+
+A ação de fechar é um `UIBarButtonItem` configurado no `viewDidLoad` do detalhe:
+
+```swift
+navigationItem.rightBarButtonItem = UIBarButtonItem(
+    systemItem: .close,
+    primaryAction: UIAction { [weak self] _ in
+        self?.dismiss(animated: true)
+    }
+)
+```
+
+Preferi usar o item de navegação do sistema em vez de colocar um botão em uma posição fixa da view. Assim, o UIKit pode reorganizá-lo quando a apresentação muda.
+
+## O que acontece ao mudar o posicionamento?
+
+Por padrão, o sistema escolhe onde apresentar a sheet. A partir do iOS 27, [`preferredPlacement`](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/preferredplacement) permite solicitar posições como `.leading`, `.center` e `.trailing`.
+
+Para comparar, mantive o mesmo detalhe e alterei apenas essa preferência:
+
+```swift
+let navigation = makeReadingSheet()
+
+if #available(iOS 27.0, *) {
+    navigation.sheetPresentationController?.preferredPlacement = .trailing
+}
+
+present(navigation, animated: true)
+```
+
+Na tela primária do Duo, o resultado não mudou. Com o detent médio, `.automatic`, `.leading` e `.trailing` produziram o mesmo frame de sheet. O botão Close continuou acima do texto.
+
+<SheetComparison capturas={[
+    { titulo: 'Automatic na tela primária', imagem: automaticPrimary, alt: 'O detalhe de leitura abre próximo à parte inferior da tela primária do Duo, com a ação de fechar na horizontal acima do texto.' },
+    { titulo: 'Trailing na mesma tela', imagem: trailingPrimary, alt: 'Solicitar o posicionamento trailing mantém o detalhe na mesma posição e na altura média nesta configuração de tela do Duo.' }
+]} />
+
+As capturas foram feitas na mesma janela, de 466 × 678 pontos. Isso me chamou a atenção porque configurar `.trailing` não significa que a sheet necessariamente vai mudar de lugar. O posicionamento continua sujeito ao ambiente em que ela aparece.
+
+Na tela interna, mais larga, o resultado foi diferente: com `.trailing`, a sheet apareceu à direita. Mas ainda havia outra variável importante nessa apresentação: a altura.
+
+## O detent também mudou a barra
+
+Com `.trailing` e o detent médio, a sheet ocupou a parte inferior direita da tela interna. Quando selecionei `.large`, ela passou a ocupar praticamente toda a altura daquele lado.
+
+Dentro de `makeReadingSheet()`, troquei a seleção inicial de `.medium` por `.large`, mantendo os dois detents disponíveis:
+
+```swift
+sheet.selectedDetentIdentifier = .large
+```
+
+<SheetComparison capturas={[
+    { titulo: 'Trailing com medium', imagem: trailingInnerMedium, alt: 'A sheet de leitura ocupa a parte inferior direita da tela interna, com a ação de fechar acima do texto.' },
+    { titulo: 'Trailing com large', imagem: trailingInnerLarge, alt: 'A sheet preenche a altura disponível do lado direito da tela interna, com a ação de fechar na borda direita e o texto deixando espaço ao lado.' }
+]} />
+
+As duas capturas usam a mesma janela de 951 × 669 pontos, o mesmo conteúdo e o mesmo posicionamento. A altura da sheet passou de 385 para 661 pontos. O Close, que antes aparecia acima do texto, foi para a borda direita.
+
+Não precisei mudar o `navigationItem` nem criar outro layout para a barra. O UIKit reorganizou os controles de acordo com a apresentação. A Apple apresenta essa adaptação das barras em [Raise the bar with iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111462/).
+
+Aqui existe uma distinção que achei útil. `preferredPlacement` solicita onde a sheet deve aparecer, e o detent selecionado determina sua altura inicial. No exemplo, manter [`.medium()`](https://developer.apple.com/documentation/uikit/uisheetpresentationcontroller/detent/medium%28%29) e `.large()` em `detents` ainda permite reduzir a sheet depois de abri-la em `.large`.
+
+## E o espaço do conteúdo?
+
+Com o botão Close na lateral, o espaço disponível para a leitura deixa de ser simétrico. Se eu calculasse a largura do texto usando a largura total da tela ou assumisse insets iguais, poderia acabar colocando conteúdo sob os controles.
+
+A scroll view do detalhe usa a safe area em cada borda:
+
+```swift
+let safeArea = view.safeAreaLayoutGuide
+
+NSLayoutConstraint.activate([
+    scrollView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
+    scrollView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
+    scrollView.topAnchor.constraint(equalTo: safeArea.topAnchor),
+    scrollView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor)
+])
+```
+
+No exemplo completo, a label de leitura também usa `contentLayoutGuide` e `frameLayoutGuide` da scroll view para quebrar as linhas e permitir a rolagem.
+
+Na tela interna, com `.trailing` e o detent grande, medi aproximadamente 76,33 pontos de inset à direita. O Close apareceu nessa região, enquanto o texto permaneceu dentro da safe area. As mesmas constraints continuaram funcionando sem nenhum ajuste específico para o Duo.
+
+## E quando o aparelho está dobrado?
+
+Mantive a mesma sheet aberta, iniciada com `.trailing` e `.large`, e dobrei o Duo na horizontal. A janela passou de 951 × 669 para 678 × 466 pontos. Nessa configuração, a sheet deixou de ocupar apenas o lado direito e passou a preencher quase toda a área visível. O Close voltou para o canto superior direito, acima do texto.
+<figure style="width: 100%; max-width: 420px; margin-inline: auto;">
+    <Image src={foldedHorizontal} alt="Sheet de leitura após dobrar o Duo na horizontal, mantendo a apresentação iniciada com trailing e large. O detalhe ocupa quase toda a tela e o Close aparece acima do texto, no canto superior direito." widths={[420, 840]} sizes="(max-width: 452px) calc(100vw - 32px), 420px" />
+    <figcaption>A mesma sheet após dobrar o Duo na horizontal, sem fechar nem apresentar o detalhe novamente.</figcaption>
+</figure>
+
+Em [Design for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111466/), a Apple documenta que sheets podem se afastar da dobra quando o Duo está parcialmente fechado. Neste teste, a mudança de tela reorganizou a sheet e seus controles sem que eu alterasse o posicionamento solicitado ou as constraints do conteúdo.
+
+Por enquanto, não vejo motivo para calcular offsets pela largura da tela ou tentar posicionar a sheet manualmente. Prefiro deixar o sistema decidir a posição e manter o conteúdo adaptável à safe area.
+
+O UIKit também oferece [`preferredVerticalBarBehavior`](https://developer.apple.com/documentation/uikit/uiviewcontroller/preferredverticalbarbehavior) no iOS 27.1 para interfaces que precisam optar por barras horizontais. Não usei essa configuração aqui: com o item Close padrão e o layout atual, a adaptação automática funcionou nos casos que testei.

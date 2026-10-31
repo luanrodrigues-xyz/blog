@@ -1,0 +1,36 @@
+<footer class="fontes-artigo" aria-label="Projeto e referências">
+  <slot />
+</footer>
+
+<style>
+  .fontes-artigo {
+    margin-block-start: 2rem;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--border);
+    color: var(--fg-muted);
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .fontes-artigo :global(p) {
+    font-size: inherit;
+    line-height: inherit;
+    margin-block: 0 0.75rem;
+  }
+
+  .fontes-artigo :global(p:last-child) {
+    margin-block-end: 0;
+  }
+
+  .fontes-artigo :global(a) {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .fontes-artigo :global(a:hover),
+  .fontes-artigo :global(a:focus-visible) {
+    color: var(--action);
+  }
+</style>

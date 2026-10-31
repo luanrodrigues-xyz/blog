@@ -1,0 +1,194 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import CoverFallback from '../components/shared/CoverFallback.astro';
+import LanguageSwitchLink from '../components/shared/LanguageSwitchLink.astro';
+import { articleUrl, formatDate, interfaceLanguage, ui } from '../config/site';
+import type { Article } from '../lib/articles';
+import { articlePage } from '../lib/article-page';
+
+interface Props {
+  entry: Article;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { language, Content, headings, related, previous, next, topic, topicUrl, topicLabel, cover, socialCover } =
+  await articlePage(entry);
+const text = ui;
+const { published, displayDate } = data;
+const breadcrumbTopic = topicLabel;
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description ?? ''}
+  language={language}
+  canonical={data.canonical}
+  alternates={data.alternates}
+  ogType="article"
+  coverUrl={socialCover}
+  coverAlt={data.coverAlt}
+  isArticle
+  published={published}
+  modified={data.updated ?? published}
+  tags={data.tags}
+>
+  <div class="article-layout">
+    <article class="article" data-article>
+      <header class="article-header">
+        <nav class="breadcrumb" aria-label={text.breadcrumb} lang={interfaceLanguage}>
+          <ol role="list">
+            <li>
+              <a href={text.articlesUrl}>{text.articles}</a>
+            </li>
+            <li>
+              <a href={topicUrl}>{breadcrumbTopic}</a>
+            </li>
+            <li aria-current="page" lang={language}>
+              {data.title}
+            </li>
+          </ol>
+        </nav>
+        <h1>{data.title}</h1>
+        <p class="lead">{data.description}</p>
+        <div class="metadata" lang={interfaceLanguage}>
+          <a rel="author" href={text.aboutUrl}>
+            {'Luan Rodrigues'}
+          </a>
+          <span aria-hidden="true">·</span>
+          <time datetime={published.toISOString().slice(0, 10)}>{displayDate}</time>
+          {data.updated && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>
+                Reviewed{' '}
+                <time datetime={data.updated.toISOString().slice(0, 10)}>
+                  {formatDate(data.updated, interfaceLanguage)}
+                </time>
+              </span>
+            </>
+          )}
+          {data.readingMinutes && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{data.readingMinutes} min read</span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <LanguageSwitchLink alternates={data.alternates} language={data.language} />
+        </div>
+      </header>
+      {cover ? (
+        <picture class="cover-picture">
+          {cover.dark && (
+            <source
+              srcset={cover.dark.srcSet.attribute || cover.dark.src}
+              type="image/webp"
+              sizes="(max-width: 927px) calc(100vw - 48px), 880px"
+              media="(prefers-color-scheme: dark)"
+            />
+          )}
+          <Image
+            class="article-cover"
+            priority
+            loading="eager"
+            src={cover.src}
+            widths={[320, 640, 960, 1200]}
+            sizes="(max-width: 927px) calc(100vw - 48px), 880px"
+            alt={data.coverAlt ?? ''}
+            width={cover.width}
+            height={cover.height}
+          />
+        </picture>
+      ) : (
+        <CoverFallback topic={topic} />
+      )}
+      {headings.length >= 3 && (
+        <details class="article-toc" lang={interfaceLanguage}>
+          <summary>On this page</summary>
+          <nav aria-label="Table of contents">
+            <ol>
+              {headings.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`} lang={language}>
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </details>
+      )}
+      <div class="prose article-body">
+        <Content />
+      </div>
+      <footer class="article-end">
+        <div class="article-share" lang={interfaceLanguage}>
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(data.canonical)}`}>
+            Share on LinkedIn
+          </a>
+          <button
+            type="button"
+            class="share-article"
+            data-share-url={data.canonical}
+            data-share-title={data.title}
+            hidden
+          >
+            Share article
+          </button>
+          <span class="share-status" role="status"></span>
+        </div>
+        {data.notasDeEstudo && (
+          <p class="article-origin" lang={interfaceLanguage}>
+            {text.fromNotes}
+          </p>
+        )}
+        <ul class="article-tags" role="list" aria-label={text.tagsLabel}>
+          {data.tags.map((tag) => (
+            <li>
+              <span>{tag}</span>
+            </li>
+          ))}
+        </ul>
+        {(previous || next) && (
+          <nav class="article-pager" aria-label="Articles by publication date">
+            <div class="pager-links">
+              {previous && (
+                <a rel="prev" href={articleUrl(previous)}>
+                  <span lang={interfaceLanguage}>Previous article</span>
+                  <strong>{previous.data.title}</strong>
+                </a>
+              )}
+              {next && (
+                <a rel="next" href={articleUrl(next)}>
+                  <span lang={interfaceLanguage}>Next article</span>
+                  <strong>{next.data.title}</strong>
+                </a>
+              )}
+            </div>
+          </nav>
+        )}
+        {related.length > 0 && (
+          <nav class="related-articles" aria-labelledby="related-title">
+            <h2 id="related-title" lang={interfaceLanguage}>
+              Continue reading
+            </h2>
+            <ul>
+              {related.map((article) => (
+                <li>
+                  <a data-analytics-kind="article" href={articleUrl(article)} lang={article.data.language}>
+                    {article.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+        <a href={text.articlesUrl} lang={interfaceLanguage}>
+          ← {text.articles}
+        </a>
+      </footer>
+    </article>
+  </div>
+</BaseLayout>

@@ -1,0 +1,322 @@
+---
+title: "Split R$ 249.99 into six installments. Who gets the extra cents?"
+description: "R$ 249.99 split into six equal parts leaves three cents over. The division is done, but the installment rule isn't."
+date: "2023-01-17"
+updated: "2026-10-06"
+topic: "swift"
+readingOrder: 2
+draft: false
+cover: "inteiros-e-centavos-em-swift.png"
+coverAlt: "24,999 cents split into six installments, with some installments at 4,167 cents to receive the extra cent and the others at 4,166."
+tags: ["Swift", "Int", "Double", "Decimal", "Swift Testing", "Overflow"]
+language: "en"
+translationKey: "integers-and-cents-in-swift"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import InstallmentsFromTotal from '../../../../../src/components/diagramas/InstallmentsFromTotal.astro';
+
+A R$ 249.99 purchase split into six installments looks simple until the installments add up to a different total.
+
+If I store the amount in cents and let integer division make the first split, this is what happens.
+
+```swift
+let total = 24_999 // R$ 249.99 in cents
+let installment = total / 6
+
+print(installment) // 4166
+print(installment * 6) // 24996
+```
+
+Six installments of R$ 41.66 add up to R$ 249.96. The missing three cents are not a Swift error. They are the remainder from integer division.
+
+## The contract of integer division
+
+Between two `Int` values, `/` truncates the quotient toward zero, while `%` returns a remainder with the same sign as the dividend. Together, these two behaviors form an identity guaranteed by the language.
+
+```swift
+let total = 24_999
+
+print(total / 6) // 4166
+print(total % 6) // 3
+print((total / 6) * 6 + total % 6) // 24999
+```
+
+The contract is that `a == (a / b) * b + a % b` always holds. The numbers add up because the identity holds.
+
+This contract also explains why a negative dividend produces a negative remainder. Since the quotient is truncated toward zero, the remainder compensates for the difference in the same direction as the dividend.
+
+`-24_999 % 6` gives `-3` because `-24_999 / 6` truncates to `-4166`, and `-4166 * 6` gives `-24_996`.
+
+What division does not decide is who gets those three cents. That part does not belong to the language. It is a business rule.
+
+## The distribution rule
+
+Here I chose to give the remaining cents to the first installments.
+
+```swift
+func installments(for total: Int, count: Int) -> [Int]? {
+    guard count > 0 else { return nil }
+
+    var base = total / count
+    var remainder = total % count
+
+    // With a negative remainder, adjust to floor division.
+    // base - 1 and remainder + count keep the identity intact.
+    if remainder < 0 {
+        base -= 1
+        remainder += count
+    }
+
+    return (0..<count).map { index in
+        index < remainder ? base + 1 : base
+    }
+}
+
+print(installments(for: 24_999, count: 6))
+// Optional([4167, 4167, 4167, 4166, 4166, 4166])
+
+print(installments(for: -24_999, count: 6))
+// Optional([-4166, -4166, -4166, -4167, -4167, -4167])
+```
+
+The first three installments become R$ 41.67. The other three stay at R$ 41.66. Add them together and the result is R$ 249.99 again.
+
+<InstallmentsFromTotal label="24_999 divided by 6 produces six base installments of 4_166 and three remaining cents, which are given to the first three installments.">
+
+The same purchase before and after applying the rule. Division finds the base installment and the remainder. The distribution rule decides where those three cents go.
+
+The widths are schematic.
+
+</InstallmentsFromTotal>
+
+Because the normalized remainder is always between zero and `count - 1`, no installment receives more than one extra cent, and the difference between the largest and smallest installment is never greater than one.
+
+I could give the extra cents to the last installments instead, or distribute them in another order defined by the product. The total would still be correct, but the rule would be different.
+
+That is why I prefer to keep this decision inside one function instead of spreading one-cent adjustments across the codebase.
+
+With a negative total, the same floor adjustment changes which side carries the extra cent. In the negative installments, the first ones have a smaller magnitude, while the last ones absorb the difference.
+
+If the domain treats refunds and charges symmetrically, that can be an acceptable result. If it does not, then the rule should be explicit instead of hiding the effect of the sign.
+
+## Why floor division instead of magnitude
+
+The most obvious fix for a negative remainder would be to calculate using `abs(total)` and apply the sign again at the end.
+
+That version hides an edge case.
+
+`abs(Int.min)` overflows because `Int.min` has no positive equivalent in two's-complement representation. The function could work for every realistic value you test and still fail on the one value that a normal range test is unlikely to cover.
+
+The floor-based normalization does not need `abs`.
+
+Dividing any `Int` by a positive count does not overflow, so `base` and `remainder` remain representable values, including when the total is `Int.min`.
+
+When I only need the magnitude in another context, `Int` also provides the `magnitude` property. It returns a `UInt`, which can represent even the magnitude of `Int.min`.
+
+The installment count is another value that usually comes from outside the function, maybe from a picker or a backend response.
+
+Integer division by zero stops execution. There is no exception to catch.
+
+I would not let an invalid configuration value crash the app because of an installment calculation, so the function returns `nil` when the count is not positive.
+
+## Turning the rule into a testable contract
+
+So far, I have checked that the numbers add up using printed examples. A contract that depends on manual checks will eventually break when someone rewrites the rule.
+
+The test should lock down what the function promises without locking down how it does the work.
+
+```swift
+import Testing
+
+@Test(
+    arguments: Array(stride(from: -1_000, through: 1_000, by: 17)),
+    1...12
+)
+func installmentsFollowTheContract(
+    total: Int,
+    count: Int
+) {
+    guard let result = installments(
+        for: total,
+        count: count
+    ) else {
+        Issue.record("count \(count) should be accepted")
+        return
+    }
+
+    #expect(result.count == count)
+    #expect(result.reduce(0, +) == total)
+    #expect(result.max()! - result.min()! <= 1)
+}
+```
+
+Those three expectations are the contract.
+
+The installments must add up to the exact original total, the requested number of installments must be respected, and no installment can differ from another by more than one cent.
+
+This also means the internal rule can change without making the test useless.
+
+A distribution that gives the extra cents to the last installments, or follows an order defined by the product, can still satisfy the same three expectations.
+
+The `by: 17` step moves through positive and negative totals without checking only round values. If a new implementation breaks any of those guarantees, it should show up in the test suite instead of production.
+
+## What if I used `Double`?
+
+Storing R$ 249.99 as `249.99` looks more natural. And `249.99 / 6` does produce decimal places.
+
+But then two different problems appear.
+
+The first one is representation.
+
+```swift
+let coffee = 0.1
+let fee = 0.2
+
+print(coffee + fee == 0.3) // false
+print(coffee + fee) // 0.30000000000000004
+```
+
+`0.1` and `0.2` do not have exact binary representations in `Double`. The approximation is already part of the value before any installment rule is applied.
+
+The second problem appears when rounding is used as a replacement for the distribution rule.
+
+Here the total in cents is already exact when converted to `Double`, and dividing it by six lands exactly halfway between two integers.
+
+```swift
+let base = Double(24_999) / 6 // 4166.5
+
+print(base.rounded()) // 4167.0
+print(base.rounded(.toNearestOrEven)) // 4166.0
+```
+
+Six installments of 4167 add up to 25002, three cents above the original total.
+
+Six installments of 4166 add up to 24996, three cents below it.
+
+The tie at 4166.5 is resolved by the rounding mode. `.rounded()` uses `toNearestOrAwayFromZero` by default, while `.toNearestOrEven` implements banker's rounding.
+
+At the exact point of the tie, who pays more is now decided by an implicitly chosen rounding mode rather than by a business rule.
+
+Integer division makes the unresolved part visible as a remainder and gives that decision back to the code that understands the domain.
+
+For cases that need decimal arithmetic, `Decimal` covers the middle ground.
+
+It can represent powers of ten exactly, which makes it useful for operations involving rates and interest without the binary approximation of `Double`. The trade-off is lower performance and APIs that are not as comfortable to work with.
+
+I would not use either `Double` or `Decimal` when the monetary value already comes in cents.
+
+`Int` keeps the loss visible in the remainder and turns the distribution into an explicit decision.
+
+That does not make `Double` bad. It just solves a different kind of problem.
+
+## Integers have limits too
+
+Using cents in an `Int` does not make the range infinite.
+
+On 64-bit platforms, including current iPhones, an `Int` uses 64 bits.
+
+```swift
+print(Int.max) // 9223372036854775807
+```
+
+In cents, that is far above any normal account balance. I would not expect to hit this limit in a normal financial operation.
+
+It becomes more interesting at system boundaries, especially when the data comes from somewhere else.
+
+Imagine importing a file with corrupted values.
+
+```swift
+func sum(_ values: [Int]) -> Int {
+    var total = 0
+
+    for value in values {
+        total += value
+    }
+
+    return total
+}
+
+let imported = [
+    9_000_000_000_000_000_000,
+    500_000_000_000_000_000
+]
+
+// print(sum(imported))
+// overflow
+```
+
+For normal integer operations, Swift checks for overflow in both debug and release builds.
+
+If the result of `+`, `-`, or `*` cannot fit in the type, execution stops. There is no exception to catch.
+
+When wrapping is intentional, operators such as `&+` exist for cases like checksums. Making that intention explicit with a wrapping operator is more honest than disabling the behavior globally.
+
+Stopping execution is better than silently allowing an invalid value to continue through the system.
+
+Still, crashing the app because an imported file is broken is not a very useful recovery strategy.
+
+At a boundary like this, I prefer to check the operation.
+
+```swift
+func sumCheckingOverflow(_ values: [Int]) -> Int? {
+    var total = 0
+
+    for value in values {
+        let (sum, overflow) =
+            total.addingReportingOverflow(value)
+
+        if overflow {
+            return nil
+        }
+
+        total = sum
+    }
+
+    return total
+}
+
+let imported = [
+    9_000_000_000_000_000_000,
+    500_000_000_000_000_000
+]
+
+print(
+    sumCheckingOverflow([10_000, -3_000, 5_000]) == 12_000
+) // true
+
+print(
+    sumCheckingOverflow(imported) == nil
+) // true
+```
+
+`addingReportingOverflow` returns the result together with a `Bool` that tells us whether the addition overflowed.
+
+Subtraction and multiplication have equivalent APIs with `subtractingReportingOverflow` and `multipliedReportingOverflow(by:)`.
+
+A checked sum answers whether the operation fits inside an `Int`.
+
+It does not answer whether the value makes sense for the domain.
+
+Each item in that imported file could fit inside an `Int` on its own and still be invalid as a monetary value, either because it exceeds the limits of the operation or because it fails a business validation.
+
+At system boundaries, I would combine overflow checking with limits defined by the domain and reject the import before doing any calculation.
+
+I would use these checked operations where values enter the app, such as imports, parsing, or integrations with external systems.
+
+Inside a rule where overflow should only happen because of a programming mistake, I would keep the normal operator.
+
+If something overflows there, I would rather find out close to where the bug started.
+
+<FontesDoArtigo>
+
+For anyone who wants to read more:
+- [Divide Whole Numbers](https://openstax.org/books/prealgebra-2e/pages/1-5-divide-whole-numbers) for integer division and remainders.
+- [Basic Operators](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/basicoperators/) for the contract between division and remainder.
+- [Advanced Operators](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/) for overflow and wrapping operators.
+- [The Basics](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics/) for `Int` and floating-point types.
+- [addingReportingOverflow(_:)](https://developer.apple.com/documentation/swift/int/addingreportingoverflow(_:)) for checked addition.
+- [Int.magnitude](https://developer.apple.com/documentation/swift/int/magnitude-swift.property) for accessing the magnitude of an integer, including `Int.min`.
+- [Swift Testing](https://developer.apple.com/xcode/testing/) for parameterized tests with `@Test`.
+
+</FontesDoArtigo>

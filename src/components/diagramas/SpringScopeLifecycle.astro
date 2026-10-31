@@ -1,0 +1,34 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props { rotulo: string; language?: 'en' | 'pt-BR'; }
+const { rotulo, language = 'en' } = Astro.props;
+const pt = language === 'pt-BR';
+const rows = [
+  ['new DeliveryAttempt()', 'new DeliveryAttempt()'],
+  ['start()', 'start()'],
+  [pt ? 'Uso do bean' : 'Use the bean', pt ? 'Uso do bean' : 'Use the bean'],
+  ['context.close()', pt ? 'O caller termina o uso' : 'Caller finishes use'],
+  [pt ? 'Spring chama close()' : 'Spring calls close()', pt ? 'Caller chama close()' : 'Caller calls close()'],
+];
+---
+<Diagrama plano rotulo={rotulo} altura={1000} minLargura={540}>
+  <span class="no txt label strong" style="--x:40; --y:24; --w:430; --h:60">singleton</span>
+  <span class="no txt label strong" style="--x:530; --y:24; --w:430; --h:60">prototype</span>
+  {rows.map((row, index) => row.map((text, column) => (
+    <div class="no nodo" style={`--x:${40 + column * 490}; --y:${104 + index * 176}; --w:430; --h:104`}>
+      <span class="txt">{text}</span>
+    </div>
+  )))}
+  <svg class="setas" viewBox="0 0 1000 1000" aria-hidden="true" focusable="false">
+    {[0,1,2,3].map(index => [255,745].map(x => (
+      <Seta tipo="neutra" x1={x} y1={214 + index * 176} x2={x} y2={274 + index * 176} />
+    )))}
+  </svg>
+  <span class="no pq label" style="--x:40; --y:928; --w:920; --h:60">{pt ? 'Sequência esquemática, sem escala de tempo' : 'Schematic order, without a time scale'}</span>
+</Diagrama>
+<style>
+.label { display:flex; align-items:center; justify-content:center; text-align:center; }
+.nodo { text-align:center; align-items:center; }
+.strong { font-weight:600; }
+</style>

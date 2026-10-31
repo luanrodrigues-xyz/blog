@@ -1,0 +1,262 @@
+---
+title: "Dividir R$ 249,99 em seis parcelas. Quem fica com os centavos?"
+description: "R$ 249,99 dividido em seis partes iguais deixa três centavos de resto. A divisão termina, mas a regra de parcelamento ainda não."
+date: "2023-01-17"
+updated: "2026-10-06"
+topic: "swift"
+readingOrder: 2
+draft: false
+cover: "inteiros-e-centavos-em-swift.png"
+coverAlt: "24999 centavos se divide e uma parcela fica em 4167, marcada com o centavo extra, enquanto a outra fica em 4166."
+tags: ["Swift", "Int", "Double", "Decimal", "Swift Testing", "Overflow"]
+language: "pt-BR"
+translationKey: "integers-and-cents-in-swift"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import ParcelasDoTotal from '../../../../../src/components/diagramas/ParcelasDoTotal.astro';
+
+Uma compra de R$ 249,99 em seis vezes parece simples até a soma das parcelas voltar diferente do total.
+
+Se eu guardar o valor em centavos e deixar a divisão inteira fazer o primeiro corte, o resultado fica assim.
+
+```swift
+let total = 24_999 // R$ 249,99 em centavos
+let parcela = total / 6
+
+print(parcela) // 4166
+print(parcela * 6) // 24996
+```
+
+Seis parcelas de R$ 41,66 somam R$ 249,96. Os três centavos que faltam não são erro do Swift. São o resto da divisão inteira.
+
+## O contrato da divisão inteira
+
+Entre dois `Int`, `/` trunca o quociente em direção ao zero e `%` devolve um resto com o sinal do dividendo. Esses dois comportamentos formam uma identidade que a documentação garante.
+
+```swift
+let total = 24_999
+
+print(total / 6) // 4166
+print(total % 6) // 3
+print((total / 6) * 6 + total % 6) // 24999
+```
+
+O contrato é que `a == (a / b) * b + a % b` vale sempre. A conta fecha porque a identidade fecha.
+
+Esse contrato também explica por que o resto de um dividendo negativo sai negativo. Como o quociente trunca em direção ao zero, o resto compensa a diferença na mesma direção do dividendo. `-24_999 % 6` resulta em `-3` porque `-24_999 / 6` trunca para `-4166`, e `-4166 * 6` chega a `-24_996`.
+
+O que a divisão não decide é quem fica com esses três centavos. Essa parte não pertence à linguagem. É regra do negócio.
+
+## A regra de distribuição
+
+Aqui eu escolhi entregar os centavos restantes para as primeiras parcelas.
+
+```swift
+func parcelas(de total: Int, em quantidade: Int) -> [Int]? {
+    guard quantidade > 0 else { return nil }
+
+    var base = total / quantidade
+    var resto = total % quantidade
+
+    // Com resto negativo, ajusto para divisão pelo piso.
+    // base -1 e resto +quantidade mantêm a identidade intacta.
+    if resto < 0 {
+        base -= 1
+        resto += quantidade
+    }
+
+    return (0..<quantidade).map { indice in
+        indice < resto ? base + 1 : base
+    }
+}
+
+print(parcelas(de: 24_999, em: 6))
+// Optional([4167, 4167, 4167, 4166, 4166, 4166])
+
+print(parcelas(de: -24_999, em: 6))
+// Optional([-4166, -4166, -4166, -4167, -4167, -4167])
+```
+
+As três primeiras parcelas ficam em R$ 41,67. As outras três ficam em R$ 41,66. Somadas, voltam aos R$ 249,99.
+
+<ParcelasDoTotal rotulo="24_999 dividido em 6 produz seis parcelas base de 4_166 e três centavos de sobra, entregues às três primeiras parcelas.">
+
+A mesma compra antes e depois da regra. A divisão encontra a parcela base e o resto. A distribuição decide onde os três centavos entram.
+
+As larguras são esquemáticas.
+
+</ParcelasDoTotal>
+
+Como o resto normalizado sempre fica entre zero e quantidade menos um, nenhuma parcela recebe mais de um centavo extra, e a diferença entre a maior e a menor parcela nunca passa de um.
+
+Eu poderia favorecer as últimas parcelas em vez das primeiras, ou distribuir seguindo outra ordem definida pelo produto. A soma continuaria fechando, mas a regra seria outra. Por isso prefiro deixar essa decisão concentrada numa função em vez de espalhar ajustes de um centavo pelo código.
+
+Com total negativo, o mesmo ajuste de piso muda o lado que carrega o centavo. Nas parcelas negativas, as primeiras ficam menores em magnitude e as últimas absorvem o peso. Se o domínio tratar estorno e cobrança de forma simétrica, isso é consequência aceitável. Se não for, é a hora de explicitar a regra, não de esconder o sinal.
+
+## Por que piso e não magnitude
+
+A correção mais óbvia para o resto negativo seria calcular sobre `abs(total)` e reaplicar o sinal no final. Essa versão esconde um caso. `abs(Int.min)` estoura, porque `Int.min` não tem correspondente positivo em complemento de dois. A função funcionaria em todo intervalo testado com valores plausíveis e quebraria no único valor que nenhum teste de intervalo óbvio cobre.
+
+A normalização pelo piso não precisa de `abs`. A divisão de qualquer `Int` por uma quantidade positiva nunca estoura, então `base` e `resto` sempre são valores representáveis, inclusive com `Int.min`. Quando preciso trabalhar apenas com a magnitude em outro contexto, `Int` também expõe a propriedade `magnitude`, que retorna um `UInt` e consegue representar inclusive a magnitude de `Int.min`.
+
+A quantidade é a outra condição que chega de fora, geralmente de um seletor ou de uma resposta de backend. Divisão por zero em `Int` interrompe a execução, sem exceção para capturar. Eu não deixaria um valor inválido de configuração derrubar o app por cima de uma conta de parcelamento, então a função devolve `nil` quando a quantidade não é positiva.
+
+## A regra vira contrato com teste
+
+Até aqui, a garantia de que a soma fecha foi conferida em exemplos impressos. Um contrato que depende de conferência manual vai quebrar na primeira reescrita da regra. O teste fixa o que a função promete sem fixar como ela cumpre.
+
+```swift
+import Testing
+
+@Test(
+    arguments: Array(stride(from: -1_000, through: 1_000, by: 17)),
+    1...12
+)
+func parcelasCumpremOContrato(
+    total: Int, quantidade: Int
+) {
+    guard let resultado = parcelas(
+        de: total, em: quantidade
+    ) else {
+        Issue.record("quantidade \(quantidade) deveria ser aceita")
+        return
+    }
+
+    #expect(resultado.count == quantidade)
+    #expect(resultado.reduce(0, +) == total)
+    #expect(resultado.max()! - resultado.min()! <= 1)
+}
+```
+
+As três expectativas são o contrato. A soma das parcelas devolve o total exato, a quantidade de parcelas é respeitada, e nenhuma parcela difere da outra por mais de um centavo.
+
+Esse formato permite trocar a regra interna sem invalidar o teste. Uma distribuição que favorece as últimas parcelas, ou uma ordem definida pelo produto, passa nas mesmas três expectativas. O passo `by: 17` percorre totais positivos e negativos sem parar só nos valores redondos, e a troca de regra que quebrar qualquer expectativa aparece na suite, não em produção.
+
+## E se fosse `Double`?
+
+Guardar R$ 249,99 como `249.99` parece mais natural. E `249.99 / 6` realmente produz casas decimais.
+
+Só que aí aparecem dois problemas de naturezas diferentes.
+
+O primeiro é a representação.
+
+```swift
+let cafe = 0.1
+let taxa = 0.2
+
+print(cafe + taxa == 0.3) // false
+print(cafe + taxa) // 0.30000000000000004
+```
+
+`0.1` e `0.2` não têm representação binária exata em `Double`. A aproximação já entra no valor antes de qualquer regra de parcelamento.
+
+O segundo aparece quando alguém tenta substituir a regra de distribuição por arredondamento. Aqui o total em centavos já é exato em `Double`, e a divisão por seis cai exatamente na metade entre dois inteiros.
+
+```swift
+let base = Double(24_999) / 6 // 4166.5
+
+print(base.rounded()) // 4167.0
+print(base.rounded(.toNearestOrEven)) // 4166.0
+```
+
+Seis parcelas de 4167 somam 25002, três centavos acima do total. Seis parcelas de 4166 somam 24996, três abaixo. O empate em 4166.5 é resolvido pelo modo de arredondamento, e `.rounded()` usa o padrão `toNearestOrAwayFromZero` enquanto `.toNearestOrEven` implementa o arredondamento bancário. Ou seja, no momento exato do empate, quem paga mais é definido por um modo de arredondamento escolhido implicitamente, não por uma regra de negócio. A divisão em `Int` expõe o empate como resto e devolve a decisão para o código que conhece o domínio.
+
+Para quem precisa de aritmética decimal, `Decimal` cobre o caso intermediário. Ele representa exatamente potências de dez, o que resolve multiplicações por taxas e juros sem a aproximação binária de `Double`, com custo de performance maior e APIs mais desconfortáveis. Eu não usaria nem `Double` nem `Decimal` quando a moeda já chega em centavos. `Int` mantém a perda visível no resto e transforma a distribuição em decisão explícita.
+
+Isso não torna `Double` ruim. Só significa que ele resolve outro tipo de problema.
+
+## Inteiro também tem limite
+
+Usar centavos em `Int` não torna o valor infinito.
+
+Nas plataformas de 64 bits, como os iPhones atuais, um `Int` ocupa 64 bits.
+
+```swift
+print(Int.max) // 9223372036854775807
+```
+
+Em centavos, é um valor muito acima de qualquer saldo normal de uma conta. Então eu não esperaria encontrar esse limite numa operação financeira comum.
+
+Ele começa a ficar mais interessante nas fronteiras do sistema, principalmente quando o dado vem de fora.
+
+Imagine um arquivo importado com valores corrompidos.
+
+```swift
+func somar(_ valores: [Int]) -> Int {
+    var total = 0
+
+    for valor in valores {
+        total += valor
+    }
+
+    return total
+}
+
+let importados = [
+    9_000_000_000_000_000_000,
+    500_000_000_000_000_000
+]
+
+// print(somar(importados))
+// overflow
+```
+
+Nas operações inteiras comuns, Swift verifica overflow tanto em debug quanto em release. Se o resultado de `+`, `-` ou `*` não couber no tipo, a execução é interrompida, sem exceção para capturar. Quando envolver é a intenção, o operador `&+` existe para casos como checksums, e afirmar essa intenção com o operador de envolvimento é mais honesto do que desligar o comportamento.
+
+Interromper é melhor do que deixar um valor inválido continuar silenciosamente pelo sistema. Ainda assim, encerrar o app porque um arquivo veio quebrado não é uma recuperação muito útil.
+
+Numa fronteira dessas, eu prefiro verificar a operação.
+
+```swift
+func somarVerificando(_ valores: [Int]) -> Int? {
+    var total = 0
+
+    for valor in valores {
+        let (soma, estourou) =
+            total.addingReportingOverflow(valor)
+
+        if estourou {
+            return nil
+        }
+
+        total = soma
+    }
+
+    return total
+}
+
+let importados = [
+    9_000_000_000_000_000_000,
+    500_000_000_000_000_000
+]
+
+print(
+    somarVerificando([10_000, -3_000, 5_000]) == 12_000
+) // true
+
+print(
+    somarVerificando(importados) == nil
+) // true
+```
+
+`addingReportingOverflow` devolve o resultado e um `Bool` informando se a soma estourou. Subtração e multiplicação têm versões equivalentes com `subtractingReportingOverflow` e `multipliedReportingOverflow(by:)`.
+
+A soma verificada responde se a operação cabe em `Int`. Ela não responde se o valor faz sentido para o domínio. Cada item daquele arquivo pode caber em `Int` isoladamente e ainda assim ser inválido como valor monetário, seja por exceder o limite da operação, seja por não passar em nenhuma validação de negócio. Nas fronteiras, eu combinaria a verificação de estouro com um limite do próprio domínio, rejeitando a importação antes de qualquer cálculo.
+
+Eu usaria essas versões nas fronteiras em que os valores entram no app, como importação, parsing ou integração com algum sistema externo.
+
+Dentro de uma regra em que overflow só pode acontecer por erro de programação, eu manteria o operador comum. Se algo estourar ali, prefiro descobrir perto de onde o erro nasceu.
+
+<FontesDoArtigo>
+
+Para quem quiser olhar mais:
+- [Divide Whole Numbers](https://openstax.org/books/prealgebra-2e/pages/1-5-divide-whole-numbers) para divisão inteira e resto.
+- [Basic Operators](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/basicoperators/) para o contrato entre divisão e resto.
+- [Advanced Operators](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/) para overflow e operadores de envolvimento.
+- [The Basics](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics/) para `Int` e tipos de ponto flutuante.
+- [addingReportingOverflow(_:)](https://developer.apple.com/documentation/swift/int/addingreportingoverflow(_:)) para a soma verificada.
+- [Int.magnitude](https://developer.apple.com/documentation/swift/int/magnitude-swift.property) para acessar a magnitude de um inteiro, inclusive `Int.min`.
+- [Swift Testing](https://developer.apple.com/xcode/testing/) para testes parametrizados com `@Test`.
+
+</FontesDoArtigo>

@@ -1,0 +1,60 @@
+---
+import { areas, areaRoute, articleAreas, type AreaId } from '../../lib/areas';
+import type { Article } from '../../lib/articles';
+interface Props {
+  articles: Article[];
+  active?: AreaId;
+  showAll?: boolean;
+}
+const { articles, active, showAll = false } = Astro.props;
+const visibleAreas = ['ios', 'frontend', 'backend'].flatMap((id) => {
+  const area = areas.find((item) => item.id === id)!;
+  const count = articles.filter((article) => articleAreas(article).some((item) => item.id === id)).length;
+  return count > 0 ? [{ ...area, count }] : [];
+});
+---
+
+<nav class="area-links" aria-label="Filter articles by area">
+  {showAll && (
+    <a href="/articles/" aria-current={!active ? 'page' : undefined}>
+      All
+    </a>
+  )}
+  {visibleAreas.map((area) => (
+    <a href={areaRoute(area.id)} aria-current={active === area.id ? 'page' : undefined}>
+      {area.label}
+      <span class="area-count">{area.count}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  .area-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .area-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    min-height: 2.75rem;
+    border-radius: var(--radius-m);
+    background: var(--fill);
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .area-links a[aria-current] {
+    outline: 1px solid var(--fg-muted);
+  }
+  .area-links a:hover {
+    background: var(--surface-hover);
+    text-decoration: none;
+  }
+  .area-count {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+</style>

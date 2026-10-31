@@ -1,0 +1,107 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '../../../public/brand/swift-decodificado.png';
+import { features, interfaceLanguage, ui } from '../../config/site';
+
+interface Props {
+  isArticle?: boolean;
+  isListingPage?: boolean;
+  isAbout?: boolean;
+  isLab?: boolean;
+}
+
+const { isArticle = false, isListingPage = false, isAbout = false, isLab = false } = Astro.props;
+const text = ui;
+---
+
+<a class="skip-link" href="#main" lang={interfaceLanguage}>
+  {text.skip}
+</a>
+<header class="site-header shell" lang={interfaceLanguage}>
+  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Software engineering for iOS and the web.">
+    <Image
+      class="wordmark-avatar"
+      src={avatar}
+      widths={[32, 64]}
+      sizes="32px"
+      loading="eager"
+      alt=""
+      width="32"
+      height="32"
+    />
+    <span class="wordmark-text">
+      <span class="wordmark-name">Luan Rodrigues</span>
+    </span>
+  </a>
+  <nav aria-label={text.navigation}>
+    <a
+      href={text.articlesUrl}
+      aria-current={Astro.url.pathname === text.articlesUrl ? 'page' : isArticle || isListingPage ? 'true' : undefined}
+    >
+      {text.articles}
+    </a>
+    {features.lab && (
+      <a href={text.labUrl} aria-current={isLab ? 'page' : undefined}>
+        {text.lab}
+      </a>
+    )}
+    <a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
+      {text.about}
+    </a>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark theme" hidden>
+      <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        aria-hidden="true"
+      >
+        <g class="theme-icon-sun">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+        </g>
+        <path class="theme-icon-moon" d="M20.9 13.1A9 9 0 0 1 10.9 3a9 9 0 1 0 10 10.1Z" />
+      </svg>
+    </button>
+  </nav>
+</header>
+
+<style>
+  .theme-icon-moon {
+    display: none;
+  }
+  :global(html[data-theme='dark']) .theme-icon-sun {
+    display: none;
+  }
+  :global(html[data-theme='dark']) .theme-icon-moon {
+    display: initial;
+  }
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    background: transparent;
+    color: var(--fg);
+    border: 0;
+    border-radius: var(--radius-m);
+    cursor: pointer;
+  }
+  .theme-toggle:hover {
+    background: var(--surface-hover);
+  }
+  .theme-toggle[hidden] {
+    display: none;
+  }
+  @media (max-width: 360px) {
+    .theme-toggle {
+      width: 2rem;
+      height: 2.75rem;
+      border: 0;
+    }
+  }
+</style>

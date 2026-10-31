@@ -1,0 +1,40 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+  language?: 'en' | 'pt-BR';
+}
+const { rotulo, language = 'en' } = Astro.props;
+const portuguese = language === 'pt-BR';
+---
+
+<Diagrama plano rotulo={rotulo} altura={510}>
+  <div class="no nodo" style="--x:60;--y:40;--w:880;--h:100">
+    <span class="txt forte">LibraryViewController</span>
+    <span class="pq">{portuguese ? 'apresenta o navigation controller' : 'presents the navigation controller'}</span>
+  </div>
+  <div class="no nodo navigation" style="--x:60;--y:220;--w:880;--h:100">
+    <span class="txt forte">UINavigationController</span>
+    <span class="pq">sheetPresentationController → {portuguese ? 'detents e posicionamento' : 'detents and placement'}</span>
+  </div>
+  <div class="no nodo" style="--x:60;--y:400;--w:880;--h:80">
+    <span class="txt forte">ReadingDetailViewController</span>
+    <span class="pq">{portuguese ? 'navigationItem e safe area do conteúdo' : 'navigationItem and content safe area'}</span>
+  </div>
+  <span class="no etq" style="--x:530;--y:160;--w:360;--h:36">
+    present(navigation, …)
+  </span>
+  <span class="no etq" style="--x:530;--y:340;--w:360;--h:36">
+    rootViewController
+  </span>
+  <svg class="setas" viewBox="0 0 1000 510" aria-hidden="true" focusable="false">
+    <Seta x1={500} y1={142} x2={500} y2={218} />
+    <Seta x1={500} y1={322} x2={500} y2={398} />
+  </svg>
+</Diagrama>
+<style>
+  .navigation {
+    background: color-mix(in srgb, var(--apple-pink) 9%, var(--canvas));
+  }
+</style>

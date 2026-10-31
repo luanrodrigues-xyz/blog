@@ -1,0 +1,172 @@
+---
+// Três entradas pelas etapas do init? (artigo inicializacao-em-swift): os guards vêm antes das
+// atribuições; uma entrada que falha num guard sai com return nil e não entrega uma instância inicializada ao chamador.
+// Duas composições: grade (etapas nas colunas, entradas nas linhas) a partir de 600px de coluna;
+// abaixo disso, a lista de etapas e uma linha por entrada com onde ela termina.
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+
+const etapas = [
+  { numero: '1 · guard', texto: 'id > 0', lista: '1 · guard: id > 0' },
+  { numero: '2 · guard', texto: 'descrição não vazia', lista: '2 · guard: descrição não vazia' },
+  { numero: '3', texto: 'atribui as propriedades', lista: '3 · atribui as propriedades' },
+  { numero: '4', texto: 'instância completa', lista: '4 · instância completa' },
+];
+type Celula = 'passa' | 'nil' | 'vazio' | 'instancia';
+const entradas: { rotulo: string; celulas: Celula[]; resumo: string; tom: 'criada' | 'recusada' }[] = [
+  {
+    rotulo: '1, "Mercado"',
+    celulas: ['passa', 'passa', 'passa', 'instancia'],
+    resumo: 'passa por 1, 2 e 3: Transacao',
+    tom: 'criada',
+  },
+  {
+    rotulo: '-1, "Mercado"',
+    celulas: ['nil', 'vazio', 'vazio', 'vazio'],
+    resumo: 'para em 1: return nil',
+    tom: 'recusada',
+  },
+  { rotulo: '2, ""', celulas: ['passa', 'nil', 'vazio', 'vazio'], resumo: 'para em 2: return nil', tom: 'recusada' },
+];
+const textoDaCelula: Record<Celula, string> = { passa: 'passa', nil: 'return nil', vazio: '', instancia: 'Transacao' };
+
+const largo = {
+  altura: 600,
+  rotulo: { x: 20, w: 240 },
+  colunas: [270, 450, 630, 810],
+  wCol: 170,
+  cabecalho: { y: 20, h: 200 },
+  linhas: [260, 370, 480],
+  hLinha: 90,
+};
+const estreito = {
+  altura: 1220,
+  etapas: [20, 150, 280, 410],
+  hEtapa: 110,
+  linhas: [580, 790, 1000],
+  hLinha: 190,
+  rotulo: { x: 20, w: 400 },
+  resumo: { x: 440, w: 540 },
+};
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+---
+
+<div class="caminho-pelo-init">
+  <div class="composicao largo">
+    <Diagrama plano rotulo={rotulo} altura={largo.altura} minLargura={600}>
+      <slot slot="legenda" />
+      <div class="no pq ink2 canto" style={pos(largo.rotulo.x, largo.cabecalho.y, largo.rotulo.w, largo.cabecalho.h)}>
+        entrada (id, descrição)
+      </div>
+      {etapas.map((e, c) => (
+        <div class="no nodo etapa" style={pos(largo.colunas[c], largo.cabecalho.y, largo.wCol, largo.cabecalho.h)}>
+          <div class="pq ink2">{e.numero}</div>
+          <div class="txt">{e.texto}</div>
+        </div>
+      ))}
+      {entradas.map((entrada, l) => (
+        <>
+          <div class="no t4 entrada" style={pos(largo.rotulo.x, largo.linhas[l], largo.rotulo.w, largo.hLinha)}>
+            {entrada.rotulo}
+          </div>
+          {entrada.celulas.map((celula, c) => (
+            <div
+              class={`no celula-caminho ${celula}`}
+              style={pos(largo.colunas[c], largo.linhas[l], largo.wCol, largo.hLinha)}
+            >
+              <div class={celula === 'passa' ? 'pq' : 'txt'}>{textoDaCelula[celula]}</div>
+            </div>
+          ))}
+        </>
+      ))}
+    </Diagrama>
+  </div>
+
+  <div class="composicao estreito">
+    <Diagrama plano rotulo={rotulo} altura={estreito.altura} minLargura={260}>
+      <slot slot="legenda" />
+      {etapas.map((e, c) => (
+        <div class="no nodo etapa-lista" style={pos(20, estreito.etapas[c], 960, estreito.hEtapa)}>
+          <div class="txt">{e.lista}</div>
+        </div>
+      ))}
+      {entradas.map((entrada, l) => (
+        <>
+          <div
+            class="no t4 entrada"
+            style={pos(estreito.rotulo.x, estreito.linhas[l], estreito.rotulo.w, estreito.hLinha)}
+          >
+            {entrada.rotulo}
+          </div>
+          <div
+            class={`no resumo ${entrada.tom}`}
+            style={pos(estreito.resumo.x, estreito.linhas[l], estreito.resumo.w, estreito.hLinha)}
+          >
+            <div class="txt">{entrada.resumo}</div>
+          </div>
+        </>
+      ))}
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .caminho-pelo-init {
+    container-type: inline-size;
+  }
+  .composicao.estreito {
+    display: none;
+  }
+  @container (max-width: 599px) {
+    .composicao.largo {
+      display: none;
+    }
+    .composicao.estreito {
+      display: block;
+    }
+  }
+  .canto,
+  .entrada {
+    display: flex;
+    align-items: center;
+  }
+  .etapa {
+    text-align: center;
+    align-items: center;
+  }
+  .etapa-lista {
+    justify-content: center;
+  }
+  .celula-caminho,
+  .resumo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 calc(var(--u) * 16);
+    border: 1px solid var(--d-line);
+    background: var(--d-bg);
+  }
+  .celula-caminho.passa {
+    color: var(--d-ink2);
+  }
+  .celula-caminho.vazio {
+    border: 0;
+    background: transparent;
+  }
+  /* return nil é a regra funcionando: contorno neutro reforçado, não a cor de problema (vermelho fica
+     para o furo, nas outras figuras do artigo). */
+  .celula-caminho.nil,
+  .resumo.recusada {
+    border: 2px solid var(--d-ink2);
+    background: var(--d-fill);
+  }
+  .celula-caminho.instancia,
+  .resumo.criada {
+    border: 2px solid var(--d-blue);
+    background: color-mix(in srgb, var(--d-blue) 12%, var(--d-bg));
+  }
+</style>

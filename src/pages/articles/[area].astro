@@ -1,0 +1,11 @@
+---
+import CatalogPage from '../../components/shared/CatalogPage.astro';
+import { areas } from '../../lib/areas';
+
+export function getStaticPaths() {
+  return areas.map(({ id }) => ({ params: { area: id }, props: { area: id } }));
+}
+const { area } = Astro.props;
+---
+
+<CatalogPage area={area} />

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --principal:#0088FF; --destaque:#FF8D28; --texto:#005FB3; }
+    @media (prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --principal:#35A4FF; --destaque:#FF9230; --texto:#B8DEFF; }
+      .sombreado { filter:none; }
+    }
+    .fundo { fill:var(--fundo); } .card { fill:var(--card); }
+    .principal { fill:var(--principal); } .destaque { fill:var(--destaque); }
+    .texto { fill:var(--texto); font:600 24px 'SF Mono',ui-monospace,Menlo,monospace; }
+    .linha { fill:none; stroke:var(--principal); stroke-width:4; stroke-linecap:round; }
+  </style>
+  <defs><filter id="sombra" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- Three queued occurrences include the repeated blue song. -->
+  <g class="sombreado" filter="url(#sombra)"><rect class="card" x="312" y="184" width="224" height="264" rx="32"/></g>
+  <text class="texto" x="344" y="232">Array</text>
+  <rect class="principal" x="344" y="272" width="160" height="14" rx="7"/>
+  <rect class="destaque" x="344" y="328" width="160" height="14" rx="7"/>
+  <rect class="principal" x="344" y="384" width="160" height="14" rx="7"/>
+  <!-- The same IDs represented as membership retain two unique members. -->
+  <path class="linha" d="M560 316H640"/><path class="principal" d="M640 308L656 316L640 324Z"/>
+  <g class="sombreado" filter="url(#sombra)"><rect class="card" x="680" y="184" width="208" height="264" rx="32"/></g>
+  <text class="texto" x="712" y="232">Set</text>
+  <rect class="principal" x="712" y="280" width="144" height="14" rx="7"/>
+  <rect class="destaque" x="712" y="360" width="144" height="14" rx="7"/>
+</svg>

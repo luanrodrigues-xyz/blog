@@ -1,0 +1,182 @@
+---
+// Abertura do artigo pagamento-duplicado-idempotencia: a sequência do toque até o segundo pagamento,
+// com o isEnabled do botão ao lado. O botão fica desabilitado do toque até o timeout, volta a ser
+// habilitado sem que o app saiba o resultado e não enxerga o que o servidor já processou.
+// A ordem é a da narrativa (esquemática): "primeira request já processada" aconteceu antes do retry.
+// Duas composições: faixa do botão ao lado com 680px; isEnabled dentro de cada etapa abaixo disso.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+
+type Etapa = {
+  titulo: string;
+  detalhe?: string;
+  estado: string;
+  botao?: string;
+};
+
+const etapas: Etapa[] = [
+  { titulo: 'Toca em Pagar', estado: 'app', botao: 'isEnabled = false' },
+  { titulo: 'Request começa', detalhe: 'sai do aparelho', estado: 'app', botao: 'isEnabled = false' },
+  { titulo: 'Timeout', detalhe: 'nenhuma resposta chega ao app', estado: 'timeout', botao: 'isEnabled = false' },
+  {
+    titulo: 'Resultado não confirmado',
+    detalhe: 'o app não sabe se houve débito',
+    estado: 'incerto',
+    botao: 'isEnabled = true',
+  },
+  { titulo: 'Usuário tenta novamente', detalhe: 'segunda request', estado: 'app', botao: 'isEnabled = false' },
+  { titulo: 'Primeira request já processada', detalhe: 'no servidor, antes do retry', estado: 'processado' },
+  { titulo: 'Segundo pagamento acontece', detalhe: 'duplicidade financeira', estado: 'duplicado' },
+];
+
+// Composição larga: etapas à esquerda, faixa do botão à direita, alinhada às etapas.
+const largo = { x: 40, w: 600, y0: 90, h: 90, passo: 130 };
+const yLargo = (i: number) => largo.y0 + i * largo.passo;
+const alturaLarga = yLargo(etapas.length - 1) + largo.h + 30;
+const centroLargo = largo.x + largo.w / 2;
+
+// Composição empilhada: largura inteira, isEnabled como terceira linha de cada etapa.
+const pilha = { x: 20, w: 960, y0: 30, h: 310, passo: 370 };
+const yPilha = (i: number) => pilha.y0 + i * pilha.passo;
+const alturaPilha = yPilha(etapas.length - 1) + pilha.h + 30;
+const centroPilha = pilha.x + pilha.w / 2;
+---
+
+<div class="tentativa">
+  <div class="composicao lado">
+    <Diagrama plano rotulo={rotulo} altura={alturaLarga}>
+      <span class="no cab titulo" style={pos(largo.x, 30, largo.w, 40)}>Sequência</span>
+      <span class="no cab titulo" style={pos(700, 30, 260, 40)}>Botão Pagar</span>
+
+      {etapas.map(({ titulo, detalhe, estado }, i) => (
+        <span class:list={['no nodo etapa', estado]} style={pos(largo.x, yLargo(i), largo.w, largo.h)}>
+          <span class="txt forte">{titulo}</span>
+          {detalhe && <span class="pq ink2">{detalhe}</span>}
+        </span>
+      ))}
+
+      <!-- Faixa do botão: um bloco por estado, com a altura das etapas que ele cobre. -->
+      <span class="no nodo faixa desabilitado" style={pos(700, yLargo(0), 260, yLargo(2) + largo.h - yLargo(0))}>
+        <span class="t4">isEnabled = false</span>
+        <span class="pq ink2">outro toque é ignorado</span>
+      </span>
+      <span class="no nodo faixa habilitado" style={pos(700, yLargo(3), 260, largo.h)}>
+        <span class="t4">isEnabled = true</span>
+        <span class="pq ink2">sem confirmação</span>
+      </span>
+      <span class="no nodo faixa desabilitado" style={pos(700, yLargo(4), 260, largo.h)}>
+        <span class="t4">isEnabled = false</span>
+        <span class="pq ink2">nova tentativa</span>
+      </span>
+      <span class="no nodo fantasma faixa" style={pos(700, yLargo(5), 260, yLargo(6) + largo.h - yLargo(5))}>
+        <span class="pq">o botão não vê o servidor</span>
+      </span>
+
+      <svg class="setas" viewBox={`0 0 1000 ${alturaLarga}`} aria-hidden="true" focusable="false">
+        {etapas.slice(1).map((_, i) => (
+          <Seta tipo="neutra" x1={centroLargo} y1={yLargo(i) + largo.h} x2={centroLargo} y2={yLargo(i + 1)} />
+        ))}
+      </svg>
+    </Diagrama>
+  </div>
+
+  <div class="composicao pilha">
+    <Diagrama plano rotulo={rotulo} altura={alturaPilha} minLargura={272}>
+      {etapas.map(({ titulo, detalhe, estado, botao }, i) => (
+        <span class:list={['no nodo etapa', estado]} style={pos(pilha.x, yPilha(i), pilha.w, pilha.h)}>
+          <span class="txt forte">{titulo}</span>
+          {detalhe && <span class="pq ink2">{detalhe}</span>}
+          {botao ? <span class="t4">botão: {botao}</span> : <span class="pq ink2">fora do alcance do botão</span>}
+        </span>
+      ))}
+
+      <svg class="setas" viewBox={`0 0 1000 ${alturaPilha}`} aria-hidden="true" focusable="false">
+        {etapas.slice(1).map((_, i) => (
+          <Seta tipo="neutra" x1={centroPilha} y1={yPilha(i) + pilha.h} x2={centroPilha} y2={yPilha(i + 1)} />
+        ))}
+      </svg>
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .tentativa {
+    container-type: inline-size;
+  }
+
+  /* Composição vertical: acima de ~460px ela só cresceria em altura, sem ganhar legibilidade. */
+  .composicao.pilha {
+    display: none;
+    max-width: 460px;
+    margin-inline: auto;
+  }
+
+  @container (max-width: 679px) {
+    .composicao.lado {
+      display: none;
+    }
+
+    .composicao.pilha {
+      display: block;
+    }
+  }
+
+  .titulo {
+    display: flex;
+    align-items: center;
+  }
+
+  .etapa,
+  .faixa {
+    align-items: flex-start;
+  }
+
+  /* A base aplica .diagrama.plano .nodo; o prefixo .tentativa garante que o estado prevaleça. */
+  .tentativa .nodo.timeout {
+    background: var(--d-laranja-tint);
+    border: 2px solid var(--d-laranja);
+  }
+
+  .tentativa .nodo.incerto {
+    background: var(--d-laranja-tint);
+    border: 1px solid var(--d-laranja);
+  }
+
+  .tentativa .nodo.processado {
+    background: var(--d-blue-tint);
+    border: 2px solid var(--d-blue);
+  }
+
+  .tentativa .nodo.duplicado {
+    background: var(--d-vermelho-tint);
+    border: 2px solid var(--d-vermelho);
+  }
+
+  .tentativa .nodo.faixa.desabilitado {
+    background: var(--d-fill);
+  }
+
+  .tentativa .nodo.faixa.habilitado {
+    background: var(--d-card);
+  }
+
+  .forte {
+    font-weight: 600;
+  }
+
+  .t4 {
+    white-space: nowrap;
+  }
+
+  /* No celular, 1 unidade vale ~0,3px: traço mais grosso para não ficar abaixo de 1,5px. */
+  .pilha :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

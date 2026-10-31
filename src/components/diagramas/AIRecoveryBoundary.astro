@@ -1,0 +1,87 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+---
+
+<div class="desktop">
+  <Diagrama plano rotulo={rotulo} altura={700}>
+    <div class="no nodo" style="--x:280;--y:40;--w:440;--h:120">
+      <span class="txt forte">Resposta externa</span>
+      <span class="pq">unknown</span>
+    </div>
+    <div class="no nodo" style="--x:280;--y:248;--w:440;--h:120">
+      <span class="txt forte">Operação · argumentos · fila</span>
+      <span class="pq">a revisão ainda é atual?</span>
+    </div>
+    <div class="no nodo" style="--x:32;--y:500;--w:432;--h:144">
+      <span class="txt forte">Aplicar busca</span>
+      <span class="pq">novos filtros e resultados</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:536;--y:500;--w:432;--h:144">
+      <span class="txt forte">Recuperar</span>
+      <span class="pq">preservar rascunho e última busca</span>
+    </div>
+    <span class="no pq" style="--x:40;--y:410;--w:380;--h:48">
+      aceita e atual
+    </span>
+    <span class="no pq" style="--x:580;--y:410;--w:380;--h:48">
+      rejeitada e atual
+    </span>
+    <svg class="setas" viewBox="0 0 1000 700" aria-hidden="true" focusable="false">
+      <Seta tipo="neutra" x1={500} y1={160} x2={500} y2={246} />
+      <path d="M500 368V392H248V498M500 392H752V498" />
+      <Seta x1={248} y1={470} x2={248} y2={498} />
+      <Seta tipo="neutra" x1={752} y1={470} x2={752} y2={498} />
+    </svg>
+  </Diagrama>
+</div>
+<div class="mobile">
+  <Diagrama plano rotulo={rotulo} altura={1460} minLargura={270}>
+    <div class="no nodo" style="--x:48;--y:40;--w:904;--h:180">
+      <span class="txt forte">Resposta externa</span>
+      <span class="pq">unknown</span>
+    </div>
+    <div class="no nodo" style="--x:48;--y:340;--w:904;--h:220">
+      <span class="txt forte">Operação · argumentos · fila</span>
+      <span class="pq">a revisão ainda é atual?</span>
+    </div>
+    <div class="no regiao" style="--x:24;--y:680;--w:952;--h:740"></div>
+    <span class="no pq" style="--x:64;--y:690;--w:872;--h:96">
+      Somente respostas da revisão atual
+    </span>
+    <div class="no nodo" style="--x:64;--y:840;--w:872;--h:200">
+      <span class="txt forte">Aceita → aplicar busca</span>
+      <span class="pq">novos filtros e resultados</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:64;--y:1160;--w:872;--h:200">
+      <span class="txt forte">Rejeitada → recuperar</span>
+      <span class="pq">preservar rascunho e última busca</span>
+    </div>
+    <svg class="setas" viewBox="0 0 1000 1460" aria-hidden="true" focusable="false">
+      <Seta tipo="neutra" x1={500} y1={220} x2={500} y2={338} />
+      <Seta tipo="neutra" x1={500} y1={560} x2={500} y2={678} />
+    </svg>
+  </Diagrama>
+</div>
+<style>
+  .mobile {
+    display: none;
+  }
+  .setas > path {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  @media (max-width: 680px) {
+    .desktop {
+      display: none;
+    }
+    .mobile {
+      display: block;
+    }
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+import ContentPage from '../components/shared/ContentPage.astro';
+
+const entries = await getCollection('sitePages', ({ data }) => data.isHome === true);
+const entry = entries[0];
+if (!entry) throw new Error('Home page not found in the sitePages collection.');
+---
+
+<ContentPage entry={entry} />

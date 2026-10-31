@@ -1,0 +1,495 @@
+---
+// Moldura comum dos diagramas (guia: editorial/guia-diagramas.md). Não desenha nada sozinha:
+// fornece os tokens `--d-*`, o quadro de 1000 unidades de largura e as classes de composição
+// (.no, .celula, .regiao, .etq, .cap…) para os componentes de cada diagrama.
+
+interface Props {
+  /** Uma frase com a conclusão do diagrama; é a única descrição que leitores de tela leem. */
+  rotulo: string;
+
+  /** Altura do desenho, em unidades (a largura é sempre 1000). */
+  altura: number;
+
+  /** Largura mínima em px; igual a --width-diagram (680): abaixo disso o quadro rola por dentro. */
+  minLargura?: number;
+
+  plano?: boolean;
+}
+
+const { rotulo, altura, minLargura = 680, plano = false } = Astro.props;
+---
+
+<figure class:list={['diagrama', { plano }]}>
+  <div
+    class="rolagem"
+    tabindex="0"
+    role="group"
+    aria-label="Diagrama: rolar na horizontal em telas estreitas"
+  >
+    <div
+      class="quadro"
+      role="img"
+      aria-label={rotulo}
+      style={`--H: ${altura}; aspect-ratio: 1000 / ${altura}; min-width: ${minLargura}px;`}
+    >
+      <slot />
+    </div>
+  </div>
+
+  {Astro.slots.has('legenda') && (
+    <figcaption>
+      <slot name="legenda" />
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  /* Linguagem plana opt-in: preserva os consumidores ainda fora da revisão. */
+  .diagrama.plano {
+    --d-bg: var(--canvas);
+    --d-card: color-mix(in srgb, var(--apple-blue) 7%, var(--canvas));
+    --d-fill: color-mix(in srgb, var(--apple-gray) 10%, var(--canvas));
+    --d-line: var(--apple-gray-text);
+    --d-ink3: var(--apple-gray-text);
+    --d-shadow: none;
+  }
+
+  .diagrama.plano .rolagem {
+    border-radius: 0;
+  }
+
+  .diagrama.plano :global(.no) {
+    border-radius: calc(var(--u) * 6);
+  }
+
+  .diagrama.plano :global(.nodo) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 4);
+    padding: calc(var(--u) * 12) calc(var(--u) * 22);
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+
+  .diagrama.plano :global(.nodo.fantasma) {
+    background: var(--d-bg);
+    border-style: dashed;
+    color: var(--d-ink2);
+  }
+
+  .diagrama.plano :global(.nodo.lista) {
+    padding: 0;
+    gap: 0;
+  }
+
+  .diagrama.plano :global(.cab) {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .diagrama.plano :global(.cap.cap),
+  .diagrama.plano :global(.etq.etq) {
+    border: 0;
+    border-radius: 0;
+    background: var(--d-bg);
+    color: var(--d-ink);
+    padding: 2px 6px;
+    font-weight: 400;
+  }
+
+  .diagrama.plano :global(.etq.etq) {
+    background: transparent;
+  }
+
+  .diagrama.plano :global(.cap.azul),
+  .diagrama.plano :global(.cap.indigo) {
+    color: var(--d-ink);
+  }
+
+  .diagrama.plano :global(.limite) {
+    border: 1.5px solid var(--d-line);
+  }
+
+  /*
+   * Cores: a paleta de sistema da Apple do projeto
+   * (src/styles/colors.css, --apple-*, com claro, escuro e alto contraste).
+   *
+   * Aqui os --d-* são só papéis: nenhum hex de cor de sistema.
+   *
+   * Cada cor tem dois usos:
+   *
+   *   --d-<cor>        preenchimento, traço, seta e contorno
+   *                    (gráficos: mínimo de 3:1 com o fundo)
+   *
+   *   --d-<cor>-texto  texto pequeno
+   *                    (mínimo de 4,5:1 sobre a cápsula da própria cor)
+   *
+   * Azul e índigo são ida e volta.
+   *
+   * Verde, vermelho e laranja marcam resultado e nunca carregam texto
+   * (o texto fica em --d-ink).
+   *
+   * As outras cores da paleta continuam disponíveis como
+   * var(--apple-<cor>) e var(--apple-<cor>-text);
+   * só entram com um significado novo, escrito no guia.
+   */
+  .diagrama {
+    --d-bg: var(--apple-gray6);
+    --d-card: var(--canvas);
+    --d-ink: var(--fg);
+    --d-ink2: var(--apple-gray-text);
+    --d-ink3: var(--apple-gray3);
+    --d-line: var(--apple-gray4);
+    --d-fill: rgba(120, 120, 128, 0.12);
+    --d-tint-alfa: 12%;
+
+    --d-blue: var(--apple-blue);
+    --d-blue-tint: color-mix(
+      in srgb,
+      var(--apple-blue) var(--d-tint-alfa),
+      transparent
+    );
+    --d-blue-texto: var(--apple-blue-text);
+
+    --d-indigo: var(--apple-indigo);
+    --d-indigo-tint: color-mix(
+      in srgb,
+      var(--apple-indigo) var(--d-tint-alfa),
+      transparent
+    );
+    --d-indigo-texto: var(--apple-indigo-text);
+
+    /* resultado: o traço usa a variante -text, porque os padrões de verde e laranja não passam 3:1 no claro */
+    --d-verde: var(--apple-green-text);
+    --d-verde-tint: color-mix(
+      in srgb,
+      var(--apple-green) var(--d-tint-alfa),
+      transparent
+    );
+
+    --d-vermelho: var(--apple-red-text);
+    --d-vermelho-tint: color-mix(
+      in srgb,
+      var(--apple-red) var(--d-tint-alfa),
+      transparent
+    );
+
+    --d-laranja: var(--apple-orange-text);
+    --d-laranja-tint: color-mix(
+      in srgb,
+      var(--apple-orange) var(--d-tint-alfa),
+      transparent
+    );
+
+    /* hachura do padding: linhas finas e espaçadas, em vez de listras densas */
+    --d-hachura: color-mix(
+      in srgb,
+      var(--apple-blue) 36%,
+      transparent
+    );
+
+    --d-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 12px 32px rgba(0, 0, 0, 0.08);
+
+    --d-font: var(
+      --font-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'SF Pro Text',
+      'Segoe UI',
+      system-ui,
+      sans-serif
+    );
+
+    --d-mono: var(
+      --font-mono,
+      ui-monospace,
+      'SF Mono',
+      Menlo,
+      monospace
+    );
+
+    margin-inline: auto;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .diagrama {
+      /* Mesmo fundo dos blocos de código no escuro (--code-bg), em vez do --canvas puro. */
+      --d-bg: var(--code-bg);
+      --d-card: var(--apple-gray5);
+      --d-fill: rgba(118, 118, 128, 0.24);
+      --d-tint-alfa: 20%;
+      --d-shadow: none;
+    }
+
+    /* .plano fixa --d-bg: var(--canvas) sem media query; sua maior especificidade
+       vence a regra acima, então o escuro precisa de uma exceção própria aqui. */
+    .diagrama.plano {
+      --d-bg: var(--code-bg);
+    }
+  }
+
+  /*
+   * Alto contraste: as cores já vêm dos valores "Increased contrast"
+   * da paleta; aqui só a cápsula e a hachura ficam mais fortes.
+   */
+  @media (prefers-contrast: more) {
+    .diagrama {
+      --d-tint-alfa: 14%;
+      --d-hachura: color-mix(
+        in srgb,
+        var(--apple-blue) 50%,
+        transparent
+      );
+    }
+  }
+
+  @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+    .diagrama {
+      --d-tint-alfa: 24%;
+    }
+  }
+
+  .rolagem {
+    overflow-x: auto;
+    border-radius: 24px;
+    background: var(--d-bg);
+  }
+
+  .quadro {
+    /* 1 unidade = 1/1000 da largura do quadro; o quadro é o container dos `cqi`. */
+    --u: 0.1cqi;
+
+    /*
+     * Escala tipográfica: cresce com o quadro, mas tem piso (13px) e teto,
+     * para não ficar maior que o texto do artigo (corpo ~22px, código 15px)
+     * quando o quadro chega a 680px.
+     */
+    --f-num: clamp(24px, calc(var(--u) * 40), 28px);
+    --f-texto: clamp(13px, calc(var(--u) * 21), 17px);
+    --f-rotulo: clamp(13px, calc(var(--u) * 17), 15px);
+
+    container-type: inline-size;
+    position: relative;
+
+    font-family: var(--d-font);
+    color: var(--d-ink);
+  }
+
+  /*
+   * O quadro pode usar a largura ampla do diagrama,
+   * mas a legenda volta para a largura editorial do artigo.
+   */
+  figcaption {
+    max-width: 680px;
+    margin-top: 1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Posicionamento em unidades do desenho: --x --y --w --h (--H é a altura do quadro). */
+  .diagrama :global(.no) {
+    position: absolute;
+    box-sizing: border-box;
+
+    /*
+     * Raio proporcional ao lado menor da caixa (18%, teto de 26 unidades):
+     * caixas pequenas não ficam "gordinhas" e todas as grandes têm o mesmo raio.
+     * Nunca escreva um raio em px.
+     */
+    border-radius: calc(
+      min(26, 0.18 * min(var(--w), var(--h))) * var(--u)
+    );
+
+    left: calc(var(--x) * 0.1%);
+    top: calc(var(--y) / var(--H) * 100%);
+    width: calc(var(--w) * 0.1%);
+    height: calc(var(--h) / var(--H) * 100%);
+  }
+
+  .diagrama :global(.ponto) {
+    position: absolute;
+    left: calc(var(--x) * 0.1%);
+    top: calc(var(--y) / var(--H) * 100%);
+    transform: translate(-50%, -50%);
+  }
+
+  .diagrama :global(.setas) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Componentes */
+
+  .diagrama :global(.regiao) {
+    background: var(--d-fill);
+  }
+
+  .diagrama :global(.celula) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 4);
+    padding: calc(var(--u) * 12) calc(var(--u) * 22);
+    background: var(--d-card);
+
+    /* contorno de 1px: a célula se separa da região sem depender da sombra (que não existe no escuro) */
+    border: 1px solid var(--d-line);
+    box-shadow: var(--d-shadow);
+  }
+
+  .diagrama :global(.celula.fantasma) {
+    background: transparent;
+    box-shadow: none;
+    border: 1.5px dashed var(--d-line);
+    color: var(--d-ink2);
+  }
+
+  .diagrama :global(.cab) {
+    color: var(--d-ink2);
+    font-weight: 500;
+    font-size: var(--f-rotulo);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .diagrama :global(.etq) {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 0.4em;
+    background: var(--d-card);
+    font-family: var(--d-mono);
+    font-weight: 600;
+    font-size: var(--f-rotulo);
+    white-space: nowrap;
+  }
+
+  .diagrama :global(.etq.fill) {
+    background: var(--d-fill);
+  }
+
+  .diagrama :global(.cap) {
+    display: inline-block;
+    padding: 2px 14px;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: var(--f-rotulo);
+    white-space: nowrap;
+  }
+
+  .diagrama :global(.cap.azul) {
+    background:
+      linear-gradient(
+        var(--d-blue-tint),
+        var(--d-blue-tint)
+      ),
+      var(--d-bg);
+
+    color: var(--d-blue-texto);
+  }
+
+  .diagrama :global(.cap.indigo) {
+    background:
+      linear-gradient(
+        var(--d-indigo-tint),
+        var(--d-indigo-tint)
+      ),
+      var(--d-bg);
+
+    color: var(--d-indigo-texto);
+    font-family: var(--d-mono);
+    font-weight: 500;
+  }
+
+  .diagrama :global(.cap.ativa) {
+    background: var(--d-ink);
+    color: var(--d-bg);
+  }
+
+  .diagrama :global(.cap.ref) {
+    border: 1.5px solid var(--d-line);
+    color: var(--d-ink2);
+    background: var(--d-card);
+  }
+
+  .diagrama :global(.t1) {
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    font-size: var(--f-num);
+  }
+
+  .diagrama :global(.txt) {
+    font-size: var(--f-texto);
+  }
+
+  .diagrama :global(.t3) {
+    font-family: var(--d-mono);
+    font-weight: 600;
+    font-size: var(--f-texto);
+  }
+
+  .diagrama :global(.t4) {
+    font-family: var(--d-mono);
+    font-weight: 500;
+    font-size: var(--f-rotulo);
+  }
+
+  .diagrama :global(.pq) {
+    font-size: var(--f-rotulo);
+  }
+
+  .diagrama :global(.ink2) {
+    color: var(--d-ink2);
+  }
+
+  .diagrama :global(.hachura) {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--d-hachura) 0 calc(var(--u) * 2),
+      transparent calc(var(--u) * 2) calc(var(--u) * 20)
+    );
+  }
+
+  .diagrama :global(.destaque) {
+    background: var(--d-blue-tint);
+  }
+
+  .diagrama :global(.lista) {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .diagrama :global(.item) {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: calc(var(--u) * 12);
+
+    padding: 0 calc(var(--u) * 22);
+
+    border-top: 1px solid var(--d-line);
+  }
+
+  .diagrama :global(.item > .txt) {
+    flex: 1;
+  }
+
+  .diagrama :global(.item > :last-child:not(:first-child):not(.txt)) {
+    margin-left: auto;
+  }
+
+  .diagrama :global(.item:first-child) {
+    border-top: 0;
+  }
+</style>

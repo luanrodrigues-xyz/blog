@@ -1,0 +1,75 @@
+---
+import { Image } from 'astro:assets';
+import baseline from '../../assets/articles/main-thread-date-formatting/baseline.png';
+import reuse from '../../assets/articles/main-thread-date-formatting/reuse-main.png';
+const cases = [
+  {
+    label: 'Um formatter por linha',
+    src: baseline,
+    alt: 'App Statement exibindo 12 mil linhas, preparação de 1840,4 ms e intervalo entre callbacks de 1861,1 ms.',
+  },
+  {
+    label: 'Um formatter por lote',
+    src: reuse,
+    alt: 'O mesmo app exibindo 12 mil linhas, preparação de 9,1 ms e intervalo entre callbacks de 19,8 ms.',
+  },
+];
+---
+
+<figure class="statement-captures">
+  <div class="captures">
+    {cases.map(({ label, src, alt }) => (
+      <div>
+        <p class="capture-label">{label}</p>
+        <div class="crop">
+          <Image src={src} alt={alt} widths={[360, 720]} sizes="(max-width: 600px) 90vw, 320px" />
+        </div>
+      </div>
+    ))}
+  </div>
+  <figcaption>
+    Recortes de capturas reais no mesmo simulador. Cada tela mostra a última repetição de sua versão, não a mediana das
+    cinco amostras. As datas e a ordem das transações foram preservadas.
+  </figcaption>
+</figure>
+
+<style>
+  :global(.prose.article-body) > .statement-captures {
+    width: 100%;
+    max-width: var(--width-reading);
+    margin-inline: auto;
+    margin-block: 2rem;
+  }
+  .captures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .capture-label {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .crop {
+    aspect-ratio: 1 / 1.15;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .crop :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+  }
+  figcaption {
+    margin-block-start: 0.75rem;
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
+    line-height: 1.65;
+  }
+  @media (max-width: 600px) {
+    .captures {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

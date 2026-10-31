@@ -1,0 +1,118 @@
+---
+const measurementId = (import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? 'G-EDBQ8DXY4C').trim();
+const containerId = (import.meta.env.PUBLIC_GTM_CONTAINER_ID ?? 'GTM-W2MRDPVS').trim();
+interface Props {
+  noscript?: boolean;
+}
+const { noscript = false } = Astro.props;
+if (containerId && !/^GTM-[A-Z0-9]+$/.test(containerId)) {
+  throw new Error('PUBLIC_GTM_CONTAINER_ID deve ter o formato GTM-XXXXXXX.');
+}
+if (measurementId && !/^G-[A-Z0-9]+$/.test(measurementId)) {
+  throw new Error('PUBLIC_GA_MEASUREMENT_ID deve ter o formato G-XXXXXXXXXX.');
+}
+const enabled = import.meta.env.PROD && Boolean(containerId || measurementId);
+---
+
+{enabled && noscript && containerId && (
+  <noscript>
+    <iframe
+      src={`https://www.googletagmanager.com/ns.html?id=${containerId}`}
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden"
+      title="Google Tag Manager"
+    />
+  </noscript>
+)}
+{enabled && !noscript && <script is:inline define:vars={{ measurementId, containerId }}>
+  // Inline scripts may run again after an Astro navigation.
+  if (location.hostname === 'luanrodrigues.xyz' && !window.__portfolioAnalytics) {
+    window.__portfolioAnalytics = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      // gtag.js expects an Arguments object in the dataLayer queue.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer.push(arguments);
+    };
+    const tag = document.createElement('script');
+    tag.async = true;
+    if (containerId) {
+      window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+      tag.src = 'https://www.googletagmanager.com/gtm.js?id=' + containerId;
+    } else {
+      window.gtag('js', new Date());
+      window.gtag('config', measurementId, { send_page_view: false });
+      tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
+    }
+    document.head.appendChild(tag);
+
+    const trackClick = (event) => {
+      if (event.type === 'auxclick' && event.button !== 1) return;
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!link || event.defaultPrevented) return;
+      const destination = new URL(link.href, location.href);
+      if (!['http:', 'https:'].includes(destination.protocol)) return;
+      const socialHost = destination.hostname.replace(/^www\./, '');
+      const social = ['github.com', 'linkedin.com'].includes(socialHost);
+      let kind;
+      if (link.dataset.analyticsKind === 'article') kind = 'article';
+      else if (social) kind = 'social';
+      else if (link.closest('.site-header')) kind = 'menu';
+      else if (
+        link.matches('.category-badge, .category-all, .area-links a') ||
+        destination.pathname.startsWith('/categories/')
+      )
+        kind = 'category';
+      else if (
+        link.matches('.featured-card, .publication-cover, .publication-title a') ||
+        link.rel === 'prev' ||
+        link.rel === 'next'
+      )
+        kind = 'article';
+      if (!kind) return;
+      const section = link.closest('.site-header')
+        ? 'header'
+        : link.closest('.featured-card')
+          ? 'featured'
+          : link.closest('.publications')
+            ? 'article_list'
+            : link.closest('[data-article]')
+              ? 'article'
+              : 'main';
+      const label = link.dataset.analyticsLabel || link.getAttribute('aria-label') || link.textContent || '';
+      const parameters = {
+        click_kind: kind,
+        click_section: section,
+        link_text: label.replace(/\s+/g, ' ').trim().slice(0, 100),
+        link_url: destination.origin + destination.pathname,
+        link_anchor: destination.hash.slice(0, 100),
+        page_location: location.origin + location.pathname,
+        page_title: document.title,
+      };
+      if (containerId) {
+        window.dataLayer.push({ event: 'portfolio_navigation_click', ...parameters });
+      } else {
+        window.gtag('event', 'navigation_click', { send_to: measurementId, ...parameters });
+      }
+    };
+    // Delegation survives ClientRouter swaps and also covers keyboard activation.
+    document.addEventListener('click', trackClick);
+    document.addEventListener('auxclick', trackClick);
+
+    let previousLocation = document.referrer;
+    document.addEventListener('astro:page-load', () => {
+      const page = {
+        page_location: location.href,
+        page_title: document.title,
+        page_referrer: previousLocation,
+      };
+      if (containerId) {
+        window.dataLayer.push({ event: 'portfolio_page_view', ...page });
+      } else {
+        window.gtag('event', 'page_view', { send_to: measurementId, ...page });
+      }
+      previousLocation = location.href;
+    });
+  }
+</script>}

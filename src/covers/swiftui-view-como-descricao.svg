@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #6155F5; --principal-tinta: #E7E4FD; --sobre-principal: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #6D7CFF; --principal-tinta: color-mix(in srgb, var(--principal) 22%, var(--card)); --sobre-principal: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .linha { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .rotulo { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-weight: 600; font-size: 22px; fill: var(--sobre-principal); text-anchor: middle; dominant-baseline: central; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- Input: a Transacao value, three fields. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="285" y="235" width="160" height="160" rx="32"/>
+  </g>
+  <rect class="neutro" x="309" y="267" width="56" height="14" rx="7"/>
+  <rect class="neutro" x="309" y="301" width="100" height="14" rx="7"/>
+  <rect class="neutro" x="309" y="335" width="76" height="14" rx="7"/>
+
+  <path class="linha" d="M445,315 H499"/>
+  <polygon class="principal" points="515,315 499,307 499,323"/>
+
+  <!-- body: takes the value in, is itself the transformation. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="principal" x="515" y="255" width="120" height="120" rx="32"/>
+  </g>
+  <text class="rotulo" x="575" y="317">body</text>
+
+  <path class="linha" d="M635,315 H689"/>
+  <polygon class="principal" points="705,315 689,307 689,323"/>
+
+  <!-- Output: the composition body returns, shaped like the real row (text left, value right). -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="705" y="217" width="210" height="196" rx="32"/>
+  </g>
+  <rect class="neutro" x="729" y="251" width="100" height="14" rx="7"/>
+  <rect class="principal-tinta" x="729" y="277" width="64" height="12" rx="6"/>
+  <rect class="principal" x="821" y="299" width="70" height="32" rx="16"/>
+</svg>

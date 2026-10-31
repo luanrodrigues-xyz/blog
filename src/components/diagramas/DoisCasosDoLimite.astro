@@ -1,0 +1,153 @@
+---
+// limite ?? 0 junta nil e 0 na mesma mensagem; guard let dá um caminho a cada caso
+// (artigo opcionais-em-swift). Duas composições da mesma figura: lado a lado quando a coluna
+// tem pelo menos 540px; empilhada abaixo disso.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+
+const geometria = {
+  lado: {
+    painel: 420,
+    caixa: 190,
+    passo: 230,
+    hCab: 40,
+    yEntrada: 50,
+    hNo: 70,
+    seta: [130, 216],
+    ySaida: 226,
+    yNota: 306,
+    hNota: 60,
+    segundo: { x0: 560, y0: 20 },
+    altura: 400,
+    divisor: 500,
+  },
+  pilha: {
+    painel: 960,
+    caixa: 440,
+    passo: 520,
+    hCab: 90,
+    yEntrada: 110,
+    hNo: 120,
+    seta: [240, 340],
+    ySaida: 350,
+    yNota: 490,
+    hNota: 110,
+    segundo: { x0: 20, y0: 680 },
+    altura: 1320,
+    divisor: 0,
+  },
+};
+const paineis = (layout: 'lado' | 'pilha') => [
+  { x0: 20, y0: 20, codigo: 'limite ?? 0', junta: true, nota: 'nil e 0 levam à mesma mensagem' },
+  { ...geometria[layout].segundo, codigo: 'guard let limite', junta: false, nota: 'cada caso tem a sua mensagem' },
+];
+---
+
+<div class="dois-casos">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const g = geometria[layout];
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={g.altura} minLargura={layout === 'lado' ? 540 : 260}>
+          <slot slot="legenda" />
+          {paineis(layout).map((p) => (
+            <>
+              <span class="no t3 titulo" style={`--x:${p.x0}; --y:${p.y0}; --w:${g.painel}; --h:${g.hCab}`}>
+                {p.codigo}
+              </span>
+              {['limite: nil', 'limite: 0'].map((entrada, i) => (
+                <span
+                  class="no t3 entrada"
+                  style={`--x:${p.x0 + i * g.passo}; --y:${p.y0 + g.yEntrada}; --w:${g.caixa}; --h:${g.hNo}`}
+                >
+                  {entrada}
+                </span>
+              ))}
+              {p.junta ? (
+                <span
+                  class="no txt saida apagou"
+                  style={`--x:${p.x0}; --y:${p.y0 + g.ySaida}; --w:${g.painel}; --h:${g.hNo}`}
+                >
+                  Limite esgotado
+                </span>
+              ) : (
+                ['Limite em análise', 'Limite esgotado'].map((saida, i) => (
+                  <span
+                    class="no txt saida"
+                    style={`--x:${p.x0 + i * g.passo}; --y:${p.y0 + g.ySaida}; --w:${g.caixa}; --h:${g.hNo}`}
+                  >
+                    {saida}
+                  </span>
+                ))
+              )}
+              <span class="no txt nota" style={`--x:${p.x0}; --y:${p.y0 + g.yNota}; --w:${g.painel}; --h:${g.hNota}`}>
+                {p.nota}
+              </span>
+            </>
+          ))}
+          <svg class="setas" viewBox={`0 0 1000 ${g.altura}`} aria-hidden="true" focusable="false">
+            {g.divisor > 0 && <line class="divisor" x1={g.divisor} y1={20} x2={g.divisor} y2={g.altura - 20} />}
+            {paineis(layout).map((p) =>
+              [0, 1].map((i) => {
+                const x1 = p.x0 + i * g.passo + g.caixa / 2;
+                const x2 = p.junta ? p.x0 + g.painel / 2 + (i === 0 ? -40 : 40) : x1;
+                return <Seta tipo="neutra" x1={x1} y1={p.y0 + g.seta[0]} x2={x2} y2={p.y0 + g.seta[1]} />;
+              }),
+            )}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .dois-casos {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  .divisor {
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  @container (max-width: 539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .titulo,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .nota {
+    color: var(--d-ink2);
+  }
+  .entrada,
+  .saida {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid var(--d-line);
+  }
+  .entrada {
+    background: var(--d-card);
+  }
+  .saida {
+    background: var(--d-bg);
+  }
+  .saida.apagou {
+    border: 2px solid var(--d-vermelho);
+    background: color-mix(in srgb, var(--d-vermelho) 12%, var(--d-bg));
+  }
+</style>

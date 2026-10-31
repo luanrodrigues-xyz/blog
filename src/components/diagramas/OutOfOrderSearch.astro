@@ -1,0 +1,124 @@
+---
+// Two searches on the same model: swift starts first, swiftui starts after it and finishes first.
+// Two stacked scenarios, same geometry: the chip marks where the call starts, the line marks the
+// suspension on await, and the end cell marks where it resolves. Order comes from the article's
+// test (it releases swiftui before swift); distances are not to scale.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+type Tipo = 'resolvido' | 'conflito' | 'neutra';
+type Fim = { codigo: string; motivo: string; tipo: Tipo };
+type Cenario = { titulo: string; swift: Fim; swiftui: Fim };
+
+const cenarios: Cenario[] = [
+  {
+    titulo: 'Without checking identity',
+    swiftui: { codigo: 'state = swiftui', motivo: 'current result', tipo: 'resolvido' },
+    swift: { codigo: 'state = swift', motivo: 'overwrites swiftui', tipo: 'conflito' },
+  },
+  {
+    titulo: 'Checking requestID before the commit',
+    swiftui: { codigo: 'state = swiftui', motivo: 'stays on screen', tipo: 'resolvido' },
+    swift: { codigo: 'return', motivo: "ID isn't the active one", tipo: 'neutra' },
+  },
+];
+
+const ALTURA_CENARIO = 270;
+const GAP = 20;
+const altura = cenarios.length * (ALTURA_CENARIO + GAP) - GAP;
+
+const CHIP = { w: 150, h: 64 };
+const FIM = { w: 300, h: 90 };
+
+function linha(cy: number, inicio: number, chegada: number) {
+  return {
+    chip: { x: inicio, y: cy - CHIP.h / 2, w: CHIP.w, h: CHIP.h },
+    fim: { x: chegada, y: cy - FIM.h / 2, w: FIM.w, h: FIM.h },
+    espera: { x: (inicio + CHIP.w + chegada) / 2 - 50, y: cy - 34, w: 100, h: 20 },
+    seta: { x1: inicio + CHIP.w, y1: cy, x2: chegada, y2: cy },
+  };
+}
+
+const quadros = cenarios.map((cenario, i) => {
+  const top = i * (ALTURA_CENARIO + GAP);
+  return {
+    cenario,
+    regiao: { x: 0, y: top, w: 1000, h: ALTURA_CENARIO },
+    titulo: { x: 24, y: top + 14, w: 700, h: 28 },
+    swift: linha(top + 120, 24, 650),
+    swiftui: linha(top + 210, 140, 400),
+  };
+});
+---
+
+<Diagrama plano rotulo={rotulo} altura={altura}>
+  <slot slot="legenda" />
+
+  {
+    quadros.map(({ cenario, regiao, titulo, swift, swiftui }) => (
+      <>
+        <div class="no regiao" style={`--x:${regiao.x}; --y:${regiao.y}; --w:${regiao.w}; --h:${regiao.h}`} />
+        <span class="no cab" style={`--x:${titulo.x}; --y:${titulo.y}; --w:${titulo.w}; --h:${titulo.h}`}>
+          {cenario.titulo}
+        </span>
+
+        {([
+          ['swift', swift, cenario.swift] as const,
+          ['swiftui', swiftui, cenario.swiftui] as const,
+        ]).map(([nome, pos, fim]) => (
+          <>
+            <div class="no celula" style={`--x:${pos.chip.x}; --y:${pos.chip.y}; --w:${pos.chip.w}; --h:${pos.chip.h}`}>
+              <span class="t3">"{nome}"</span>
+            </div>
+            <span class="no pq ink2 espera" style={`--x:${pos.espera.x}; --y:${pos.espera.y}; --w:${pos.espera.w}; --h:${pos.espera.h}`}>
+              await
+            </span>
+            <div class="no celula" style={`--x:${pos.fim.x}; --y:${pos.fim.y}; --w:${pos.fim.w}; --h:${pos.fim.h}`}>
+              <span class="t3">{fim.codigo}</span>
+              <span class="pq ink2">{fim.motivo}</span>
+            </div>
+          </>
+        ))}
+      </>
+    ))
+  }
+
+  <svg class="setas" viewBox={`0 0 1000 ${altura}`} aria-hidden="true" focusable="false">
+    {
+      quadros.map(({ cenario, swift, swiftui }) => (
+        <>
+          <Seta x1={swift.seta.x1} y1={swift.seta.y1} x2={swift.seta.x2} y2={swift.seta.y2} tipo={cenario.swift.tipo} />
+          <Seta x1={swiftui.seta.x1} y1={swiftui.seta.y1} x2={swiftui.seta.x2} y2={swiftui.seta.y2} tipo={cenario.swiftui.tipo} />
+        </>
+      ))
+    }
+  </svg>
+</Diagrama>
+
+<style>
+  .cab {
+    display: flex;
+    align-items: center;
+  }
+
+  .espera {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.diagrama) .celula {
+    align-items: center;
+    text-align: center;
+  }
+
+  :global(.diagrama) .celula .t3 {
+    white-space: nowrap;
+  }
+</style>

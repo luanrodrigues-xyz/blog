@@ -1,0 +1,244 @@
+---
+// Base dos grafos de referências do artigo arc-em-swift: as variáveis `fluxo` e `tela`, o objeto
+// FluxoDeLogin e o objeto VerificacaoEmDuasEtapas, sempre nas mesmas posições, para as figuras do
+// artigo poderem ser comparadas. A seta parte de quem guarda a referência (guia de diagramas).
+// Setas sólidas = referência forte; vermelha quando fecha o ciclo; tracejada = weak.
+// Cada painel é desenhado em coordenadas locais (1000 × 1050) e posicionado com uma escala: lado a lado
+// a partir de 680px de coluna; empilhados abaixo, com a mesma escala em pixels, para a fonte caber.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+export type Objeto = { vivo: boolean; linhas: string[] };
+export type Painel = {
+  titulo: string;
+  resultado: string;
+  /** A variável `fluxo`: aponta para o objeto ou guarda nil. */
+  fluxo: 'aponta' | 'nil';
+  /** A variável `tela`, quando existe no painel. */
+  tela?: boolean;
+  objetoFluxo: Objeto;
+  objetoTela: Objeto;
+  /** Referência forte do fluxo para a tela (propriedade verificacao). */
+  ida: boolean;
+  /** Referência da tela para o fluxo (propriedade fluxo), quando existe. */
+  volta?: 'forte' | 'weak';
+};
+interface Props {
+  rotulo: string;
+  paineis: Painel[];
+}
+const { rotulo, paineis } = Astro.props;
+
+// Coordenadas locais de um painel.
+const L = {
+  titulo: { x: 0, y: 0, w: 1000, h: 80 },
+  varFluxo: { x: 0, y: 110, w: 280, h: 190 },
+  objFluxo: { x: 380, y: 110, w: 620, h: 190 },
+  varTela: { x: 0, y: 520, w: 280, h: 340 },
+  objTela: { x: 380, y: 520, w: 620, h: 340 },
+  rotuloIda: { x: 0, y: 350, w: 490, h: 120 },
+  rotuloVolta: { x: 750, y: 320, w: 250, h: 180 },
+  resultado: { x: 0, y: 890, w: 1000, h: 160 },
+  xIda: 520,
+  xVolta: 680,
+  altura: 1050,
+};
+type Caixa = { x: number; y: number; w: number; h: number };
+
+function composicao(tipo: 'lado' | 'pilha') {
+  const s = tipo === 'lado' ? 0.48 : 0.96;
+  const origens = paineis.map((_, i) =>
+    tipo === 'lado' ? { x: 20 + i * 500, y: 20 } : { x: 20, y: 20 + i * (L.altura * s + 70) },
+  );
+  const altura = Math.ceil(Math.max(...origens.map((o) => o.y + L.altura * s)) + 20);
+  const pos = (i: number, c: Caixa) => {
+    const o = origens[i];
+    return `--x:${o.x + c.x * s}; --y:${o.y + c.y * s}; --w:${c.w * s}; --h:${c.h * s}`;
+  };
+  const pt = (i: number, x: number, y: number) => ({ x: origens[i].x + x * s, y: origens[i].y + y * s });
+  const divisores =
+    paineis.length < 2
+      ? []
+      : tipo === 'lado'
+        ? [{ x1: 500, y1: 20, x2: 500, y2: altura - 20 }]
+        : origens.slice(1).map((o) => ({ x1: 20, y1: o.y - 35, x2: 980, y2: o.y - 35 }));
+  return { s, altura, pos, pt, divisores, minLargura: tipo === 'lado' ? 680 : 280 };
+}
+const topoGap = L.objFluxo.y + L.objFluxo.h + 10;
+const baseGap = L.objTela.y - 10;
+const meioFluxo = L.varFluxo.y + L.varFluxo.h / 2;
+const meioTela = L.varTela.y + L.varTela.h / 2;
+---
+
+<div class="referencias-do-login">
+  {(['lado', 'pilha'] as const).map((tipo) => {
+    const c = composicao(tipo);
+    return (
+      <div class={`composicao ${tipo}`}>
+        <Diagrama plano rotulo={rotulo} altura={c.altura} minLargura={c.minLargura}>
+          <slot slot="legenda" />
+          {paineis.map((p, i) => (
+            <>
+              <div class="no txt forte linha" style={c.pos(i, L.titulo)}>
+                <span set:html={p.titulo} />
+              </div>
+              <div class:list={['no', 'nodo', 'centro', { fantasma: p.fluxo === 'nil' }]} style={c.pos(i, L.varFluxo)}>
+                <span class="t4">fluxo</span>
+                {p.fluxo === 'nil' && <span class="t4">nil</span>}
+              </div>
+              <div class:list={['no', 'nodo', { fantasma: !p.objetoFluxo.vivo }]} style={c.pos(i, L.objFluxo)}>
+                <span class="txt forte">FluxoDeLogin</span>
+                {p.objetoFluxo.linhas.map((l) => (
+                  <span class="pq" set:html={l} />
+                ))}
+              </div>
+              {p.tela && (
+                <div class="no nodo centro" style={c.pos(i, L.varTela)}>
+                  <span class="t4">tela</span>
+                </div>
+              )}
+              <div class:list={['no', 'nodo', { fantasma: !p.objetoTela.vivo }]} style={c.pos(i, L.objTela)}>
+                <span class="txt forte">
+                  Verificacao
+                  <wbr />
+                  EmDuasEtapas
+                </span>
+                {p.objetoTela.linhas.map((l) => (
+                  <span class="pq" set:html={l} />
+                ))}
+              </div>
+              {p.ida && (
+                <div class="no pq rotulo ida" style={c.pos(i, L.rotuloIda)}>
+                  <code class="t4">verificacao</code>
+                </div>
+              )}
+              {p.volta && (
+                <div class="no pq rotulo volta" style={c.pos(i, L.rotuloVolta)}>
+                  <code class="t4">fluxo</code>
+                  <span>{p.volta === 'forte' ? 'forte' : 'weak'}</span>
+                </div>
+              )}
+              <div class="no pq forte linha" style={c.pos(i, L.resultado)}>
+                <span set:html={p.resultado} />
+              </div>
+            </>
+          ))}
+          <svg class:list={['setas', tipo]} viewBox={`0 0 1000 ${c.altura}`} aria-hidden="true" focusable="false">
+            {c.divisores.map((l) => (
+              <line class="divisor" x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />
+            ))}
+            {paineis.map((p, i) => {
+              const a = c.pt(i, L.varFluxo.x + L.varFluxo.w + 12, meioFluxo);
+              const b = c.pt(i, L.objFluxo.x - 12, meioFluxo);
+              const t1 = c.pt(i, L.varTela.x + L.varTela.w + 12, meioTela);
+              const t2 = c.pt(i, L.objTela.x - 12, meioTela);
+              const d1 = c.pt(i, L.xIda, topoGap);
+              const d2 = c.pt(i, L.xIda, baseGap);
+              const u1 = c.pt(i, L.xVolta, baseGap);
+              const u2 = c.pt(i, L.xVolta, topoGap);
+              const ponta = 18;
+              const meia = 9;
+              return (
+                <>
+                  {p.fluxo === 'aponta' && <Seta tipo="neutra" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />}
+                  {p.tela && <Seta tipo="neutra" x1={t1.x} y1={t1.y} x2={t2.x} y2={t2.y} />}
+                  {p.ida && <Seta tipo="neutra" x1={d1.x} y1={d1.y} x2={d2.x} y2={d2.y} />}
+                  {p.volta && (
+                    <>
+                      <line class:list={['retorno', p.volta]} x1={u1.x} y1={u1.y} x2={u2.x} y2={u2.y + ponta} />
+                      <polygon
+                        class:list={['ponta', p.volta]}
+                        points={`${u2.x},${u2.y} ${u2.x - meia},${u2.y + ponta} ${u2.x + meia},${u2.y + ponta}`}
+                      />
+                    </>
+                  )}
+                </>
+              );
+            })}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .referencias-do-login {
+    container-type: inline-size;
+  }
+  /* Empilhado: acima de ~480px ele só cresceria em altura, sem ganhar legibilidade. */
+  .composicao.pilha {
+    display: none;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  @container (max-width: 679px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .linha {
+    display: flex;
+    align-items: center;
+  }
+  .forte {
+    font-weight: 600;
+  }
+  :global(.diagrama) .no.nodo.centro {
+    align-items: center;
+    text-align: center;
+  }
+  .rotulo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 2);
+  }
+  .rotulo.ida {
+    align-items: flex-end;
+  }
+  .rotulo.volta {
+    align-items: flex-start;
+  }
+  /* O código dentro da figura segue o tamanho do texto ao redor, e não o 0.86em do código do artigo. */
+  :global(.prose) .referencias-do-login :global(code) {
+    font-family: var(--d-mono);
+    font-size: var(--f-rotulo);
+    background: none;
+    padding: 0;
+  }
+  :global(.prose) .referencias-do-login :global(.txt code) {
+    font-size: var(--f-texto);
+  }
+  .divisor {
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  .retorno {
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .retorno.forte {
+    stroke: var(--d-vermelho);
+  }
+  .retorno.weak {
+    stroke: var(--d-ink2);
+    stroke-dasharray: 10 8;
+  }
+  .ponta.forte {
+    fill: var(--d-vermelho);
+  }
+  .ponta.weak {
+    fill: var(--d-ink2);
+  }
+  .pilha .retorno,
+  .pilha :global(.seta line) {
+    stroke-width: 5;
+  }
+  .pilha .retorno.weak {
+    stroke-dasharray: 14 10;
+  }
+</style>

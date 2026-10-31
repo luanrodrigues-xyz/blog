@@ -1,0 +1,84 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const cases = [
+  { title: 'Without the pending check', result: 'isDone = false', note: 'local value overwritten' },
+  { title: 'With the pending check', result: 'isDone = true', note: 'local value kept' },
+];
+---
+
+<div class="pending-merge">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={rotulo} altura={wide ? 552 : 1680} minLargura={260}>
+        {cases.map((item, i) => {
+          const x = wide ? 32 + i * 500 : 32;
+          const y = wide ? 0 : i * 840;
+          const w = wide ? 436 : 936;
+          const headingHeight = wide ? 48 : 100;
+          const nodeHeight = wide ? 120 : 180;
+          const localY = y + (wide ? 80 : 132);
+          const remoteY = y + (wide ? 240 : 372);
+          const resultY = y + (wide ? 400 : 612);
+          return (
+            <>
+              <span class="no pq heading" style={`--x:${x};--y:${y + 12};--w:${w};--h:${headingHeight}`}>
+                {item.title}
+              </span>
+              <div class="no nodo" style={`--x:${x};--y:${localY};--w:${w};--h:${nodeHeight}`}>
+                <span class="t3">isDone = true</span>
+                <span class="pq">pendingSync = true</span>
+              </div>
+              <div class="no nodo fantasma" style={`--x:${x};--y:${remoteY};--w:${w};--h:${nodeHeight}`}>
+                <span class="pq">Remote merge</span>
+                <span class="t3">isDone = false</span>
+              </div>
+              <div class="no nodo" style={`--x:${x};--y:${resultY};--w:${w};--h:${nodeHeight}`}>
+                <span class="t3">{item.result}</span>
+                <span class="pq">{item.note}</span>
+              </div>
+              <svg class="setas" viewBox={`0 0 1000 ${wide ? 552 : 1680}`} aria-hidden="true" focusable="false">
+                <Seta x1={x + w / 2} y1={localY + nodeHeight} x2={x + w / 2} y2={remoteY} />
+                <Seta x1={x + w / 2} y1={remoteY + nodeHeight} x2={x + w / 2} y2={resultY} />
+              </svg>
+            </>
+          );
+        })}
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .pending-merge {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .pending-merge :global(.nodo) {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

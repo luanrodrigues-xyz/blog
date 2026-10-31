@@ -1,0 +1,38 @@
+/* Category page: the tags its articles cover, between the header and the list. */
+.topic-tags {
+  margin: 0 0 var(--space-8);
+}
+
+.topic-tags h2 {
+  margin: 0 0 var(--space-3);
+  color: var(--fg-muted);
+  font: 600 var(--text-xs) / 1.4 var(--font-ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.topic-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.topic-tags__list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+
+.topic-tags__count {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}

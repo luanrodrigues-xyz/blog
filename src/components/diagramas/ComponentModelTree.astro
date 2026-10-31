@@ -1,0 +1,19 @@
+---
+import Diagrama from './Diagrama.astro';
+---
+<Diagrama plano altura={570} rotulo="ScreenComponent escolhe entre text, com content, e button, com title e action obrigatórios. Os campos de uma alternativa não pertencem à outra.">
+  <div class="no nodo" style="--x:300; --y:40; --w:400; --h:90"><span class="t3">ScreenComponent</span><span class="pq ink2">uma alternativa por valor</span></div>
+  <svg class="setas" viewBox="0 0 1000 570" aria-hidden="true">
+    <path d="M500 130 V190 M260 240 V190 H740 V240" />
+  </svg>
+  <div class="no nodo" style="--x:40; --y:240; --w:440; --h:270">
+    <span class="t3">.text(TextComponent)</span><span class="pq ink2">dados que coexistem</span><span class="t4 field">content: String</span>
+  </div>
+  <div class="no nodo" style="--x:520; --y:240; --w:440; --h:270">
+    <span class="t3">.button(ButtonComponent)</span><span class="pq ink2">dados que coexistem</span><span class="t4 field">title: String</span><span class="t4">action: ArticleAction</span>
+  </div>
+</Diagrama>
+<style>
+  path { fill: none; stroke: var(--d-line); stroke-width: 2; }
+  .field { margin-top: calc(var(--u) * 24); }
+</style>

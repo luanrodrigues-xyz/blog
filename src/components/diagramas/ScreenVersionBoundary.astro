@@ -1,0 +1,21 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+---
+<Diagrama plano altura={1050} rotulo="RemoteScreen primeiro decodifica schemaVersion. Se a versão não for 1, lança unsupportedVersion e não decodifica os componentes pelo formato da versão 1. Com versão 1, decodifica os componentes e acceptScreen aplica a política. Falhas de decoding ou de contrato recusam a tela. Somente AcceptedScreen chega ao renderer.">
+  <div class="no nodo" style="--x:40; --y:40; --w:560; --h:120"><span class="t3">schemaVersion</span><span class="pq ink2">ler o número do contrato</span></div>
+  <div class="no nodo" style="--x:660; --y:260; --w:300; --h:160"><span class="t4">versão ≠ 1</span><span class="txt">Recusar formato</span></div>
+  <div class="no nodo" style="--x:40; --y:260; --w:560; --h:160"><span class="t4">versão = 1</span><span class="t3">[RemoteComponent]</span><span class="pq ink2">decodificar tipos e campos</span></div>
+  <div class="no nodo" style="--x:40; --y:540; --w:560; --h:180"><span class="t3">acceptScreen</span><span class="pq ink2">IDs e conteúdo obrigatório</span><span class="pq">erros recusam a composição</span></div>
+  <div class="no nodo" style="--x:660; --y:540; --w:300; --h:180"><span class="txt">Recusar a tela</span><span class="pq ink2">falha de decoding</span><span class="pq ink2">ou do contrato</span></div>
+  <span class="no pq" style="--x:360; --y:760; --w:220; --h:50">sucesso</span>
+  <div class="no nodo" style="--x:40; --y:840; --w:560; --h:150"><span class="t3">AcceptedScreen</span><span class="pq ink2">componentes → renderer</span></div>
+  <svg class="setas" viewBox="0 0 1000 1050" aria-hidden="true">
+    <Seta x1={320} y1={160} x2={320} y2={260} tipo="neutra" />
+    <Seta x1={600} y1={100} x2={810} y2={260} tipo="neutra" />
+    <Seta x1={600} y1={340} x2={660} y2={560} tipo="neutra" />
+    <Seta x1={600} y1={630} x2={660} y2={630} tipo="neutra" />
+    <Seta x1={320} y1={420} x2={320} y2={540} tipo="neutra" />
+    <Seta x1={320} y1={720} x2={320} y2={840} tipo="neutra" />
+  </svg>
+</Diagrama>

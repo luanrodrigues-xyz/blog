@@ -1,0 +1,100 @@
+---
+// A mesma Conta e as mesmas escritas isolam a diferença entre valor e referência.
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const linhas = [
+  { codigo: 'conta.saldo = 100_000', struct: 'recusado · conta é let', classe: 'aceito · muda o objeto' },
+  { codigo: 'conta = Conta(…)', struct: 'recusado · conta é let', classe: 'recusado · conta é let' },
+  { codigo: 'conta.numero = "98765-4"', struct: 'recusado · numero é let', classe: 'recusado · numero é let' },
+];
+---
+
+<div class="comparacao">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const largo = layout === 'lado';
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={largo ? 720 : 2440} minLargura={largo ? 540 : 260}>
+          <slot slot="legenda" />
+          {[false, true].map((classe, i) => {
+            const x = largo ? 20 + i * 500 : 20;
+            const y = largo ? 20 : 20 + i * 1200;
+            const w = largo ? 460 : 960;
+            return (
+              <>
+                <div class="no txt titulo" style={`--x:${x};--y:${y};--w:${w};--h:${largo ? 90 : 180}`}>
+                  <span>
+                    let conta
+                    <br />
+                    {classe ? 'class Conta' : 'struct Conta'}
+                  </span>
+                </div>
+                {linhas.map((l, j) => (
+                  <div
+                    class:list={['no linha', { aceita: classe && j === 0 }]}
+                    style={`--x:${x};--y:${y + (largo ? 110 : 210) + j * (largo ? 160 : 290)};--w:${w};--h:${largo ? 140 : 250}`}
+                  >
+                    <div class="t4">{l.codigo}</div>
+                    <div class="pq">{classe ? l.classe : l.struct}</div>
+                  </div>
+                ))}
+                <div
+                  class="no txt nota"
+                  style={`--x:${x};--y:${y + (largo ? 610 : 1090)};--w:${w};--h:${largo ? 80 : 110}`}
+                >
+                  {classe ? 'let fixa a referência' : 'let impede mutar o valor'}
+                </div>
+              </>
+            );
+          })}
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .comparacao {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .linha {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 8);
+    padding: 0 calc(var(--u) * 20);
+    background: var(--d-bg);
+    border: 1px solid var(--d-line);
+  }
+  .linha.aceita {
+    border: 2px solid var(--d-blue);
+    background: color-mix(in srgb, var(--d-blue) 12%, var(--d-bg));
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .titulo,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .nota {
+    color: var(--d-ink2);
+  }
+  .t4 {
+    overflow-wrap: anywhere;
+  }
+</style>

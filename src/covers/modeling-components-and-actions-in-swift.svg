@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+:root{--bg:#F2F2F7;--card:#fff;--neutral:#E5E5EA;--primary:#34C759;--ink:#176A2C;--tint:#DCF4E2}
+@media(prefers-color-scheme:dark){:root{--bg:#1C1C1E;--card:#2C2C2E;--neutral:#3A3A3C;--primary:#30D158;--ink:#9DE7AF;--tint:color-mix(in srgb,var(--primary) 30%,var(--card))}.shadow{filter:none}}
+.bg{fill:var(--bg)}.card{fill:var(--card)}.neutral{fill:var(--neutral)}.primary{fill:var(--primary)}.tint{fill:var(--tint)}.line{fill:none;stroke:var(--primary);stroke-width:4;stroke-linecap:round}.label{fill:var(--ink);font:600 25px 'SF Mono',ui-monospace,Menlo,monospace}
+</style>
+<defs><filter id="sombra"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/></filter></defs>
+<rect class="bg" width="1200" height="630"/>
+<g class="shadow" filter="url(#sombra)"><rect class="card" x="392" y="112" width="416" height="406" rx="32"/></g>
+<text class="label" x="440" y="174">ButtonComponent</text>
+<rect class="neutral" x="440" y="210" width="320" height="14" rx="7"/>
+<rect class="neutral" x="440" y="242" width="224" height="14" rx="7"/>
+<rect class="tint" x="424" y="296" width="352" height="182" rx="24"/>
+<text class="label" x="456" y="348">openArticle</text>
+<path class="line" d="M472 374V422H504"/>
+<text class="label" x="528" y="430">ArticleID</text>
+</svg>

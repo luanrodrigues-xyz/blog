@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1584" height="396" viewBox="0 0 1584 396">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#0088FF; --tinta:#D6EAFF; --destaque:#6155F5; --realce:#E8E5FF; }
+    @media (prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#0091FF; --tinta:color-mix(in srgb,var(--principal) 30%,var(--card)); --destaque:#6D7CFF; --realce:color-mix(in srgb,var(--destaque) 22%,var(--card)); }
+      .sombreado { filter:none; }
+    }
+    .fundo { fill:var(--fundo); }
+    .card { fill:var(--card); }
+    .neutro { fill:var(--neutro); }
+    .principal { fill:var(--principal); }
+    .tinta { fill:var(--tinta); }
+    .destaque { fill:var(--destaque); }
+    .estado { fill:var(--realce); stroke:var(--destaque); stroke-width:4; }
+    .linha { fill:none; stroke:var(--principal); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .fluxo { fill:none; stroke:var(--destaque); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .sombreado { filter:url(#sombra); }
+  </style>
+  <defs><filter id="sombra"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1584" height="396"/>
+  <g transform="translate(648 -54.8) scale(.8)">
+  <!-- Um comportamento de pagamento observado no app. -->
+  <rect class="card sombreado" x="328" y="168" width="192" height="296" rx="32"/>
+  <rect class="neutro" x="400" y="184" width="48" height="8" rx="4"/>
+  <rect class="tinta" x="352" y="224" width="144" height="88" rx="24"/>
+  <rect class="principal" x="368" y="244" width="32" height="14" rx="7"/>
+  <rect class="principal" x="368" y="278" width="80" height="14" rx="7"/>
+  <rect class="neutro" x="352" y="336" width="120" height="14" rx="7"/>
+  <rect class="neutro" x="352" y="360" width="88" height="14" rx="7"/>
+  <rect class="principal" x="352" y="400" width="144" height="32" rx="16"/>
+  <!-- Conexão discreta entre a implementação e seu modelo de estado. -->
+  <path class="linha" d="M564 316H604"/>
+  <path class="principal" d="M616 316 604 309 604 323Z"/>
+  <!-- Uma tela iOS ligada ao estado e aos dois caminhos do fluxo. -->
+  <rect class="card sombreado" x="664" y="192" width="208" height="248" rx="32"/>
+  <rect class="neutro" x="744" y="208" width="48" height="8" rx="4"/>
+  <rect class="tinta" x="696" y="232" width="144" height="48" rx="16"/>
+  <rect class="principal" x="712" y="249" width="72" height="14" rx="7"/>
+  <path class="fluxo" d="M768 280V300"/>
+  <rect class="estado" x="748" y="300" width="40" height="40" rx="12"/>
+  <path class="fluxo" d="M768 340V356H716V372M768 356H820V372"/>
+  <path class="destaque" d="M716 380 709 368 723 368Z"/>
+  <path class="destaque" d="M820 380 813 368 827 368Z"/>
+  <rect class="estado" x="696" y="380" width="40" height="32" rx="12"/>
+  <rect class="estado" x="800" y="380" width="40" height="32" rx="12"/>
+  </g>
+</svg>

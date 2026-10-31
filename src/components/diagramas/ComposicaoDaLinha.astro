@@ -1,0 +1,214 @@
+---
+import Diagrama from './Diagrama.astro';
+import Escala from './Escala.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+const linhas = [
+  {
+    y: 80,
+    nome: 'Café',
+    tipo: 'Despesa',
+    valor: '-R$ 7,50',
+  },
+  {
+    y: 332,
+    nome: 'Salário',
+    tipo: 'Entrada',
+    valor: 'R$ 3.000,00',
+  },
+];
+---
+
+<Diagrama plano rotulo={rotulo} altura={580}>
+  <slot slot="legenda" />
+
+  <span
+    class="no cab"
+    style="--x:32; --y:22; --w:900; --h:32"
+  >
+    Mesma composição · entradas diferentes
+  </span>
+
+  {linhas.map(({ y, nome, tipo, valor }) => (
+    <>
+      <!-- HStack -->
+      <div
+        class="no regiao hstack"
+        style={`--x:32; --y:${y}; --w:900; --h:240`}
+      ></div>
+
+      <span
+        class="no cab"
+        style={`--x:52; --y:${y + 12}; --w:120; --h:28`}
+      >
+        HStack
+      </span>
+
+      <!-- VStack -->
+      <div
+        class="no vstack"
+        style={`--x:52; --y:${y + 48}; --w:330; --h:160`}
+      >
+        <span class="estrutura">VStack</span>
+
+        <div class="text-filho text-descricao">
+          <span class="tipo-view">Text</span>
+          <span class="conteudo">{nome}</span>
+        </div>
+
+        <div class="text-filho">
+          <span class="tipo-view">Text</span>
+          <span class="conteudo secundario">{tipo}</span>
+        </div>
+      </div>
+
+      <!-- Spacer -->
+      <div
+        class="no spacer"
+        style={`--x:410; --y:${y + 48}; --w:170; --h:160`}
+      >
+        <span class="estrutura-central">Spacer</span>
+      </div>
+
+      <!-- Text do valor -->
+      <div
+        class="no text-valor"
+        style={`--x:608; --y:${y + 48}; --w:304; --h:160`}
+      >
+        <span class="estrutura">Text</span>
+        <span class="valor">{valor}</span>
+      </div>
+    </>
+  ))}
+
+  <Escala
+    x={32}
+    y={540}
+  />
+</Diagrama>
+
+<style>
+  .hstack {
+    background: var(--d-fill);
+  }
+
+  .vstack {
+    position: absolute;
+    box-sizing: border-box;
+
+    padding: 12px 16px;
+
+    border: 1px solid var(--d-line);
+    border-radius: 8px;
+
+    background: color-mix(
+      in srgb,
+      var(--apple-blue, #0088ff) 6%,
+      white
+    );
+  }
+
+  .estrutura {
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-family: var(--d-mono);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--d-ink2);
+  }
+
+  .text-filho {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    box-sizing: border-box;
+    height: 28px;
+    padding: 4px 10px;
+
+    border: 1px solid var(--d-line);
+    border-radius: 6px;
+
+    background: var(--d-bg);
+  }
+
+  .text-descricao {
+    margin-bottom: 8px;
+  }
+
+  .tipo-view {
+    flex: 0 0 auto;
+
+    font-family: var(--d-mono);
+    font-size: 13px;
+    line-height: 1;
+    color: var(--d-ink2);
+  }
+
+  .conteudo {
+    font-family: var(--d-mono);
+    font-size: 16px;
+    line-height: 1;
+    color: var(--d-ink);
+  }
+
+  .conteudo.secundario {
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--d-ink2);
+  }
+
+  .spacer {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border: 1px solid var(--d-line);
+    border-radius: 8px;
+
+    background: var(--d-fill);
+  }
+
+  .estrutura-central {
+    font-family: var(--d-mono);
+    font-size: 15px;
+    color: var(--d-ink2);
+  }
+
+  .text-valor {
+    position: absolute;
+    box-sizing: border-box;
+
+    padding: 14px 18px;
+
+    border: 1px solid var(--d-line);
+    border-radius: 8px;
+
+    background: color-mix(
+      in srgb,
+      var(--apple-blue, #0088ff) 6%,
+      white
+    );
+  }
+
+  .valor {
+    display: block;
+    margin-top: 22px;
+
+    font-family: var(--d-mono);
+    font-size: 19px;
+    line-height: 1;
+    color: var(--d-ink);
+  }
+</style>

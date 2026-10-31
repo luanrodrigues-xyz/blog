@@ -1,0 +1,116 @@
+---
+// Dois valores independentes guardam referências para um único objeto.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const layouts = {
+  lado: {
+    altura: 450,
+    nomes: [
+      { x: 20, y: 80, w: 420, h: 150 },
+      { x: 20, y: 250, w: 420, h: 150 },
+    ],
+    objeto: { x: 620, y: 180, w: 360, h: 120 },
+  },
+  pilha: {
+    altura: 1180,
+    nomes: [
+      { x: 240, y: 110, w: 740, h: 300 },
+      { x: 240, y: 450, w: 740, h: 300 },
+    ],
+    objeto: { x: 320, y: 920, w: 660, h: 230 },
+  },
+};
+const pos = (b: { x: number; y: number; w: number; h: number }) => `--x:${b.x};--y:${b.y};--w:${b.w};--h:${b.h}`;
+---
+
+<div class="referencias">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const g = layouts[layout];
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={g.altura} minLargura={layout === 'lado' ? 540 : 260}>
+          <slot slot="legenda" />
+          <div class="no txt titulo" style={`--x:20;--y:10;--w:960;--h:${layout === 'lado' ? 60 : 90}`}>
+            dois valores de Fatura
+          </div>
+          {g.nomes.map((b, i) => (
+            <div class="no caixa" style={pos(b)}>
+              <div class="t4 titulo">{i === 0 ? 'agosto' : 'simulacao'}</div>
+              <div class:list={['t4', { mudou: i === 1 }]}>total: {i === 0 ? '320_000' : '470_000'}</div>
+              <div class="t4">cartao</div>
+            </div>
+          ))}
+          <div class="no caixa objeto" style={pos(g.objeto)}>
+            <div class="txt titulo">um objeto Cartao</div>
+            <div class="t4 mudou">limite: 800_000</div>
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${g.altura}`} aria-hidden="true" focusable="false">
+            {layout === 'lado' ? (
+              g.nomes.map((b) => (
+                <Seta tipo="neutra" x1={b.x + b.w + 12} y1={b.y + 120} x2={608} y2={b.y === 80 ? 210 : 270} />
+              ))
+            ) : (
+              <>
+                <path class="trajeto" d="M340 422H120V1035H260" />
+                <Seta tipo="neutra" x1={260} y1={1035} x2={300} y2={1035} />
+                <Seta tipo="neutra" x1={660} y1={762} x2={660} y2={900} />
+              </>
+            )}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .referencias {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .caixa {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 20);
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .no.titulo {
+    display: flex;
+    align-items: center;
+  }
+  .objeto {
+    background: var(--d-bg);
+  }
+  .mudou {
+    font-weight: 600;
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+  .trajeto {
+    fill: none;
+    stroke: var(--d-ink2);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

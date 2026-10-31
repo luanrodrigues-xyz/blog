@@ -1,0 +1,58 @@
+---
+// Seta em SVG: sólida azul = ida (proposta, ação, dado indo); tracejada índigo = volta (resposta, medida).
+// Vai dentro de <svg class="setas" viewBox="0 0 1000 {altura}">.
+interface Props {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  tipo?: 'ida' | 'volta' | 'neutra' | 'conflito' | 'resolvido';
+}
+const { x1, y1, x2, y2, tipo = 'ida' } = Astro.props;
+const dx = x2 - x1;
+const dy = y2 - y1;
+const comprimento = Math.hypot(dx, dy) || 1;
+const ux = dx / comprimento;
+const uy = dy / comprimento;
+const ponta = 18;
+const meia = 9;
+const bx = x2 - ux * ponta;
+const by = y2 - uy * ponta;
+const pontos = `${x2},${y2} ${bx - uy * meia},${by + ux * meia} ${bx + uy * meia},${by - ux * meia}`;
+---
+
+<g class={`seta ${tipo}`}>
+  <line x1={x1} y1={y1} x2={bx} y2={by}></line>
+  <polygon points={pontos}></polygon>
+</g>
+
+<style>
+  .seta {
+    --cor: var(--d-blue);
+  }
+  .seta.volta {
+    --cor: var(--d-indigo);
+  }
+  .seta.neutra {
+    --cor: var(--d-ink2);
+  }
+  .seta.conflito {
+    --cor: var(--d-vermelho);
+  }
+  .seta.resolvido {
+    --cor: var(--d-verde);
+  }
+  line {
+    stroke: var(--cor);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .volta line,
+  .conflito line {
+    stroke-width: 2.5;
+    stroke-dasharray: 10 8;
+  }
+  polygon {
+    fill: var(--cor);
+  }
+</style>

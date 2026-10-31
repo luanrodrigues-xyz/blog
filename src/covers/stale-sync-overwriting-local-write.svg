@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #FF383C; --principal-texto: #C61226; --principal-tinta: #FFD9DA; --sobre-principal: #fff;
+      --destaque: #6155F5; --destaque-texto: #564ADE; --destaque-tinta: #E3E0FD; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #FF4245; --principal-texto: #FF686A; --principal-tinta: color-mix(in srgb, var(--principal) 30%, var(--card)); --sobre-principal: #fff;
+        --destaque: #6D7CFF; --destaque-texto: #8390FF; --destaque-tinta: color-mix(in srgb, var(--destaque) 22%, var(--card)); --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .destaque { fill: var(--destaque); }
+    .destaque-tinta { fill: var(--destaque-tinta); }
+    .linha-principal { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; }
+    .linha-destaque { fill: none; stroke: var(--destaque); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1 11; }
+    .ponta-principal { fill: var(--principal); }
+    .rotulo { font-family: SF Mono, ui-monospace, Menlo, monospace; font-size: 22px; font-weight: 600; fill: var(--principal-texto); text-anchor: middle; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- Remote snapshot: same task row, claims it's still open. Its path stops before the gate. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="300" y="160" width="176" height="112" rx="32"/>
+  </g>
+  <rect class="neutro" x="324" y="192" width="70" height="12" rx="6"/>
+  <rect class="destaque-tinta" x="324" y="226" width="128" height="12" rx="6"/>
+
+  <!-- Local write: same row, already saved as done. Its path reaches the gate and passes through. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="300" y="358" width="176" height="112" rx="32"/>
+  </g>
+  <rect class="neutro" x="324" y="390" width="70" height="12" rx="6"/>
+  <rect class="principal-tinta" x="324" y="424" width="128" height="12" rx="6"/>
+
+  <!-- Local write reaches the gate: elbow connector, solid, arrowhead into the gate. -->
+  <path class="linha-principal" d="M476 414H528V315H552"/>
+  <polygon class="ponta-principal" points="560,315 542,307 542,323"/>
+
+  <!-- Remote snapshot never reaches the gate: dashed connector stops at the rejection badge. -->
+  <path class="linha-destaque" d="M476 216H536V305"/>
+  <circle class="destaque" cx="536" cy="315" r="20"/>
+  <path d="M528 307 544 323M544 307 528 323" stroke="var(--sobre-destaque)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- The gate: the pendingSync check. Only a write with nothing pending gets to commit. -->
+  <rect class="principal" x="560" y="249" width="140" height="132" rx="24"/>
+  <path d="M598 319 622 343 664 299" fill="none" stroke="var(--sobre-principal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="rotulo" x="630" y="405">pendingSync</text>
+
+  <!-- The committed row, carrying only the value the gate let through. -->
+  <path class="linha-principal" d="M700 315H752"/>
+  <polygon class="ponta-principal" points="760,315 742,307 742,323"/>
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="760" y="233" width="150" height="164" rx="32"/>
+  </g>
+  <rect class="principal" x="792" y="265" width="86" height="14" rx="7"/>
+  <rect class="principal-tinta" x="792" y="297" width="86" height="22" rx="11"/>
+  <rect class="principal-tinta" x="792" y="331" width="86" height="22" rx="11"/>
+</svg>

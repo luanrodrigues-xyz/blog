@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --background: #F2F2F7; --card: #fff; --neutral: #E5E5EA; --primary: #FFCC00; --ink: #6B5500; --highlight: #0088FF; }
+    @media (prefers-color-scheme: dark) {
+      svg { --background: #1C1C1E; --card: #2C2C2E; --neutral: #3A3A3C; --primary: #FFDF00; --ink: #FFE97D; --highlight: #5CB3FF; }
+      .shadow { filter: none; }
+    }
+    .background { fill: var(--background); }
+    .card { fill: var(--card); }
+    .neutral { fill: var(--neutral); }
+    .primary { fill: var(--primary); }
+    .focus { fill: none; stroke: var(--highlight); stroke-width: 4; }
+    .line { fill: none; stroke: var(--highlight); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .label { fill: var(--ink); font: 600 24px 'SF Mono', ui-monospace, Menlo, monospace; }
+  </style>
+  <defs><filter id="shadow" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="background" width="1200" height="630"/>
+  <!-- A form keeps its error above the action. -->
+  <g class="shadow" filter="url(#shadow)"><rect class="card" x="400" y="155" width="400" height="320" rx="32"/></g>
+  <rect class="neutral" x="432" y="195" width="176" height="14" rx="7"/>
+  <rect class="neutral" x="432" y="235" width="336" height="48" rx="24"/>
+  <rect class="primary" x="432" y="307" width="8" height="48" rx="4"/>
+  <text class="label" x="456" y="339">Enter a note</text>
+  <rect class="neutral" x="432" y="387" width="176" height="48" rx="24"/>
+  <!-- Focus moves from the save action to the error. -->
+  <rect class="focus" x="424" y="299" width="352" height="64" rx="24"/>
+  <path class="line" d="M624 411 H840 Q864 411 864 387 V355 Q864 331 840 331 H816"/>
+  <polygon class="primary" points="800,331 816,323 816,339"/>
+</svg>

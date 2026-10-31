@@ -1,0 +1,133 @@
+---
+// try? apaga a causa; catch por padrão permite mensagens distintas, sem implementar retry.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const causas = [
+  { erro: 'sessionExpired', resposta: 'mensagem de login' },
+  { erro: 'serverUnavailable', resposta: 'indisponibilidade' },
+  { erro: 'corruptedResponse', resposta: 'resposta corrompida' },
+];
+---
+
+<div class="causas">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const largo = layout === 'lado';
+    const altura = largo ? 570 : 1880;
+    const x2 = largo ? 540 : 20;
+    const y2 = largo ? 20 : 800;
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={altura} minLargura={largo ? 600 : 260}>
+          <slot slot="legenda" />
+          <div class="no t3 titulo" style={`--x:20;--y:20;--w:${largo ? 440 : 960};--h:${largo ? 60 : 90}`}>
+            try?
+          </div>
+          {causas.map((c, i) => (
+            <div
+              class="no t4 causa"
+              style={`--x:20;--y:${largo ? 100 + i * 130 : 130 + i * 160};--w:${largo ? 270 : 600};--h:${largo ? 90 : 120}`}
+            >
+              {c.erro}
+            </div>
+          ))}
+          <div
+            class="no t3 nil"
+            style={`--x:${largo ? 370 : 800};--y:${largo ? 235 : 270};--w:${largo ? 90 : 180};--h:${largo ? 110 : 170}`}
+          >
+            nil
+          </div>
+          <div
+            class="no txt nota"
+            style={`--x:20;--y:${largo ? 480 : 620};--w:${largo ? 440 : 960};--h:${largo ? 70 : 110}`}
+          >
+            uma mensagem genérica
+          </div>
+          <div class="no t3 titulo" style={`--x:${x2};--y:${y2};--w:${largo ? 440 : 960};--h:${largo ? 60 : 90}`}>
+            catch específicos
+          </div>
+          {causas.map((c, i) => (
+            <div
+              class="no resposta"
+              style={`--x:${x2};--y:${y2 + (largo ? 80 + i * 130 : 110 + i * 270)};--w:${largo ? 440 : 960};--h:${largo ? 90 : 230}`}
+            >
+              <div class="t4">{c.erro}</div>
+              <div class="txt">{c.resposta}</div>
+            </div>
+          ))}
+          <div
+            class="no txt nota"
+            style={`--x:${x2};--y:${y2 + (largo ? 460 : 940)};--w:${largo ? 440 : 960};--h:${largo ? 70 : 110}`}
+          >
+            a causa participa da escolha
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${altura}`} aria-hidden="true" focusable="false">
+            {causas.map((_, i) => (
+              <Seta
+                tipo="neutra"
+                x1={largo ? 302 : 632}
+                y1={largo ? 145 + i * 130 : 190 + i * 160}
+                x2={largo ? 358 : 788}
+                y2={largo ? 255 + i * 35 : 290 + i * 65}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .causas {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:599px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .titulo,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .nota {
+    color: var(--d-ink2);
+  }
+  .causa,
+  .nil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--d-line);
+    background: var(--d-card);
+  }
+  .nil {
+    border: 2px solid var(--d-ink2);
+    background: var(--d-fill);
+  }
+  .resposta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 18);
+    border: 1px solid var(--d-line);
+    background: var(--d-bg);
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+</style>

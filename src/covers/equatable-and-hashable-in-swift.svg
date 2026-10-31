@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+:root{--bg:#F2F2F7;--card:#fff;--neutral:#E5E5EA;--primary:#0088FF;--ink:#005FB3;--tint:#D6EAFF;--accent:#6155F5}
+@media(prefers-color-scheme:dark){:root{--bg:#1C1C1E;--card:#2C2C2E;--neutral:#3A3A3C;--primary:#35A4FF;--ink:#B8DEFF;--tint:color-mix(in srgb,var(--primary) 30%,var(--card));--accent:#A29BFF}.shadow{filter:none}}
+.bg{fill:var(--bg)}.card{fill:var(--card)}.neutral{fill:var(--neutral)}.primary{fill:var(--primary)}.tint{fill:var(--tint)}.accent{fill:var(--accent)}.line{fill:none;stroke:var(--primary);stroke-width:4;stroke-linecap:round}.label{fill:var(--ink);font:600 25px 'SF Mono',ui-monospace,Menlo,monospace}
+</style>
+<defs><filter id="sombra"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/></filter></defs>
+<rect class="bg" width="1200" height="630"/>
+<!-- Content changes while the key stays the same. -->
+<g class="shadow" filter="url(#sombra)">
+<rect class="card" x="336" y="152" width="224" height="176" rx="32"/>
+<rect class="card" x="640" y="152" width="224" height="176" rx="32"/>
+</g>
+<rect class="tint" x="368" y="184" width="160" height="48" rx="24"/>
+<rect class="tint" x="672" y="184" width="160" height="48" rx="24"/>
+<text class="label" x="448" y="216" text-anchor="middle">s1</text>
+<text class="label" x="752" y="216" text-anchor="middle">s1</text>
+<rect class="neutral" x="368" y="256" width="88" height="14" rx="7"/>
+<rect class="accent" x="672" y="256" width="160" height="14" rx="7"/>
+<rect class="neutral" x="368" y="288" width="144" height="14" rx="7"/>
+<rect class="neutral" x="672" y="288" width="144" height="14" rx="7"/>
+<!-- Both song states use one favorite key. -->
+<path class="line" d="M448 328V376H600M752 328V376H600V406"/>
+<path class="primary" d="M600 420l-9-16h18z"/>
+<rect class="tint" x="528" y="424" width="144" height="72" rx="24"/>
+<text class="label" x="600" y="469" text-anchor="middle">s1</text>
+</svg>

@@ -1,0 +1,326 @@
+---
+title: "Server-driven UI and the limits of the app-server contract"
+description: "A Node.js BFF can change the order of components on a screen, but it cannot make an installed Swift app run an action it does not support."
+date: "2026-10-08"
+updated: "2026-10-12"
+topic: "architecture"
+readingOrder: 21
+draft: false
+tags: ["Swift", "Server-Driven UI", "BFF", "Node.js", "API Contracts"]
+cover: "server-driven-ui-contract-boundary.png"
+coverAlt: "Two known component shapes reach matching slots in the app, while an unknown shape stops at the contract boundary."
+language: "en"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import RemoteUIContractOwners from '../../../../../src/components/diagramas/RemoteUIContractOwners.astro';
+import RemoteScreenAcceptance from '../../../../../src/components/diagramas/RemoteScreenAcceptance.astro';
+
+Imagine an order screen with a delivery status and a tracking button. The product team wants to try putting the button first. Both components already exist in the app, so the server only needs to send them in a different order.
+
+Now the team wants that button to open a live map of the courier’s location. Changing the action in JSON is easy enough, but it won’t help if the installed app has no code to open the map.
+
+This is one limit of server-driven UI. The server can describe the screen, but it depends on components and actions already built into the app. Zalando ran into a similar problem with Appcraft: new primitives, or changes to existing ones, still require an app update.
+
+To look at that limit, I’m using a small Node.js Backend for Frontend (BFF) to build the response and Swift to decode it. The Swift examples form one program using Foundation. I left out SwiftUI and navigation so I can focus on unsupported data.
+
+## What the BFF can choose
+
+A BFF usually adapts backend data for the client using the API. Here, I also use it to choose the screen components and their order. That is a choice for this example; not every BFF needs to build UI descriptions.
+
+The contract has only two components, `statusCard` and `button`, and one action, `openOrderTracking`. That is enough to test what the server can change without a new app release.
+
+<RemoteUIContractOwners />
+
+```json
+{
+  "schemaVersion": 1,
+  "sections": [
+    {
+      "id": "delivery-status",
+      "type": "statusCard",
+      "title": "Your order is on the way",
+      "subtitle": "Expected delivery tomorrow"
+    },
+    {
+      "id": "tracking",
+      "type": "button",
+      "title": "Track delivery",
+      "action": {
+        "type": "openOrderTracking",
+        "orderId": "123"
+      }
+    }
+  ]
+}
+```
+
+The `type` field is not a Swift class name. It refers to something both sides agreed on: `button` means a native button, and `openOrderTracking` means the tracking flow, which takes an order ID.
+
+I don’t want the server to send any method name or code for the app to run. Each accepted action must already have an implementation in the app.
+
+The `tracking` ID stays the same when the button moves. If the renderer uses it to identify the section, a new title or position should not create a new identity. IDs still need to be unique within the screen.
+
+## Building the response in Node.js
+
+I kept the order data fixed in this function. There are no service calls or HTTP endpoints here; I only want to test how the screen is put together.
+
+```javascript
+export function buildOrderScreen({ trackingFirst = false } = {}) {
+  const status = {
+    id: "delivery-status",
+    type: "statusCard",
+    title: "Your order is on the way",
+    subtitle: "Expected delivery tomorrow",
+  };
+
+  const tracking = {
+    id: "tracking",
+    type: "button",
+    title: "Track delivery",
+    action: {
+      type: "openOrderTracking",
+      orderId: "123",
+    },
+  };
+
+  return {
+    schemaVersion: 1,
+    sections: trackingFirst ? [tracking, status] : [status, tracking],
+  };
+}
+```
+
+Changing `trackingFirst` only reverses the sections. If the renderer follows the array, the server can do that without adding a new component. Native layout, text sizes, accessibility, and button behavior still live in the app.
+
+These tests stop at decoding. A SwiftUI renderer would need separate integration and accessibility tests.
+
+## Limiting the components and actions the app supports
+
+I used Swift enums with associated values to limit what the server can send. Each component carries the data its implementation needs.
+
+```swift fragment
+import Foundation
+
+enum ScreenAction: Equatable {
+    case openOrderTracking(orderID: String)
+}
+
+enum ScreenComponent: Equatable {
+    case statusCard(title: String, subtitle: String)
+    case button(title: String, action: ScreenAction)
+}
+```
+
+`openOrderTracking` takes only the order ID. The server cannot choose an arbitrary method or URL.
+
+The JSON uses `type` to identify each case, so I wrote custom `Decodable` implementations for both enums.
+
+```swift fragment
+extension ScreenAction: Decodable {
+    private enum Kind: String, Decodable {
+        case openOrderTracking
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type, orderId
+    }
+
+    init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try values.decode(Kind.self, forKey: .type)
+
+        switch kind {
+        case .openOrderTracking:
+            let orderID = try values.decode(String.self, forKey: .orderId)
+            self = .openOrderTracking(orderID: orderID)
+        }
+    }
+}
+
+extension ScreenComponent: Decodable {
+    private enum Kind: String, Decodable {
+        case statusCard, button
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type, title, subtitle, action
+    }
+
+    init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try values.decode(Kind.self, forKey: .type)
+
+        switch kind {
+        case .statusCard:
+            self = .statusCard(
+                title: try values.decode(String.self, forKey: .title),
+                subtitle: try values.decode(String.self, forKey: .subtitle)
+           )
+        case .button:
+            self = .button(
+                title: try values.decode(String.self, forKey: .title),
+                action: try values.decode(ScreenAction.self, forKey: .action)
+           )
+        }
+    }
+}
+```
+
+`Kind` accepts only the declared values. Any other `type` makes decoding fail, whether it appears in a button action or a component.
+
+The compiler checks that the `switch` handles every known `Kind` case. It cannot predict values the server might send tomorrow. Those are checked at decoding time.
+
+## Validating the response before rendering
+
+I want to reject the full response if the version is unsupported or any section fails. That check starts in `RemoteScreen`, before the result reaches the presentation layer.
+
+```swift fragment
+struct ScreenSection: Decodable, Equatable {
+    let id: String
+    let component: ScreenComponent
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+    }
+
+    init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        component = try ScreenComponent(from: decoder)
+    }
+}
+
+enum ScreenContractError: Error {
+    case unsupportedVersion(Int)
+    case invalidSectionIDs
+}
+
+struct RemoteScreen: Decodable {
+    let sections: [ScreenSection]
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, sections
+    }
+
+    init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let version = try values.decode(Int.self, forKey: .schemaVersion)
+        guard version == 1 else {
+            throw ScreenContractError.unsupportedVersion(version)
+        }
+
+        sections = try values.decode([ScreenSection].self, forKey: .sections)
+        let ids = sections.map(.id)
+        guard ids.allSatisfy({ !$0.isEmpty }), Set(ids).count == ids.count else {
+            throw ScreenContractError.invalidSectionIDs
+        }
+    }
+}
+```
+
+I don’t use `try?` to skip individual sections. If one fails, the entire screen is rejected. On an order screen, ignoring data I don’t understand might hide the delivery status or the only way to track the order.
+
+The presentation layer handles that with two states:
+
+```swift fragment
+enum OrderScreenState {
+    case content(RemoteScreen)
+    case unavailable
+}
+
+func orderScreenState(for data: Data) -> OrderScreenState {
+    do {
+        let screen = try JSONDecoder().decode(RemoteScreen.self, from: data)
+        return .content(screen)
+    } catch {
+        return .unavailable
+    }
+}
+```
+
+A SwiftUI view could render `.content` or show an unavailable message with a retry option. A partly decoded screen never reaches that state.
+
+That doesn’t mean every unknown component should break the whole screen. Skipping a promotional card might be fine, for example. But the contract would need to tell optional sections apart from required ones. This JSON doesn’t, so I reject the response.
+
+<RemoteScreenAcceptance />
+
+`schemaVersion` helps check the format, but it cannot guarantee compatibility on its own. The server could still send a new action, change what a field means, or remove required data while keeping the value at `1`.
+
+This example has other gaps. The decoder accepts an empty `sections` array or an empty `orderId`, because I haven’t added those product rules. And valid fields do not replace the order service checking whether the order exists and whether the user may access it.
+
+There is a less obvious case: the BFF sends only `delivery-status`, with `schemaVersion: 1` and the right fields. Decoding succeeds. But an order that is out for delivery now has no tracking button. The JSON is valid, while the screen may be incomplete.
+
+The current model does not even include the order status needed to check this rule. We could add it and define which sections each status requires, or make the BFF responsible for the structure and test the combinations it sends. Decoding alone cannot check that.
+
+## What happens when the response changes
+
+The first change is safe for this contract: `trackingFirst: true` puts `tracking` before `delivery-status`, and the app still accepts both sections.
+
+The next change is different. The button stays, but its action becomes:
+
+```json
+{
+  "type": "openCourierMap",
+  "orderId": "123"
+}
+```
+
+The app knows the button, but not `openCourierMap`. Decoding fails on the action’s `type`, and the screen is rejected.
+
+If I keep `openOrderTracking` but remove `orderId`, I get a different failure: the action is known, but its required input is missing. This function helps compare them:
+
+```swift fragment
+func decodingResult(for data: Data) -> String {
+    do {
+        let screen = try JSONDecoder().decode(RemoteScreen.self, from: data)
+        return "accepted " + screen.sections.map(.id).joined(separator: ", ")
+    } catch DecodingError.dataCorrupted(let context) {
+        let path = context.codingPath.map(.stringValue).joined(separator: ".")
+        return "dataCorrupted at " + path
+    } catch DecodingError.keyNotFound(let key, _) {
+        return "keyNotFound " + key.stringValue
+    } catch {
+        return "rejected " + String(describing: error)
+    }
+}
+
+for name in ["normal", "reordered", "unknownAction", "missingOrder"] {
+    let data = try Data(contentsOf: URL(fileURLWithPath: name + ".json"))
+    print(name + ".json -> " + decodingResult(for: data))
+}
+```
+
+I saved four responses in local JSON files. `normal.json` comes from `buildOrderScreen()`, and `reordered.json` uses `trackingFirst: true`. In `unknownAction.json`, I changed the action to `openCourierMap`; in `missingOrder.json`, I removed `orderId`. The expected output is:
+
+```text
+normal.json -> accepted delivery-status, tracking
+reordered.json -> accepted tracking, delivery-status
+unknownAction.json -> dataCorrupted at sections.Index 1.action.type
+missingOrder.json -> keyNotFound orderId
+```
+
+Both errors end up as `.unavailable` in the presentation flow. The output helps debug the cause, but those strings are neither user-facing messages nor a stable error contract.
+
+Extra fields that the decoder does not read are ignored. Replacing `statusCard` with `courierMap`, however, fails because that `type` is not part of `Kind`.
+
+## Releasing new actions without breaking older apps
+
+The app needs to implement the map and define its inputs before it can handle `openCourierMap`. But releasing a new version does not update every phone at once. The BFF still needs to send older apps something they understand.
+
+The client could report its supported capabilities, or the BFF could keep a mapping of app versions to supported contracts. Either way, `schemaVersion: 1` does not mean every installed version understands the same actions.
+
+For apps without `openCourierMap`, the BFF can keep sending `openOrderTracking`. If there is no compatible option, we need to decide what older versions should show instead of sending an incomplete screen. The order service still checks permissions, and the decoder still protects the app if the server selects an unsupported contract.
+
+For this kind of screen, I would keep components and actions specific to orders. A general layout language might help in other cases, but it also creates more rules for the app to understand, maintain, and test.
+
+<FontesDoArtigo>
+
+References
+
+- [Zalando Engineering — Transitioning to Appcraft](https://engineering.zalando.com/posts/2024/05/appcraft.html)
+- [Microsoft — Backends for Frontends pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends)
+- [Apple — Encoding and decoding custom types](https://developer.apple.com/documentation/foundation/encoding-and-decoding-custom-types)
+- [Swift — Enumerations](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/enumerations/)
+
+</FontesDoArtigo>

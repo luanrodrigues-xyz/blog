@@ -1,0 +1,26 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props { rotulo: string; }
+const { rotulo } = Astro.props;
+---
+<Diagrama plano rotulo={rotulo} altura={1080} minLargura={540}>
+  <div class="no nodo" style="--x:80; --y:40; --w:840; --h:110"><span class="txt strong">AppConfig</span><span class="pq">two bean definitions</span></div>
+  <span class="no pq label" style="--x:240; --y:190; --w:520; --h:60">registers creation rules</span>
+  <div class="no regiao" style="--x:40; --y:340; --w:920; --h:680"></div>
+  <span class="no txt label" style="--x:80; --y:365; --w:840; --h:70">ApplicationContext</span>
+  <div class="no nodo" style="--x:110; --y:490; --w:780; --h:140"><span class="txt strong">WelcomeService</span><span class="pq">welcome rule</span></div>
+  <span class="no pq label" style="--x:150; --y:670; --w:700; --h:70">sender field points to</span>
+  <div class="no nodo" style="--x:110; --y:820; --w:780; --h:140"><span class="txt strong">ConsoleMessageSender</span><span class="pq">selected MessageSender implementation</span></div>
+  <svg class="setas" viewBox="0 0 1000 1080" aria-hidden="true" focusable="false">
+    <Seta tipo="neutra" x1={500} y1={150} x2={500} y2={185} />
+    <Seta tipo="neutra" x1={500} y1={260} x2={500} y2={338} />
+    <Seta x1={500} y1={630} x2={500} y2={665} />
+    <Seta x1={500} y1={750} x2={500} y2={818} />
+  </svg>
+</Diagrama>
+<style>
+.strong { font-weight: 600; }
+.nodo { text-align: center; align-items: center; }
+.label { display: flex; align-items: center; justify-content: center; text-align: center; }
+</style>

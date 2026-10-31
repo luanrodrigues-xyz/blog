@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#0088FF; --tinta:#D6EAFF; --texto:#005FB3; --destaque:#FF8D28; }
+    @media (prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#35A4FF; --tinta:color-mix(in srgb,var(--principal) 30%,var(--card)); --texto:#B8DEFF; --destaque:#FF9230; }
+      .sombreado { filter:none; }
+    }
+    .fundo { fill:var(--fundo); } .card { fill:var(--card); }
+    .neutro { fill:var(--neutro); } .principal { fill:var(--principal); }
+    .tinta { fill:var(--tinta); } .destaque { fill:var(--destaque); }
+    .texto { fill:var(--texto); font:600 26px 'SF Mono',ui-monospace,Menlo,monospace; }
+    .linha { fill:none; stroke:var(--destaque); stroke-width:4; stroke-linecap:round; }
+  </style>
+  <defs><filter id="sombra" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- One type boundary contains both original and additional members. -->
+  <g class="sombreado" filter="url(#sombra)"><rect class="card" x="392" y="128" width="416" height="384" rx="32"/></g>
+  <text class="texto" x="432" y="188">PlayQueue</text>
+  <rect class="principal" x="432" y="232" width="248" height="14" rx="7"/>
+  <rect class="neutro" x="432" y="280" width="176" height="14" rx="7"/>
+  <!-- Additional functionality stays inside the same boundary. -->
+  <rect class="tinta" x="416" y="344" width="368" height="136" rx="24"/>
+  <path class="linha" d="M448 400H480M464 384V416"/>
+  <rect class="destaque" x="504" y="392" width="240" height="14" rx="7"/>
+  <rect class="principal" x="504" y="432" width="144" height="14" rx="7"/>
+</svg>

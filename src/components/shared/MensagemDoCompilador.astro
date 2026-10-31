@@ -1,0 +1,79 @@
+---
+interface Props {
+  tipo?: 'erro' | 'aviso';
+  arquivo?: string;
+  linha: number;
+  coluna: number;
+  mensagem: string;
+  codigo: string[];
+  linhaInicial?: number;
+}
+
+const {
+  tipo = 'erro',
+  arquivo,
+  linha,
+  coluna,
+  mensagem,
+  codigo,
+  linhaInicial = 1,
+} = Astro.props;
+
+const palavra = tipo === 'aviso' ? 'warning' : 'error';
+
+const ultimaLinha = linhaInicial + codigo.length - 1;
+const larguraGutter = String(ultimaLinha).length;
+
+const cabecalho = `${arquivo ? `${arquivo}:` : ''}${linha}:${coluna}: ${palavra}: ${mensagem}`;
+
+const corpo = codigo
+  .flatMap((texto, i) => {
+    const numero = linhaInicial + i;
+    const atual = `${String(numero).padStart(larguraGutter)} | ${texto}`;
+    if (numero !== linha) return [atual];
+    const indicador = `${' '.repeat(larguraGutter)} | ${' '.repeat(Math.max(coluna - 1, 0))}\`- ${palavra}: ${mensagem}`;
+    return [atual, indicador];
+  })
+  .join('\n');
+
+const diagnostico = `${cabecalho}\n${corpo}`;
+---
+
+<pre class="mensagem-compilador" data-tipo={tipo}><code>{diagnostico}</code></pre>
+
+<style>
+  pre.mensagem-compilador {
+    --cor: var(--apple-red-text);
+    --fundo: color-mix(in srgb, var(--apple-red) 12%, var(--canvas));
+    margin: 1.6rem 0 2rem;
+    padding: 1.2rem 1.3rem;
+    border: 1.5px solid var(--cor);
+    border-radius: var(--radius-l);
+    background: var(--fundo);
+    color: var(--fg);
+    font: var(--code-weight) 0.84rem/1.5 var(--font-mono);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  pre.mensagem-compilador[data-tipo='aviso'] {
+    --cor: var(--apple-orange-text);
+    --fundo: color-mix(in srgb, var(--apple-orange) 12%, var(--canvas));
+  }
+
+  @media (prefers-color-scheme: dark) {
+    pre.mensagem-compilador {
+      --fundo: color-mix(in srgb, var(--apple-red) 20%, var(--canvas));
+    }
+
+    pre.mensagem-compilador[data-tipo='aviso'] {
+      --fundo: color-mix(in srgb, var(--apple-orange) 20%, var(--canvas));
+    }
+  }
+
+  pre.mensagem-compilador code {
+    font: inherit;
+    background: none;
+    padding: 0;
+  }
+</style>

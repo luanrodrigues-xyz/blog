@@ -1,0 +1,103 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'Removing the first s1 shifts s2 from index 1 to index 0 and the last s1 from index 2 to index 1. The saved index 1 remains valid but now selects s1 instead of s2.';
+---
+
+<div class="index-shift">
+  {[true, false].map((wide) => {
+    const height = wide ? 600 : 1110;
+    const beforeY = wide ? 80 : 150;
+    const afterY = wide ? 370 : 750;
+    const cellHeight = wide ? 110 : 230;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          <div class="no txt heading" style={`--x:20;--y:10;--w:960;--h:${wide ? 60 : 120}`}>
+            Before remove(at: 0)
+          </div>
+          {['s1', 's2', 's1'].map((id, i) => (
+            <div
+              class:list={['no', 'nodo', 'entry', { selected: i === 1 }]}
+              style={`--x:${20 + i * 330};--y:${beforeY};--w:300;--h:${cellHeight}`}
+            >
+              <span class="pq">index {i}</span>
+              <span class="t4">{id}</span>
+            </div>
+          ))}
+          <div class="no pq removed" style={`--x:20;--y:${beforeY + cellHeight + 10};--w:300;--h:${wide ? 60 : 120}`}>
+            removed
+          </div>
+          <div class="no txt heading" style={`--x:680;--y:${wide ? 290 : 610};--w:300;--h:${wide ? 60 : 120}`}>
+            After
+          </div>
+          {['s2', 's1'].map((id, i) => (
+            <div
+              class:list={['no', 'nodo', 'entry', { selected: i === 1 }]}
+              style={`--x:${20 + i * 330};--y:${afterY};--w:300;--h:${cellHeight}`}
+            >
+              <span class="pq">index {i}</span>
+              <span class="t4">{id}</span>
+            </div>
+          ))}
+          <div class="no pq note" style={`--x:20;--y:${afterY + cellHeight + 20};--w:960;--h:${wide ? 80 : 100}`}>
+            Outlined position · savedIndex = 1
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {[1, 2].map((i) => (
+              <Seta
+                tipo="neutra"
+                x1={170 + i * 330}
+                y1={beforeY + cellHeight + 5}
+                x2={170 + (i - 1) * 330}
+                y2={afterY - 5}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .index-shift {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading,
+  .note {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  .entry {
+    align-items: center;
+    text-align: center;
+  }
+  .selected {
+    outline: 2px solid var(--d-blue-texto);
+    outline-offset: 2px;
+  }
+  .removed {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: var(--d-ink2);
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

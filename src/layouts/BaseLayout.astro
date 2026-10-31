@@ -1,0 +1,156 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import GoogleAnalytics from '../components/GoogleAnalytics.astro';
+import '../styles/site.css';
+import readingStyles from '../styles/reading.css?url';
+import aboutStyles from '../styles/about.css?url';
+import notFoundStyles from '../styles/not-found.css?url';
+import topicTagStyles from '../styles/topic-tags.css?url';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import { interfaceLanguage, site, ui, type Language } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Idioma predominante do conteúdo desta página (vira `<html lang>`). Chrome e listagens usam `interfaceLanguage`. */
+  language: Language;
+  canonical?: string | null;
+  alternates?: { language: string; url: string }[];
+  ogType?: string;
+  coverUrl?: string;
+  coverAlt?: string;
+  isHome?: boolean;
+  isArticle?: boolean;
+  isAbout?: boolean;
+  isLab?: boolean;
+  isListingPage?: boolean;
+  hasTopicTags?: boolean;
+  isNotFound?: boolean;
+  draft?: boolean;
+  noindex?: boolean;
+  published?: Date;
+  modified?: Date;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  language,
+  canonical: canonicalProp,
+  alternates = [],
+  ogType = 'website',
+  coverUrl,
+  coverAlt,
+  isHome = false,
+  isArticle = false,
+  isAbout = false,
+  isLab = false,
+  isListingPage = false,
+  hasTopicTags = false,
+  isNotFound = false,
+  draft = false,
+  noindex = false,
+  published,
+  modified,
+  tags = [],
+} = Astro.props;
+const canonical =
+  canonicalProp === null ? undefined : (canonicalProp ?? new URL(Astro.url.pathname, site.origin).toString());
+const text = ui;
+const socialImage = coverUrl ? new URL(coverUrl, site.origin).toString() : `${site.origin}/og-default.png`;
+const socialImageAlt =
+  coverAlt ?? (language === 'en' ? 'Illustrated avatar of Luan Rodrigues' : 'Avatar ilustrado do Luan Rodrigues');
+const titleText = isHome ? 'Luan Rodrigues | iOS Developer' : isArticle ? title : `${title} · ${site.name}`;
+---
+
+<!doctype html>
+<html lang={language} data-ui-lang={interfaceLanguage}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titleText}</title>
+    <meta name="description" content={description} />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} | RSS`} href={`${site.origin}/rss.xml`} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {alternates.map((alternate) => (
+      <link rel="alternate" hreflang={alternate.language} href={alternate.url} />
+    ))}
+    {(draft || noindex) && <meta name="robots" content="noindex" />}
+    <meta property="og:title" content={isHome ? titleText : title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={socialImageAlt} />
+    <meta property="og:locale" content={language === 'en' ? 'en_US' : 'pt_BR'} />
+    {alternates.some((alternate) => alternate.language !== language) && (
+      <meta property="og:locale:alternate" content={language === 'en' ? 'pt_BR' : 'en_US'} />
+    )}
+    <meta name="author" content={site.author} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={isHome ? titleText : title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
+    {isArticle && !draft && published && (
+      <meta property="article:published_time" content={published.toISOString().slice(0, 10)} />
+    )}
+    {isArticle && !draft && tags.map((tag) => <meta property="article:tag" content={tag} />)}
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {(isArticle || isAbout) && <link rel="stylesheet" href={readingStyles} />}
+    {isAbout && <link rel="stylesheet" href={aboutStyles} />}
+    {hasTopicTags && <link rel="stylesheet" href={topicTagStyles} />}
+    {isNotFound && <link rel="stylesheet" href={notFoundStyles} />}
+    <ClientRouter />
+    <GoogleAnalytics />
+    {isArticle && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: title,
+          description,
+          inLanguage: language,
+          datePublished: published?.toISOString().slice(0, 10),
+          dateModified: (modified ?? published)?.toISOString().slice(0, 10),
+          author: { '@type': 'Person', name: site.author, url: new URL(text.aboutUrl, site.origin).toString() },
+          mainEntityOfPage: canonical ?? new URL(Astro.url.pathname, site.origin).toString(),
+          image: socialImage,
+        }).replace(/<\//g, '<\\/')}
+      />
+    )}
+  </head>
+  <body
+    class:list={[
+      {
+        'page-article': isArticle,
+        'page-list': isHome || isAbout || isLab || isListingPage,
+        'page-home': isHome,
+        'page-about': isAbout,
+        'page-lab': isLab,
+        'page-listing': isListingPage,
+        'page-not-found': isNotFound,
+      },
+    ]}
+  >
+    <GoogleAnalytics noscript />
+    <SiteHeader isArticle={isArticle} isListingPage={isListingPage} isAbout={isAbout} isLab={isLab} />
+    <main id="main" class="shell">
+      <slot />
+    </main>
+    <SiteFooter />
+    <script>
+      import '../scripts/site.js';
+      import '../scripts/theme.js';
+    </script>
+  </body>
+</html>

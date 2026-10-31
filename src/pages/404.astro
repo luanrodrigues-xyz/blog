@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { interfaceLanguage, site, ui } from '../config/site';
+
+const text = ui;
+---
+
+<BaseLayout
+  title="Page not found"
+  description={text.notFound}
+  language={interfaceLanguage}
+  canonical={null}
+  noindex
+  isNotFound
+>
+  <section class="not-found">
+    <p class="eyebrow">404</p>
+    <h1>Page not found</h1>
+    <p class="lead">{text.notFound} The address may have changed, or the article is not published yet.</p>
+    <div class="not-found-actions">
+      <a class="button is-primary" href={text.homeUrl}>
+        {text.home}
+      </a>
+      <a class="button" href={text.articlesUrl}>
+        {text.articles}
+      </a>
+    </div>
+    <h2 class="not-found-channels-title">{text.channels}</h2>
+    <ul class="not-found-channels" role="list">
+      {site.links.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

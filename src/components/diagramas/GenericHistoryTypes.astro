@@ -1,0 +1,85 @@
+---
+import Diagrama from './Diagrama.astro';
+const label =
+  'One PlaybackHistory definition relates Entry to the stored array, record argument and optional last result. For the separate song history, those types are Song, array of Song and optional Song. For the episode history, they are Episode, array of Episode and optional Episode. These are type relationships, not a runtime conversion or inheritance hierarchy.';
+---
+
+<div class="history-types">
+  {[true, false].map((wide) => {
+    const height = wide ? 870 : 1810;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          <div class="no nodo definition" style={`--x:32;--y:32;--w:936;--h:${wide ? 180 : 300}`}>
+            <span class="t4">PlaybackHistory&lt;Entry&gt;</span>
+            <span class="pq">One definition, related types</span>
+          </div>
+          {[
+            ['Song', 'songHistory'],
+            ['Episode', 'episodeHistory'],
+          ].map(([type, name], i) => (
+            <div
+              class="no nodo"
+              style={`--x:${wide ? 32 + i * 496 : 32};--y:${wide ? 390 : 540 + i * 600};--w:${wide ? 440 : 936};--h:${wide ? 360 : 460}`}
+            >
+              <span class="pq heading">{name}</span>
+              <span class="t4">Entry = {type}</span>
+              <span class="t4">entries → [{type}]</span>
+              <span class="t4">record → {type}</span>
+              <span class="t4">last → {type}?</span>
+            </div>
+          ))}
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {wide ? (
+              <>
+                <line class="connector" x1="500" y1="212" x2="500" y2="300" />
+                <line class="connector" x1="252" y1="300" x2="748" y2="300" />
+                <line class="connector" x1="252" y1="300" x2="252" y2="390" />
+                <line class="connector" x1="748" y1="300" x2="748" y2="390" />
+              </>
+            ) : (
+              <>
+                <line class="connector" x1="500" y1="332" x2="500" y2="420" />
+                <line class="connector" x1="16" y1="420" x2="500" y2="420" />
+                <line class="connector" x1="500" y1="420" x2="500" y2="540" />
+                <line class="connector" x1="16" y1="420" x2="16" y2="1370" />
+                <line class="connector" x1="16" y1="1370" x2="32" y2="1370" />
+              </>
+            )}
+          </svg>
+          <div class="no pq note" style={`--x:32;--y:${wide ? 790 : 1620};--w:936;--h:${wide ? 50 : 160}`}>
+            Separate values, separate concrete types
+          </div>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .history-types {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .connector {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .stacked .connector {
+    stroke-width: 6;
+  }
+</style>

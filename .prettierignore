@@ -1,0 +1,11 @@
+# Só o código é formatado. Textos, exemplos e arquivos gerados ficam como estão.
+/contents/
+/editorial/
+/examples/
+/public/
+/dist/
+/.astro/
+/node_modules/
+package-lock.json
+src/config/*.json
+/*.md

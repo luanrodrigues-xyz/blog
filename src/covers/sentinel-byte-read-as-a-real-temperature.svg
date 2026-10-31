@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #00C3D0; --principal-texto: #006E81; --principal-tinta: #D6F5F7; --sobre-principal: #fff;
+      --destaque: #FF383C; --destaque-texto: #C61226; --destaque-tinta: #FFD9DA; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #00D2E0; --principal-texto: #00D2E0; --principal-tinta: color-mix(in srgb, var(--principal) 30%, var(--card)); --sobre-principal: #000;
+        --destaque: #FF4245; --destaque-texto: #FF686A; --destaque-tinta: color-mix(in srgb, var(--destaque) 22%, var(--card)); --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .destaque { fill: var(--destaque); }
+    .destaque-tinta { fill: var(--destaque-tinta); }
+    .linha-principal { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; }
+    .linha-destaque { fill: none; stroke: var(--destaque); stroke-width: 4; stroke-linecap: round; }
+    .ponta-principal { fill: var(--principal); }
+    .ponta-destaque { fill: var(--destaque); }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- The raw byte: one card, read once, not yet interpreted either way. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="300" y="259" width="176" height="112" rx="32"/>
+  </g>
+  <rect class="neutro" x="324" y="291" width="70" height="12" rx="6"/>
+  <rect class="neutro" x="324" y="325" width="128" height="12" rx="6"/>
+
+  <!-- Top path: cast straight to signed, no check. Reaches a badge marked wrong. -->
+  <path class="linha-destaque" d="M476 297H536V215H548"/>
+  <polygon class="ponta-destaque" points="556,215 540,207 540,223"/>
+  <circle class="destaque" cx="576" cy="215" r="20"/>
+  <path d="M568 207 584 223M584 207 568 223" stroke="var(--sobre-destaque)" stroke-width="5" stroke-linecap="round"/>
+  <path class="linha-destaque" d="M596 215H612"/>
+  <polygon class="ponta-destaque" points="620,215 604,207 604,223"/>
+
+  <!-- Top output: a full bar, as confident-looking as a real reading. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="620" y="159" width="150" height="112" rx="32"/>
+  </g>
+  <rect class="neutro" x="644" y="191" width="50" height="12" rx="6"/>
+  <rect class="destaque-tinta" x="644" y="225" width="100" height="12" rx="6"/>
+
+  <!-- Bottom path: the sentinel is checked first. Reaches a badge marked right. -->
+  <path class="linha-principal" d="M476 333H536V415H548"/>
+  <polygon class="ponta-principal" points="556,415 540,407 540,423"/>
+  <circle class="principal" cx="576" cy="415" r="20"/>
+  <path d="M566 415 574 423 588 405" fill="none" stroke="var(--sobre-principal)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="linha-principal" d="M596 415H612"/>
+  <polygon class="ponta-principal" points="620,415 604,407 604,423"/>
+
+  <!-- Bottom output: a short bar, visibly closer to empty than to a value. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="620" y="359" width="150" height="112" rx="32"/>
+  </g>
+  <rect class="neutro" x="644" y="391" width="50" height="12" rx="6"/>
+  <rect class="principal-tinta" x="644" y="425" width="36" height="12" rx="6"/>
+</svg>

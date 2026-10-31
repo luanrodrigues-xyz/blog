@@ -1,0 +1,48 @@
+---
+import { areas, articleAreas, type AreaId } from '../../lib/areas';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleList from './ArticleList.astro';
+import AreaLinks from './AreaLinks.astro';
+import { homeContent } from '../../lib/home';
+import { interfaceLanguage } from '../../config/site';
+
+// Um catálogo só, nos dois idiomas editoriais: a UI é sempre em inglês; cada artigo mantém o seu idioma.
+interface Props {
+  area?: AreaId;
+}
+const { area } = Astro.props;
+const selected = areas.find((item) => item.id === area);
+const content = await homeContent();
+const articles = area
+  ? content.articles.filter((article) => articleAreas(article).some((item) => item.id === area))
+  : content.articles;
+---
+
+<BaseLayout
+  title={selected ? `${selected.label} articles` : 'All articles'}
+  description={selected?.description ?? 'Technical articles on iOS, web, and backend development, newest first.'}
+  language={interfaceLanguage}
+  isListingPage
+>
+  <div class="listing-page">
+    <header class="page-header listing-head" lang={interfaceLanguage}>
+      <h1>{selected ? `${selected.label} articles` : 'All articles'}</h1>
+      <p class="lead">{selected?.description ?? 'Browse the latest articles, or filter by iOS, Web, and Backend.'}</p>
+    </header>
+    <section class="catalog-categories" aria-label="Development areas">
+      <AreaLinks articles={content.articles} active={area} showAll />
+    </section>
+    {articles.length > 0 ? (
+      <ArticleList articles={articles} />
+    ) : (
+      <p lang={interfaceLanguage}>
+        No articles published yet. <a href="/articles/">Browse all articles →</a>
+      </p>
+    )}
+  </div>
+</BaseLayout>
+<style>
+  .catalog-categories {
+    margin-bottom: var(--space-10);
+  }
+</style>

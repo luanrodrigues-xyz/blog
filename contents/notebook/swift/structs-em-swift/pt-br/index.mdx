@@ -1,0 +1,246 @@
+---
+title: "Structs: a cópia da transação não muda o extrato"
+description: "A pessoa corrige o valor de uma compra, mas o extrato continua mostrando o valor antigo. A alteração foi feita em uma cópia."
+date: "2023-03-03"
+topic: "swift"
+readingOrder: 5
+draft: false
+cover: "structs-em-swift.png"
+coverAlt: "Um lançamento do extrato é copiado para um cartão separado. A cópia muda, enquanto o lançamento original permanece igual."
+tags: ["Swift", "struct", "mutating", "Fundamentals"]
+language: "pt-BR"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import CopiaOuEscritaNoExtrato from '../../../../../src/components/diagramas/CopiaOuEscritaNoExtrato.astro';
+import QuemPodeMudarOCampo from '../../../../../src/components/diagramas/QuemPodeMudarOCampo.astro';
+
+`struct` costuma aparecer como um jeito de agrupar propriedades. Só que uma das características mais importantes desse tipo aparece quando atribuímos uma instância a outra variável. Em Swift, uma struct é um tipo de valor (*value type*), e essa atribuição produz um valor que pode ser modificado independentemente do original.
+
+Imagine uma tela de edição de um lançamento bancário. A pessoa abre uma compra feita no mercado e corrige o valor, mas o extrato continua mostrando o valor antigo. A alteração aconteceu, só que em uma cópia da transação.
+
+Neste exemplo, os valores são representados por inteiros em centavos. O sinal negativo indica uma saída no extrato.
+
+```swift
+struct Transacao {
+    let id: Int
+    var descricao: String
+    var valor: Int
+}
+
+var extrato = [
+    Transacao(id: 1, descricao: "Mercado", valor: -8_950),
+    Transacao(id: 2, descricao: "Tarifa", valor: -1_290)
+]
+
+var editada = extrato[0]
+editada.valor = -9_850
+
+print(editada.valor)    // -9850
+print(extrato[0].valor) // -8950
+```
+
+`Transacao` define um tipo com três propriedades. Como não declaramos um inicializador próprio, o Swift disponibiliza o inicializador `Transacao(id:descricao:valor:)`, que permite informar os valores dessas propriedades ao criar uma instância.
+
+A parte interessante está nas últimas linhas. `editada` recebeu o primeiro lançamento do extrato e teve seu valor corrigido. Mesmo assim, `extrato[0]` continua com `-8_950`. A atribuição não fez as duas variáveis compartilharem uma mesma instância mutável.
+
+## Quando a edição fica só na cópia
+
+`var editada = extrato[0]` não cria outro nome para o mesmo lançamento. `editada` recebe o valor da transação e passa a poder ser modificada independentemente do elemento armazenado no array.
+
+Isso é o comportamento esperado de um *value type*. Como `Transacao` guarda apenas `Int` e `String`, alterar suas propriedades não modifica o lançamento original. Existe uma independência entre os valores, mas isso não significa necessariamente que o Swift precise duplicar todos os dados fisicamente na memória no momento da atribuição.
+
+Tipos como `Array` e `String` podem usar uma otimização chamada *Copy-on-Write*, compartilhando armazenamento interno enquanto não há necessidade de realizar uma cópia para preservar essa independência. Para quem utiliza esses tipos, a regra continua sendo a mesma: modificar um valor não deve produzir uma alteração inesperada em outro.
+
+O `Array` também é um tipo de valor, como vimos no [artigo sobre `let` e `var`](/articles/pt/let-e-var-em-swift/). Aqui temos uma struct armazenada dentro de um array. Se quisermos corrigir o lançamento original, a escrita precisa alcançar o elemento que está no extrato.
+
+```swift
+// Altera diretamente o elemento armazenado no array.
+extrato[0].valor = -9_850
+
+print(extrato[0].valor) // -9850
+
+// Outra possibilidade: editar uma cópia e devolvê-la.
+var editada = extrato[1]
+editada.descricao = "Tarifa do pacote"
+
+extrato[1] = editada
+
+print(extrato[1].descricao) // Tarifa do pacote
+```
+
+Na primeira operação, `extrato[0].valor = -9_850` modifica o elemento armazenado dentro do array. Como esse elemento faz parte do valor de `extrato`, a operação também é uma mutação do array. Isso só é permitido porque `extrato` foi declarado com `var`.
+
+A segunda operação segue outro caminho. Primeiro copiamos a transação, modificamos a cópia e depois atribuímos o valor editado de volta à posição correspondente no array.
+
+Eu prefiro pensar nessa segunda forma como um rascunho de edição. A transação original continua disponível enquanto a pessoa modifica os campos, e a decisão de aplicar a alteração pode acontecer em outro momento.
+
+<CopiaOuEscritaNoExtrato rotulo="Com var editada = extrato[0], a correção muda só a cópia editada e o extrato continua com -8_950. Com extrato[0].valor = -9_850, o próprio elemento do extrato muda, sem guardar um rascunho em outra variável.">
+
+O contorno azul marca o valor corrigido. Os dois painéis mostram onde a correção fica em cada forma de escrita.
+
+</CopiaOuEscritaNoExtrato>
+
+### Um rascunho antes de salvar
+
+Imagine que a pessoa abriu a compra do mercado, começou a corrigir o valor e ainda não decidiu se vai salvar. Podemos representar esse comportamento sem alterar imediatamente o extrato.
+
+```swift
+var extrato = [
+    Transacao(id: 1, descricao: "Mercado", valor: -8_950)
+]
+
+// A edição começa com uma cópia do lançamento.
+var rascunho = extrato[0]
+
+// A pessoa corrige o valor.
+rascunho.valor = -9_850
+
+// O extrato ainda guarda o valor original.
+print(extrato[0].valor) // -8950
+
+// A pessoa confirma a alteração.
+extrato[0] = rascunho
+
+print(extrato[0].valor) // -9850
+```
+
+Enquanto a pessoa modifica `rascunho`, o lançamento armazenado em `extrato` permanece como estava. Se a edição for cancelada, basta descartar o rascunho. Se for confirmada, atribuímos o valor editado ao array.
+
+Esse comportamento é útil em telas com formulários, nas quais a pessoa pode alterar vários campos antes de confirmar. Não precisamos modificar o estado original a cada interação, e também não precisamos desfazer manualmente cada alteração quando a edição é cancelada.
+
+É claro que isso resolve apenas a parte local da edição. Em uma aplicação real, ainda precisamos lidar com persistência, validação e possíveis mudanças que aconteceram enquanto a tela estava aberta. O exemplo também utiliza uma posição fixa do array. Se a lista puder mudar durante a edição, é mais seguro localizar o lançamento pelo identificador antes de aplicar a alteração.
+
+O ponto aqui é entender o que a struct permite: manter um valor temporário para edição sem alterar o original antes da confirmação.
+
+## `for var` também copia
+
+A mesma regra aparece quando percorremos um array. O exemplo abaixo tenta zerar uma tarifa, mas a primeira tentativa não altera o extrato.
+
+```swift
+var extrato = [
+    Transacao(id: 1, descricao: "Mercado", valor: -8_950),
+    Transacao(id: 2, descricao: "Tarifa", valor: -1_290)
+]
+
+for var transacao in extrato where transacao.descricao == "Tarifa" {
+    transacao.valor = 0
+}
+
+print(extrato[1].valor) // -1290
+
+for indice in extrato.indices where extrato[indice].descricao == "Tarifa" {
+    extrato[indice].valor = 0
+}
+
+print(extrato[1].valor) // 0
+```
+
+Em `for var transacao in extrato`, cada iteração trabalha com um valor recebido do array. O `var` permite modificar a variável local `transacao`, mas a alteração não é escrita de volta no elemento original.
+
+Na segunda tentativa, percorremos os índices e modificamos diretamente `extrato[indice].valor`. Dessa vez, a escrita alcança o array, e o valor da tarifa passa a ser zero.
+
+Esse é um detalhe fácil de ignorar. O código dentro do primeiro laço compila, executa e modifica a variável local. Só não modifica o lugar que talvez estivéssemos tentando atualizar.
+
+## `let` e `var` dentro de uma struct
+
+Até aqui, todas as transações foram armazenadas em variáveis mutáveis. Mas declarar uma propriedade como `var` não significa que ela sempre poderá ser alterada.
+
+```swift
+let fechada = Transacao(
+    id: 3,
+    descricao: "Aluguel",
+    valor: -180_000
+)
+
+// Erro: fechada é uma constante.
+// fechada.valor = -175_000
+
+var aberta = fechada
+aberta.valor = -175_000
+
+// Erro: id foi declarado com let.
+// aberta.id = 4
+
+print(fechada.valor) // -180000
+print(aberta.valor)  // -175000
+```
+
+Mesmo que `valor` tenha sido declarado com `var` dentro de `Transacao`, não podemos alterar `fechada.valor`. A razão é que `fechada` foi declarada com `let`, e modificar uma propriedade armazenada de uma struct significa modificar o valor que aquela constante representa.
+
+O compilador recusa a operação com uma mensagem semelhante a `cannot assign to property: 'fechada' is a 'let' constant`.
+
+Quando criamos `aberta` usando `var`, podemos modificar `valor`, mas `id` continua imutável porque sua própria declaração utiliza `let`.
+
+<QuemPodeMudarOCampo rotulo="Em let fechada, atribuir a id ou a valor é recusado. Em var aberta, cópia de fechada, id continua recusado porque é let, e só valor muda, de -180_000 para -175_000.">
+
+Os dois campos em cada nome. Um campo só muda quando o nome é `var` e a propriedade também. O `-175_000` fica em `aberta`, e `fechada` continua com `-180_000`.
+
+</QuemPodeMudarOCampo>
+
+O `var` de uma propriedade permite que ela seja modificada, mas não transforma a struct em um objeto compartilhado. No caso de `Transacao`, eu manteria `id` como `let`, porque corrigir o valor ou a descrição de uma compra não deveria mudar a identidade do lançamento.
+
+Essa combinação de `let` e `var` acaba expressando uma regra do próprio modelo. Algumas informações podem ser corrigidas, enquanto outras permanecem fixas durante a vida daquele valor.
+
+## Alterando `self` com `mutating`
+
+Até agora, modificamos as propriedades diretamente. Também podemos colocar uma operação de alteração dentro da própria struct.
+
+Voltando à compra do mercado, uma transação pode oferecer um método específico para corrigir seu valor.
+
+```swift
+struct Transacao {
+    let id: Int
+    var descricao: String
+    var valor: Int
+
+    mutating func corrigirValor(para novoValor: Int) {
+        valor = novoValor
+    }
+}
+
+var extrato = [
+    Transacao(id: 1, descricao: "Mercado", valor: -8_950),
+    Transacao(id: 2, descricao: "Tarifa", valor: -1_290)
+]
+
+extrato[0].corrigirValor(para: -9_850)
+
+print(extrato[0].valor) // -9850
+print(extrato[1].valor) // -1290
+
+let fechada = Transacao(
+    id: 3,
+    descricao: "Aluguel",
+    valor: -180_000
+)
+
+// Erro: fechada é uma constante.
+// fechada.corrigirValor(para: -175_000)
+```
+
+A palavra `mutating` aparece porque o método altera o próprio valor da transação. Em métodos de instância de uma struct, `self` é imutável por padrão. Se retirarmos `mutating` e tentarmos atribuir um novo valor à propriedade `valor`, o compilador recusa a operação.
+
+A mensagem é semelhante a `cannot assign to property: 'self' is immutable`, acompanhada da sugestão `mark method 'mutating' to make 'self' mutable`.
+
+Ao declarar o método como `mutating`, permitimos que ele modifique `self`. Essa permissão também aparece na forma como podemos chamar o método: a instância precisa estar armazenada em um lugar mutável.
+
+Por isso, `extrato[0].corrigirValor(para:)` funciona quando `extrato` é um `var`, enquanto a mesma chamada em `fechada` é recusada por tentar modificar uma constante.
+
+Existe uma semelhança com o `inout` do [artigo sobre funções](/articles/pt/funcoes-em-swift/). Nos dois casos, uma operação pode modificar um valor mantido por quem fez a chamada. A diferença é onde essa intenção aparece: `inout` é utilizado na declaração de parâmetros de uma função, enquanto `mutating` declara que um método de um tipo de valor pode modificar sua própria instância.
+
+Outra característica de `mutating` é que ele não fica limitado à alteração de propriedades individuais. Um método também pode substituir `self` por outro valor do mesmo tipo. Isso faz sentido porque o método está autorizado a modificar o valor representado pela instância, e não apenas um campo específico.
+
+Para `Transacao`, corrigir `valor` já é suficiente para demonstrar esse comportamento. A chamada deixa explícita a operação permitida pelo modelo, e o compilador continua impedindo que ela seja executada sobre uma constante.
+
+Até aqui, `Transacao` guarda apenas tipos de valor, `Int` e `String`, então as alterações feitas em suas cópias permanecem independentes. Mas uma struct também pode armazenar uma propriedade cujo tipo é uma classe. Nesse caso, copiar a struct copia o valor da referência, e as duas structs podem continuar apontando para o mesmo objeto.
+
+Esse comportamento fica para o artigo [Uma struct que guarda uma referência](/articles/pt/struct-com-referencia-em-swift/).
+
+<FontesDoArtigo>
+
+- [Structures and Classes](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures/)
+- [Properties](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/properties/)
+- [Methods](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/methods/)
+
+</FontesDoArtigo>

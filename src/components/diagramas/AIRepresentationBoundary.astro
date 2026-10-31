@@ -1,0 +1,94 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+---
+
+<div class="wide">
+  <Diagrama plano rotulo={rotulo} altura={620}>
+    <div class="no nodo" style="--x:24;--y:48;--w:280;--h:144">
+      <span class="txt forte">Plano da IA</span>
+      <span class="pq">tipo e filtro</span>
+    </div>
+    <div class="no nodo" style="--x:360;--y:48;--w:280;--h:144">
+      <span class="txt forte">Aplicação</span>
+      <span class="pq">valida e seleciona</span>
+    </div>
+    <div class="no nodo" style="--x:696;--y:48;--w:280;--h:144">
+      <span class="txt forte">React</span>
+      <span class="pq">componentes locais</span>
+    </div>
+    <span class="no pq" style="--x:672;--y:212;--w:304;--h:72">
+      somente planos aceitos
+    </span>
+    <div class="no nodo" style="--x:360;--y:360;--w:280;--h:160">
+      <span class="txt forte">API oficial</span>
+      <span class="pq">registros validados</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:24;--y:360;--w:280;--h:160">
+      <span class="txt forte">Plano inválido</span>
+      <span class="pq">mensagem e recuperação</span>
+    </div>
+    <svg class="setas" viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
+      <Seta tipo="neutra" x1={304} y1={120} x2={358} y2={120} />
+      <Seta x1={640} y1={120} x2={694} y2={120} />
+      <Seta tipo="neutra" x1={500} y1={360} x2={500} y2={194} />
+      <path class="rejection" d="M400 192V280H164V358" />
+      <Seta tipo="neutra" x1={164} y1={336} x2={164} y2={358} />
+    </svg>
+  </Diagrama>
+</div>
+
+<div class="narrow">
+  <Diagrama plano rotulo={rotulo} altura={1700} minLargura={270}>
+    <div class="no nodo" style="--x:48;--y:48;--w:904;--h:200">
+      <span class="txt forte">Plano da IA</span>
+      <span class="pq">tipo e filtro</span>
+    </div>
+    <div class="no nodo" style="--x:48;--y:376;--w:904;--h:200">
+      <span class="txt forte">Aplicação</span>
+      <span class="pq">valida e seleciona</span>
+    </div>
+    <div class="no nodo" style="--x:48;--y:704;--w:904;--h:200">
+      <span class="txt forte">API oficial</span>
+      <span class="pq">registros validados</span>
+    </div>
+    <div class="no nodo" style="--x:48;--y:1080;--w:904;--h:200">
+      <span class="txt forte">React</span>
+      <span class="pq">renderiza planos aceitos</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:48;--y:1408;--w:904;--h:200">
+      <span class="txt forte">Plano inválido</span>
+      <span class="pq">mensagem e recuperação</span>
+    </div>
+    <svg class="setas" viewBox="0 0 1000 1700" aria-hidden="true" focusable="false">
+      <Seta tipo="neutra" x1={500} y1={248} x2={500} y2={374} />
+      <Seta tipo="neutra" x1={500} y1={704} x2={500} y2={578} />
+    </svg>
+    <span class="no pq" style="--x:48;--y:952;--w:904;--h:80">
+      A aplicação escolhe o destino
+    </span>
+  </Diagrama>
+</div>
+
+<style>
+  .narrow {
+    display: none;
+  }
+  .rejection {
+    fill: none;
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  @media (max-width: 680px) {
+    .wide {
+      display: none;
+    }
+    .narrow {
+      display: block;
+    }
+  }
+</style>

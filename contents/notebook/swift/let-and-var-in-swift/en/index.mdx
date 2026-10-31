@@ -1,0 +1,314 @@
+---
+title: "let and var in Swift. What stays fixed when the balance changes?"
+description: "In JavaScript, a const that holds an array can still use push. Does the same apply to let in Swift?"
+updated: "2026-10-04"
+date: "2023-01-02"
+topic: "swift"
+readingOrder: 1
+draft: false
+cover: "let-and-var-in-swift.png"
+coverAlt: "Two identical rows of three elements attempt to grow by one: the let row rejects the fourth slot, the var row accepts and keeps it."
+tags: ["Swift", "let", "var", "Array", "Copy-on-Write", "Fundamentals"]
+language: "en"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import MensagemDoCompilador from '../../../../../src/components/shared/MensagemDoCompilador.astro';
+import LetAndVarInArray from '../../../../../src/components/diagramas/LetAndVarInArray.astro';
+
+In a statement, for example, the balance changes with every transaction, while the card limit shouldn't change. In the examples below, values are in cents. `150_000` represents R$ 1,500.00.
+
+```swift
+var balance = 150_000
+let limit = 500_000
+
+balance -= 3_000
+balance += 12_000
+
+print(balance) // 159000
+
+// limit = 600_000 // Error — limit was declared with let
+```
+
+So far, `var` and `let` look pretty obvious. The difference gets more interesting once the name holds an array.
+
+## An array held by `let`
+
+```swift
+let transactions = [10_000, -3_000, 5_000]
+
+// transactions.append(2_000) // Error — transactions is let
+// transactions[0] = 0 // Error — this doesn't compile either
+
+print(transactions.count) // 3
+```
+
+If you come from JavaScript, this is exactly where the comparison can mislead you. A `const` that holds an array can still use `push`. The constant stops you from replacing that reference with another one, but the array's contents stay mutable.
+
+In Swift, the behavior is different. `transactions.append(2_000)` is rejected with `cannot use mutating member on immutable value: 'transactions' is a 'let' constant`.
+
+The important detail is that `Array` is a value type. Its elements are part of the value held in `transactions`, so adding, removing, or replacing an element means mutating the array itself. Since the name was declared with `let`, that mutation isn't allowed.
+
+For a statement that actually receives new entries, that's when `var` makes sense.
+
+```swift
+var statement = [10_000, -3_000, 5_000]
+
+statement.append(2_000)
+
+print(statement) // [10000, -3000, 5000, 2000]
+```
+
+<LetAndVarInArray label="With let, append(2_000) is rejected and transactions keeps its three values; with var, the same append makes statement hold an array with four values, under the same name and the same type.">
+
+The same `append(2_000)` is attempted with both names. The three original elements stay in the same order. Only `statement` ends up holding the new fourth entry.
+
+</LetAndVarInArray>
+
+Something I like about this is that the declaration already tells you a lot. When I see `let transactions`, I know that array shouldn't gain, lose, or replace entries while that name exists.
+
+## What happens when the array is copied
+
+Value semantics get more interesting once two variables are involved.
+
+```swift
+var originalStatement = [10_000, -3_000, 5_000]
+var statementCopy = originalStatement
+
+statementCopy.append(2_000)
+
+print(originalStatement) // [10000, -3000, 5000]
+print(statementCopy)     // [10000, -3000, 5000, 2000]
+```
+
+From the point of view of code using the type, `originalStatement` and `statementCopy` are independent values. Changing one doesn't change the other.
+
+That doesn't mean Swift has to copy every element immediately at the moment of assignment. `Array` uses Copy-on-Write to share storage for as long as possible, while still preserving value semantics when one of the copies needs to change.
+
+So this line:
+
+```swift
+var statementCopy = originalStatement
+```
+
+shouldn't be read as "copy every element to another place in memory right now."
+
+From the caller's point of view, what matters is the observable behavior. After that assignment, each variable represents its own value.
+
+```swift
+statementCopy.append(2_000)
+```
+
+That change doesn't show up in `originalStatement`.
+
+It's a distinction I prefer to keep separate. Value semantics describe the behavior the type offers. Copy-on-Write is a strategy used to implement that behavior without making unnecessary copies every time an array is assigned.
+
+## `var` doesn't change the type
+
+```swift
+var balance = 0
+
+// balance = 12.5 // Error — balance is an Int
+
+print(balance) // 0
+```
+
+`var` lets you replace the value, not the type. The literal `0` made the compiler infer `Int`, so from then on `balance` stays an `Int`.
+
+The same goes for the array. If `statement` was inferred as `[Int]`, this doesn't compile either:
+
+```swift
+// statement.append(12.5) // Error — 12.5 is not an Int
+```
+
+In a representation of money in cents, that's useful because the value stays an integer from start to finish. The fact that the variable can change doesn't allow its type to change along the way.
+
+## `let` doesn't need to start with a value
+
+The monthly fee depends on the plan. It's zero for premium customers and R$ 12.90 for everyone else. In this case, the value hasn't been assigned yet on the declaration line, but the fee can still be a `let`.
+
+```swift
+func monthlyFee(premium: Bool) -> Int {
+    let fee: Int
+
+    if premium {
+        fee = 0
+    } else {
+        fee = 1_290
+    }
+
+    // fee = 990 // Error — fee has already received a value
+
+    return fee
+}
+
+print(monthlyFee(premium: true))  // 0
+print(monthlyFee(premium: false)) // 1290
+```
+
+This part is more interesting than it looks. `let` doesn't require the value to appear on the same line as the declaration. The compiler needs to be able to prove that the name is initialized before its first read and that it won't be assigned again.
+
+If I remove the `else`, that stops being true.
+
+```swift
+func monthlyFee(premium: Bool) -> Int {
+    let fee: Int
+
+    if premium {
+        fee = 0
+    }
+
+    return fee // Error — fee may not have been initialized
+}
+```
+
+I could also start with `var fee = 0` and change the value in one of the branches.
+
+```swift
+func monthlyFee(premium: Bool) -> Int {
+    var fee = 0
+
+    if !premium {
+        fee = 1_290
+    }
+
+    return fee
+}
+```
+
+This code works. The problem shows up when `0` shouldn't be an implicit decision.
+
+If I forget a path, `fee` already has a value and the code keeps compiling.
+
+With:
+
+```swift
+let fee: Int
+```
+
+every path that reaches `return` has to choose the value on purpose.
+
+This is called definite initialization.
+
+## With a class, `let` means something else
+
+So far, the `Array` examples might suggest that `let` means nothing related to that name can ever change.
+
+With a class, it isn't quite like that.
+
+```swift
+final class Card {
+    var limit: Int
+
+    init(limit: Int) {
+        self.limit = limit
+    }
+}
+
+let card = Card(limit: 500_000)
+
+card.limit -= 30_000
+
+print(card.limit) // 470000
+```
+
+This compiles.
+
+The name `card` can't start referring to a different instance:
+
+```swift
+// card = Card(limit: 800_000) // Error
+```
+
+But the instance it refers to can still change because `limit` was declared with `var`.
+
+This is an important difference from the `Array<Int>` used earlier. There, calls like `append`, `remove`, or replacing an element would mutate the array's own value, and those mutations are blocked when the array is stored in a `let`.
+
+With a class, `let` stops that name from referring to a different instance. It doesn't turn the instance's mutable properties into constants.
+
+If I don't want outside code to change the limit directly, I can restrict that mutation.
+
+```swift
+final class Card {
+    private(set) var limit: Int
+
+    init(limit: Int) {
+        self.limit = limit
+    }
+
+    func spend(_ amount: Int) {
+        limit -= amount
+    }
+}
+
+let card = Card(limit: 500_000)
+
+card.spend(30_000)
+
+print(card.limit) // 470000
+
+// card.limit = 100_000 // Error — the setter is private
+```
+
+Now the value can still change, but the change has to go through `Card` itself.
+
+In real code, `spend(_:)` would probably have other rules. It could reject a negative amount, check the available limit, or apply another domain condition. The point here is only where the mutation is allowed to happen.
+
+`let` and `private(set)` solve different problems.
+
+`let card` stops that name from referring to a different instance.
+
+`private(set) var limit` stops code outside `Card` from changing the property directly.
+
+## Starting with `let`
+
+```swift
+func availableLimit(limit: Int, billAmount: Int) -> Int {
+    var available = limit - billAmount
+    return available
+}
+```
+
+This code compiles, but the compiler warns:
+
+<MensagemDoCompilador
+    tipo="aviso"
+    linha={2}
+    coluna={9}
+    mensagem="variable 'available' was never mutated; consider changing to 'let' constant"
+    codigo={[
+        'func availableLimit(limit: Int, billAmount: Int) -> Int {',
+        '    var available = limit - billAmount',
+        '    return available',
+        '}',
+    ]}
+/>
+
+I'd follow the warning.
+
+```swift
+func availableLimit(limit: Int, billAmount: Int) -> Int {
+    let available = limit - billAmount
+    return available
+}
+```
+
+I prefer to start with `let` and switch to `var` once the change is actually part of the behavior, like it is with `balance` and `statement`.
+
+A `var` that never changes makes the reader look for a change that doesn't exist.
+
+After these examples, `let` looks less like just a word for "constant."
+
+With value types, it prevents the stored value from being mutated through that name. With a class, it prevents the name from referring to a different instance, but it doesn't freeze the instance's internal state.
+
+It's a small difference in syntax, but it changes a lot of what I can assume when I run into that name in the middle of the code.
+
+<FontesDoArtigo>
+
+Further reading:
+
+- [The Basics](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/thebasics/)
+- [Collection Types](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/collectiontypes/)
+- [Structures and Classes](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/classesandstructures/)
+
+</FontesDoArtigo>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+svg { --bg:#F2F2F7; --card:#fff; --neutral:#E5E5EA; --primary:#34C759; --tint:#DDF5E3; --other:#6155F5; --other-tint:#E7E4FD; }
+@media(prefers-color-scheme:dark) { svg { --bg:#1C1C1E; --card:#2C2C2E; --neutral:#3A3A3C; --primary:#4BD166; --tint:color-mix(in srgb,var(--primary) 30%,var(--card)); --other:#6D7CFF; --other-tint:color-mix(in srgb,var(--other) 22%,var(--card)); } }
+.bg { fill:var(--bg); } .card { fill:var(--card); } .neutral { fill:var(--neutral); } .primary { fill:var(--primary); } .tint { fill:var(--tint); } .other { fill:var(--other); } .other-tint { fill:var(--other-tint); }
+.route { fill:none; stroke:var(--primary); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+.lookup { fill:none; stroke:var(--other); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+<rect class="bg" width="1200" height="630"/>
+<!-- A retained object persists through two operation positions. -->
+<rect class="card" x="328" y="112" width="232" height="128" rx="32"/>
+<rect class="neutral" x="360" y="152" width="168" height="14" rx="7"/>
+<rect class="neutral" x="360" y="184" width="104" height="14" rx="7"/>
+<path class="route" d="M444 240V384"/><polygon class="primary" points="444,396 434,376 454,376"/>
+<rect class="tint" x="360" y="408" width="168" height="112" rx="24"/>
+<rect class="primary" x="392" y="448" width="104" height="14" rx="7"/>
+<!-- Two lookups resolve separate targets. -->
+<rect class="card" x="640" y="112" width="232" height="128" rx="32"/>
+<rect class="neutral" x="672" y="152" width="168" height="14" rx="7"/>
+<rect class="neutral" x="672" y="184" width="104" height="14" rx="7"/>
+<path class="lookup" d="M756 240V312H688V384M756 312H832V384"/>
+<polygon class="other" points="688,396 678,376 698,376"/><polygon class="other" points="832,396 822,376 842,376"/>
+<rect class="other-tint" x="632" y="408" width="112" height="112" rx="24"/><rect class="other-tint" x="776" y="408" width="112" height="112" rx="24"/>
+<rect class="other" x="656" y="448" width="64" height="14" rx="7"/><rect class="other" x="800" y="448" width="64" height="14" rx="7"/>
+</svg>

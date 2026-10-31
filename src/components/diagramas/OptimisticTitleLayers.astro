@@ -1,0 +1,79 @@
+---
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+---
+
+<div class="desktop">
+  <Diagrama plano rotulo={rotulo} altura={520}>
+    <span class="no cab" style="--x:40;--y:32;--w:920;--h:40">
+      B accepted while A is still unresolved
+    </span>
+    <div class="no nodo" style="--x:40;--y:104;--w:440;--h:128">
+      <span class="pq ink2">Confirmed server state</span>
+      <span class="txt forte">Books to share</span>
+      <span class="pq mono">revision = 11</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:520;--y:104;--w:440;--h:128">
+      <span class="pq ink2">Unresolved operation A</span>
+      <span class="txt">Weekend reading</span>
+      <span class="pq mono">sequence = 1</span>
+    </div>
+    <span class="no txt mono" style="--x:40;--y:272;--w:920;--h:40">
+      acceptedThrough = 2
+    </span>
+    <span class="no txt" style="--x:40;--y:328;--w:920;--h:40">
+      Only pending sequences above 2 can change the preview.
+    </span>
+    <div class="no nodo" style="--x:40;--y:408;--w:920;--h:80">
+      <span class="txt">
+        Visible title <strong>Books to share</strong>
+      </span>
+    </div>
+  </Diagrama>
+</div>
+
+<div class="mobile">
+  <Diagrama plano rotulo={rotulo} altura={1540} minLargura={270}>
+    <span class="no cab" style="--x:40;--y:40;--w:920;--h:120">
+      B accepted while A is still unresolved
+    </span>
+    <div class="no nodo" style="--x:40;--y:200;--w:920;--h:280">
+      <span class="pq ink2">Confirmed server state</span>
+      <span class="txt forte">Books to share</span>
+      <span class="pq mono">revision = 11</span>
+    </div>
+    <div class="no nodo fantasma" style="--x:40;--y:560;--w:920;--h:280">
+      <span class="pq ink2">Unresolved operation A</span>
+      <span class="txt">Weekend reading</span>
+      <span class="pq mono">sequence = 1</span>
+    </div>
+    <span class="no txt mono" style="--x:40;--y:920;--w:920;--h:100">
+      acceptedThrough = 2
+    </span>
+    <span class="no txt" style="--x:40;--y:1060;--w:920;--h:160">
+      Only pending sequences above 2 can change the preview.
+    </span>
+    <div class="no nodo" style="--x:40;--y:1280;--w:920;--h:200">
+      <span class="txt">
+        Visible title <strong>Books to share</strong>
+      </span>
+    </div>
+  </Diagrama>
+</div>
+
+<style>
+  .mobile {
+    display: none;
+  }
+  @media (max-width: 680px) {
+    .desktop {
+      display: none;
+    }
+    .mobile {
+      display: block;
+    }
+  }
+</style>

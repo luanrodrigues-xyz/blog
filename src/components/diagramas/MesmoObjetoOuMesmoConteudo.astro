@@ -1,0 +1,92 @@
+---
+// As setas apontam da referência ao objeto. Conteúdo igual não implica identidade igual.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+---
+
+<div class="identidade">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const largo = layout === 'lado';
+    const ys = largo ? [70, 170, 330] : [110, 270, 560];
+    const objetoX = largo ? 420 : 340;
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={largo ? 650 : 1160} minLargura={largo ? 540 : 260}>
+          <slot slot="legenda" />
+          {['conta', 'mesma', 'outra'].map((nome, i) => (
+            <div class="no t4 nome" style={`--x:20;--y:${ys[i]};--w:240;--h:${largo ? 70 : 120}`}>
+              {nome}
+            </div>
+          ))}
+          {[0, 1].map((i) => (
+            <div
+              class="no caixa"
+              style={`--x:${objetoX};--y:${largo ? 70 + i * 250 : 90 + i * 450};--w:${980 - objetoX};--h:${largo ? 190 : 350}`}
+            >
+              <div class="txt titulo">objeto {i + 1}</div>
+              <div class="t4">numero: "12345-6"</div>
+              <div class="t4">saldo: 150_000</div>
+            </div>
+          ))}
+          <div class="no t4 resultado" style={`--x:20;--y:${largo ? 540 : 970};--w:960;--h:${largo ? 90 : 160}`}>
+            <span>
+              conta === mesma → true
+              <br />
+              conta === outra → false
+            </span>
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${largo ? 650 : 1160}`} aria-hidden="true" focusable="false">
+            {ys.map((y) => (
+              <Seta tipo="neutra" x1={272} y1={y + (largo ? 35 : 60)} x2={objetoX - 12} y2={y + (largo ? 35 : 60)} />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .identidade {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .nome {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--d-line);
+  }
+  .caixa {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 20);
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .resultado {
+    display: flex;
+    align-items: center;
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+</style>

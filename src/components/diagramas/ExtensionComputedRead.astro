@@ -1,0 +1,95 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const rows = [
+  { state: '["s1", "s2"]', result: 's1', action: 'Initial queue' },
+  { state: '["s2"]', result: 's2', action: 'After first removal' },
+  { state: '[]', result: 'nil', action: 'After second removal' },
+];
+const label =
+  'Three successive states of the same queue are shown. Reading songIDs.first returns s1 for [s1, s2], s2 after the first removal, and nil after the second removal. nextSongID computes from the current array and has no separate stored value.';
+---
+
+<div class="computed-read">
+  {[true, false].map((wide) => {
+    const height = wide ? 720 : 2030;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          {rows.map((row, i) => {
+            const y = wide ? 32 + i * 230 : 32 + i * 670;
+            return (
+              <>
+                <div class="no pq caption" style={`--x:32;--y:${y};--w:936;--h:${wide ? 50 : 100}`}>
+                  {row.action}
+                </div>
+                <div
+                  class="no nodo centered"
+                  style={`--x:32;--y:${y + (wide ? 80 : 130)};--w:${wide ? 400 : 936};--h:${wide ? 110 : 180}`}
+                >
+                  <span class="pq">songIDs</span>
+                  <span class="t4">{row.state}</span>
+                </div>
+                <div
+                  class="no t4 centered"
+                  style={`--x:${wide ? 456 : 32};--y:${y + (wide ? 62 : 340)};--w:${wide ? 288 : 650};--h:${wide ? 50 : 100}`}
+                >
+                  songIDs.first
+                </div>
+                <div
+                  class="no nodo centered"
+                  style={`--x:${wide ? 776 : 32};--y:${y + (wide ? 80 : 460)};--w:${wide ? 192 : 936};--h:${wide ? 110 : 180}`}
+                >
+                  <span class="pq">result</span>
+                  <span class="t4">{row.result}</span>
+                </div>
+              </>
+            );
+          })}
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {rows.map((_, i) => (
+              <Seta
+                tipo="neutra"
+                x1={wide ? 432 : 820}
+                y1={wide ? 167 + i * 230 : 342 + i * 670}
+                x2={wide ? 756 : 820}
+                y2={wide ? 167 + i * 230 : 474 + i * 670}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .computed-read {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .centered,
+  .caption {
+    display: flex;
+    align-items: center;
+  }
+  .centered {
+    justify-content: center;
+    text-align: center;
+  }
+  .caption {
+    font-weight: 600;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

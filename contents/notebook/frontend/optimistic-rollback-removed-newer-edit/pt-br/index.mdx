@@ -1,0 +1,285 @@
+---
+title: "Um rollback otimista apagou uma edição mais recente"
+description: "Duas edições de título se sobrepõem. A segunda é salva, mas a rejeição da primeira restaura um snapshot antigo por cima dela. Remover a operação que falhou exige outro modelo."
+date: "2026-09-27"
+updated: "2026-09-28"
+topic: "frontend"
+readingOrder: 9
+draft: false
+tags: ["TypeScript", "UI otimista", "Estado", "Concorrência", "Mutações", "Testes"]
+language: "pt-BR"
+cover: "optimistic-rollback-removed-newer-edit.png"
+coverAlt: "A edição rejeitada A aparece riscada acima da edição aceita B, que mantém seu valor confirmado."
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import OptimisticTitleLayers from '../../../../../src/components/diagramas/OptimisticTitleLayers.astro';
+import comparison from './rollback-comparison.png';
+import comparisonMobile from './rollback-comparison-mobile.png';
+
+Uma lista de leitura se chama `Reading list`. A pessoa muda o título para `Weekend reading` e, antes de o primeiro salvamento terminar, muda novamente para `Books to share`. As duas edições aparecem imediatamente na tela.
+
+O segundo salvamento dá certo. Pouco depois, o primeiro é rejeitado. O tratamento desse erro restaura o título anterior à primeira edição, e a tela volta a mostrar `Reading list`. O servidor já salvou `Books to share`.
+
+O rollback usou um snapshot real. O problema é que esse snapshot já não representa o estado que a operação rejeitada pode substituir.
+
+Para reproduzir o problema, usei TypeScript e promises controladas. Assim posso escolher a ordem das respostas sem depender de React ou de uma API real.
+
+## Por que o snapshot antigo causa o problema
+
+Uma atualização otimista mostra o resultado esperado antes de o servidor confirmá-lo. Aqui, uma mutação é uma requisição para substituir o título de uma lista de leitura. Guardar o título anterior faz o rollback parecer simples.
+
+```ts
+let title = 'Reading list';
+let nextSequence = 0;
+
+async function rename(nextTitle: string) {
+  const previousTitle = title;
+  title = nextTitle;
+  const result = await saveTitle({
+    sequence: ++nextSequence,
+    title: nextTitle,
+  });
+
+  title = result.kind === 'accepted'
+    ? result.saved.title
+    : previousTitle;
+}
+```
+
+Esse trecho depende de `saveTitle`, cujo resultado é um valor aceito pelo servidor ou uma rejeição definitiva. Por enquanto, rejeição significa que o servidor não aplicou aquela edição. Uma resposta perdida é outro caso.
+
+Vamos chamar a primeira edição de A e a segunda de B. A guarda `Reading list` como título anterior. B começa enquanto A ainda está pendente, então guarda `Weekend reading` como título anterior. Esse segundo snapshot já contém uma alteração não confirmada.
+
+Quando B é aceita, o título passa a ser o valor salvo, `Books to share`. Depois, A falha e atribui seu próprio `previousTitle`. Nada verifica se outra operação alterou o título desde que A começou.
+
+O exemplo controlado no navegador abaixo conclui B com sucesso antes de rejeitar A. Os dois painéis recebem os mesmos resultados. O painel da esquerda usa rollback por snapshot. O da direita usa o modelo desenvolvido a seguir.
+
+<picture class="article-screenshot">
+  <source media="(max-width: 480px)" srcset={comparisonMobile.src} />
+  <img src={comparison.src} width={comparison.width} height={comparison.height} alt="Depois de B ser aceita e A ser rejeitada, o rollback por snapshot mostra Reading list. O modelo que considera cada operação mostra Books to share, com esse mesmo título confirmado e nenhuma operação sem resultado." loading="lazy" />
+</picture>
+
+## Um ID de requisição não corrige o snapshot
+
+Uma primeira melhoria é permitir que apenas a operação iniciada mais recentemente restaure seu snapshot. Isso protege B do erro de A nessa sequência, mas outra ordem revela uma lacuna.
+
+Inicie A e depois B. Rejeite A enquanto B ainda está pendente. A já não é a operação mais recente, então seu rollback é ignorado. Em seguida, rejeite B. B restaura `Weekend reading`, o título que capturou de A. Os dois salvamentos falharam, mas a tela agora mostra a edição rejeitada de A.
+
+Comparar os textos dos títulos também não resolve. Duas edições distintas podem conter o mesmo título. A operação precisa de identidade própria, e o valor confirmado precisa ficar separado da prévia.
+
+Eu manteria o último valor confirmado pelo servidor e uma lista de edições ainda sem resultado. Rejeitar uma edição remove essa edição da lista. O título visível é então calculado a partir do que restou.
+
+## A ordem das edições não é a ordem dos salvamentos
+
+Neste exemplo, cada operação substitui o título inteiro. Uma edição local mais recente substitui a intenção de uma anterior. Essa regra seria diferente ao acrescentar uma quantidade ou atualizar campos separados.
+
+O serviço simulado devolve o título que salvou e uma revisão numérica. Uma revisão maior representa um estado confirmado mais tarde no servidor para essa lista de leitura. O serviço atribui a revisão ao efetivar a escrita. Ela não é um timestamp do cliente nem um número atribuído quando a resposta chega.
+
+A sequência local tem outra função: registrar a ordem em que este editor iniciou suas edições. Os dois números precisam ficar separados porque o servidor pode efetivar as escritas em outra ordem.
+
+```ts
+export type SavedTitle = Readonly<{
+  title: string;
+  revision: number;
+}>;
+
+export type Edit = Readonly<{
+  sequence: number;
+  title: string;
+}>;
+
+export type State = Readonly<{
+  confirmed: SavedTitle;
+  acceptedThrough: number;
+  pending: readonly Edit[];
+}>;
+
+export type Event =
+  | { type: 'started'; edit: Edit }
+  | { type: 'accepted'; sequence: number; saved: SavedTitle }
+  | { type: 'rejected'; sequence: number };
+```
+
+`confirmed` contém apenas dados do servidor. `pending` contém operações ainda sem resultado, na ordem em que foram iniciadas localmente. `acceptedThrough` registra a maior sequência local que já recebeu uma confirmação de aceite.
+
+Depois que B é aceita, uma operação A ainda sem resultado não deve voltar a ser a prévia só porque B saiu da lista de pendências. A ainda pode precisar de uma resposta, mas sua intenção local já foi substituída por uma edição posterior aceita.
+
+<OptimisticTitleLayers rotulo="B é aceita com revisão 11 do servidor e sequência local 2. A continua sem resultado, com sequência 1. Como acceptedThrough vale 2, A não pode substituir a prévia. O título visível vem do valor confirmado Books to share." />
+
+Somente edições sem resultado com sequência acima de `acceptedThrough` participam da prévia. `pending` precisa manter a ordem de início, preservada pelo reducer ao acrescentar cada edição ao final da lista. Por isso, a última edição desse recorte representa o título local mais recente. Sem nenhuma, a prévia usa o título confirmado.
+
+```ts
+export function initialState(saved: SavedTitle): State {
+  return { confirmed: saved, acceptedThrough: 0, pending: [] };
+}
+
+export function visibleTitle(state: State): string {
+  const newerEdits = state.pending.filter(
+    (edit) => edit.sequence > state.acceptedThrough,
+  );
+  return newerEdits.at(-1)?.title ?? state.confirmed.title;
+}
+```
+
+Esse é um estado derivado. Não existe um segundo título armazenado que cada tratamento de sucesso e erro precise manter sincronizado.
+
+## A rejeição remove uma operação
+
+O reducer precisa remover a operação que terminou sem alterar as outras edições pendentes. Para isso, cada evento carrega a sequência da edição correspondente.
+
+```ts
+export function reduceTitle(state: State, event: Event): State {
+  if (event.type === 'started') {
+    return { ...state, pending: [...state.pending, event.edit] };
+  }
+
+  const edit = state.pending.find(
+    (candidate) => candidate.sequence === event.sequence,
+  );
+  if (!edit) return state;
+
+  const pending = state.pending.filter(
+    (candidate) => candidate.sequence !== event.sequence,
+  );
+
+  if (event.type === 'rejected') {
+    return { ...state, pending };
+  }
+
+  return {
+    confirmed:
+      event.saved.revision > state.confirmed.revision
+        ? event.saved
+        : state.confirmed,
+    acceptedThrough: Math.max(state.acceptedThrough, edit.sequence),
+    pending,
+  };
+}
+```
+
+O ramo de rejeição não atribui nenhum título anterior. Se B já foi aceita, rejeitar A mantém o valor confirmado de B intacto. Se as duas edições forem rejeitadas, não sobra nenhuma prévia pendente, e o título confirmado inicial volta a ficar visível.
+
+O sucesso exige duas verificações. A revisão do servidor decide se os dados retornados podem substituir `confirmed`. A maior sequência local decide quais intenções anteriores ainda pendentes foram substituídas por uma edição aceita.
+
+Suponha que A tenha sido efetivada como revisão 11 e B como revisão 12, mas a resposta de B chegue primeiro. B atualiza `confirmed` para a revisão 12. A resposta atrasada de A remove A da lista de pendências, mas a revisão 11 não pode substituir a 12.
+
+Se um resultado chegar duas vezes, o segundo não encontra mais a operação pendente e é ignorado. Esse reducer trata resultados de mutações de uma sessão do editor. Leituras em segundo plano e atualizações de outros clientes não estão integradas a ele.
+
+## Cada resposta precisa voltar para a edição certa
+
+O controlador cria a sequência antes de iniciar a requisição e a mantém ao atravessar o `await`. Ao receber o resultado, envia essa mesma sequência ao reducer, mesmo que outra operação termine primeiro.
+
+```ts
+export type SaveResult =
+  | { kind: 'accepted'; saved: SavedTitle }
+  | { kind: 'rejected'; reason: string };
+
+export type SaveTitle = (edit: Edit) => Promise<SaveResult>;
+
+export function createEditor(saveTitle: SaveTitle) {
+  let state = initialState({ title: 'Reading list', revision: 10 });
+  let nextSequence = 0;
+
+  function dispatch(event: Event) {
+    state = reduceTitle(state, event);
+  }
+
+  async function rename(title: string): Promise<SaveResult> {
+    const edit = { sequence: ++nextSequence, title };
+    dispatch({ type: 'started', edit });
+    const result = await saveTitle(edit);
+
+    if (result.kind === 'accepted') {
+      dispatch({ type: 'accepted', sequence: edit.sequence, saved: result.saved });
+    } else {
+      dispatch({ type: 'rejected', sequence: edit.sequence });
+    }
+    return result;
+  }
+
+  return { rename, getState: () => state };
+}
+```
+
+Mantive o controlador fora do React para testar essa lógica separadamente. A mesma função `reduceTitle` poderia ser usada em um `useReducer`. Com `useState`, eu usaria `setState(current => reduceTitle(current, event))`, para aplicar cada evento ao estado atual, sem recuperar um valor capturado antes da requisição.
+
+Esse controlador trata resultados conhecidos de aceite ou rejeição. Se `saveTitle` lançar uma exceção, a promise de `rename` é rejeitada e a edição continua pendente. A recuperação desse resultado desconhecido fica para o adaptador, como veremos no caso do timeout.
+
+As regras de revisão e de operação continuam pertencendo ao modelo. A fila de atualizações do React não define qual resposta do servidor é mais recente. A documentação explica como funções de atualização recebem o estado da fila em [Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates).
+
+Eu apresentaria os erros junto da operação e do título que ela tentou salvar. Uma rejeição de `Weekend reading` não deveria gerar uma mensagem dizendo que `Books to share` não foi salvo. Em um editor completo, a mensagem e uma possível nova tentativa também precisam desse contexto. Sob esta política de substituição de título, tentar novamente inicia uma nova edição local.
+
+## Testando respostas fora de ordem
+
+Uma rede rápida não basta para testar esse bug. O teste precisa decidir qual operação termina primeiro. Uma promise cuja resolução fica sob controle do teste permite fazer isso.
+
+```ts
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((accept) => {
+    resolve = accept;
+  });
+  return { promise, resolve };
+}
+```
+
+Com Vitest e promises controladas, consigo reproduzir a ordem exata das respostas. O teste verifica o comportamento do estado local, sem depender de requisições HTTP.
+
+```ts
+it('keeps B after B succeeds and A is rejected', async () => {
+  const first = deferred<SaveResult>();
+  const second = deferred<SaveResult>();
+  const editor = createEditor((edit) =>
+    edit.sequence === 1 ? first.promise : second.promise,
+  );
+
+  const a = editor.rename('Weekend reading');
+  const b = editor.rename('Books to share');
+
+  second.resolve({
+    kind: 'accepted',
+    saved: { title: 'Books to share', revision: 11 },
+  });
+  await b;
+  expect(visibleTitle(editor.getState())).toBe('Books to share');
+
+  first.resolve({ kind: 'rejected', reason: 'Title was not saved' });
+  await a;
+  expect(visibleTitle(editor.getState())).toBe('Books to share');
+});
+```
+
+A asserção depois de B importa. A ainda está sem resultado naquele ponto. Se a prévia usasse apenas a última edição pendente, voltaria a mostrar A assim que B, já aceita, fosse removida da lista.
+
+Outras ordens testam partes diferentes da regra. Rejeite A e depois B para verificar que um valor otimista rejeitado nunca é restaurado como dado confirmado. Aceite A enquanto B está pendente e depois rejeite B para verificar que o valor salvo de A fica visível. Entregue a revisão 11 depois da 12 para verificar que a ordem de chegada não faz os dados confirmados retrocederem.
+
+## E se o servidor salvar A depois de B?
+
+Agora mude uma condição. B é efetivada primeiro, como revisão 11. A é efetivada depois, como revisão 12. As duas operações dão certo, mas o título final no servidor é `Weekend reading`.
+
+O reducer aceita a revisão 12. Quando não há mais uma prévia mais recente, ele também mostra `Weekend reading`. Isso é diferente do bug de rollback. Nenhuma operação rejeitada restaurou um snapshot. O serviço de fato efetivou A depois de B.
+
+Se o produto exigir que a última edição local se torne o título salvo ao final, eu mudaria o protocolo de escrita. Uma opção é enviar as escritas dessa entidade uma por vez. Outra é uma regra de versão ou ordenação imposta pelo servidor. Uma sequência do cliente armazenada apenas no navegador não consegue fazer o servidor aplicar essa política.
+
+Escritas condicionais são um contrato possível. Com um servidor que aplica corretamente `If-Match`, uma escrita pode ser rejeitada quando o recurso já não corresponde à versão que o cliente leu. Isso revela um conflito a resolver. Não repete B automaticamente nem faz B prevalecer. Veja a [referência de If-Match da MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match).
+
+Para este editor pequeno, permitir apenas um salvamento sem resultado por vez também eliminaria a sobreposição local. Eu escolheria essa interação mais simples se edições rápidas e repetidas não fossem um requisito.
+
+## Um timeout não é uma rejeição
+
+O reducer remove uma operação apenas quando sua rejeição é conhecida. Uma requisição pode ficar sem resposta mesmo depois de o servidor aplicar a escrita. Tratar toda exceção como `rejected` esconderia essa incerteza e poderia mostrar um estado confirmado incorreto.
+
+Eu não deixaria a pessoa diante de um indicador de salvamento interminável. O adaptador precisa informar que o resultado ainda é desconhecido e reconciliar a operação com o serviço. Isso pode exigir uma consulta ao status da operação ou uma leitura autoritativa com garantias de consistência adequadas. O exemplo mantém a pendência, mas não implementa essa recuperação.
+
+O mesmo cuidado vale ao integrar um cache de consultas. Uma nova busca em segundo plano pode sobrescrever uma prévia independentemente do tratamento de erro de uma mutação. Chaves de cache, leituras desatualizadas, invalidação e edições pendentes precisam seguir uma política consistente. O [guia de atualizações otimistas do TanStack Query](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates) documenta snapshots de cache, cancelamento de consultas e novas buscas. Esses mecanismos precisam ser avaliados diante das operações sobrepostas da funcionalidade real.
+
+O modelo aqui se limita a um título e a resultados conhecidos de mutações. Remover uma operação rejeitada funciona porque os dados confirmados nunca foram substituídos por um snapshot não confirmado. Para estender isso a vários campos, incrementos, armazenamento offline ou outros editores, é preciso definir como essas operações se combinam antes de escolher uma regra de rollback.
+
+<FontesDoArtigo>
+
+- [React — Enfileiramento de atualizações de estado](https://react.dev/learn/queueing-a-series-of-state-updates)
+- [TanStack Query v5 — Atualizações otimistas](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates)
+- [MDN — If-Match](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match)
+
+</FontesDoArtigo>

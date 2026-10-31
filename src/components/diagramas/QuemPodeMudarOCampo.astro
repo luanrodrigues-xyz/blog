@@ -1,0 +1,155 @@
+---
+// let/var do nome × let/var da propriedade (artigo structs-em-swift). Os dois campos de fechada e de
+// aberta, com o resultado de atribuir a cada um: só o var valor de um var aberta muda. Azul = o que
+// muda, como em CopiaOuEscritaNoExtrato. Duas composições: lado a lado a partir de 540px de coluna;
+// empilhada abaixo disso.
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+
+type Campo = { declaracao: string; valor: string; resultado: string; muda: boolean };
+type Painel = { nome: string; campos: Campo[]; nota: string };
+const paineis: Painel[] = [
+  {
+    nome: 'let fechada',
+    campos: [
+      { declaracao: 'let id', valor: '3', resultado: 'recusado: id é let', muda: false },
+      { declaracao: 'var valor', valor: '-180_000', resultado: 'recusado: fechada é let', muda: false },
+    ],
+    nota: 'nome let: nenhum campo muda',
+  },
+  {
+    nome: 'var aberta = fechada',
+    campos: [
+      { declaracao: 'let id', valor: '3', resultado: 'recusado: id é let', muda: false },
+      { declaracao: 'var valor', valor: '-175_000', resultado: 'mudou, era -180_000', muda: true },
+    ],
+    nota: 'nome var: só o campo var muda',
+  },
+];
+
+const geometria = {
+  largo: {
+    w: 460,
+    origens: [
+      { x: 20, y: 20 },
+      { x: 520, y: 20 },
+    ],
+    nome: { y: 0, h: 60 },
+    campos: [80, 200],
+    hCampo: 100,
+    nota: { y: 320, h: 60 },
+    divisor: { x1: 500, y1: 20, x2: 500, y2: 400 },
+    altura: 420,
+    minLargura: 540,
+  },
+  estreito: {
+    w: 960,
+    origens: [
+      { x: 20, y: 20 },
+      { x: 20, y: 710 },
+    ],
+    nome: { y: 0, h: 90 },
+    campos: [110, 320],
+    hCampo: 190,
+    nota: { y: 530, h: 100 },
+    divisor: { x1: 20, y1: 680, x2: 980, y2: 680 },
+    altura: 1360,
+    minLargura: 260,
+  },
+};
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+---
+
+<div class="quem-pode-mudar">
+  {(['largo', 'estreito'] as const).map((layout) => {
+    const g = geometria[layout];
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={g.altura} minLargura={g.minLargura}>
+          <slot slot="legenda" />
+          {paineis.map((p, i) => {
+            const o = g.origens[i];
+            return (
+              <>
+                <div class="no t3 nome" style={pos(o.x, o.y + g.nome.y, g.w, g.nome.h)}>
+                  {p.nome}
+                </div>
+                {p.campos.map((c, k) => (
+                  <div class:list={['no campo', { muda: c.muda }]} style={pos(o.x, o.y + g.campos[k], g.w, g.hCampo)}>
+                    <div class="linha">
+                      <div class="t4">{c.declaracao}</div>
+                      <div class="t4">{c.valor}</div>
+                    </div>
+                    <div class="pq resultado">{c.resultado}</div>
+                  </div>
+                ))}
+                <div class="no txt nota" style={pos(o.x, o.y + g.nota.y, g.w, g.nota.h)}>
+                  {p.nota}
+                </div>
+              </>
+            );
+          })}
+          <svg class="setas" viewBox={`0 0 1000 ${g.altura}`} aria-hidden="true" focusable="false">
+            <line class="divisor" x1={g.divisor.x1} y1={g.divisor.y1} x2={g.divisor.x2} y2={g.divisor.y2} />
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .quem-pode-mudar {
+    container-type: inline-size;
+  }
+  .composicao.estreito {
+    display: none;
+  }
+  @container (max-width: 539px) {
+    .composicao.largo {
+      display: none;
+    }
+    .composicao.estreito {
+      display: block;
+    }
+  }
+  .divisor {
+    stroke: var(--d-line);
+    stroke-width: 1.5;
+  }
+  .nome,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .campo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 22);
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+  .campo.muda {
+    background: color-mix(in srgb, var(--d-blue) 12%, var(--d-card));
+    border: 2px solid var(--d-blue);
+  }
+  .linha {
+    display: flex;
+    justify-content: space-between;
+    gap: calc(var(--u) * 12);
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+  .resultado {
+    color: var(--d-ink2);
+  }
+  .campo.muda .resultado {
+    color: var(--d-ink);
+  }
+</style>

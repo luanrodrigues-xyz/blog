@@ -1,0 +1,117 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+const englishLabel =
+  'The Node.js BFF chooses section order and values in JSON. The installed Swift app implements statusCard, button, and openOrderTracking. Sending these names selects existing code. Implementing another view or flow requires a change in the app.';
+
+interface Props {
+  language?: 'en' | 'pt-BR';
+}
+const { language = 'en' } = Astro.props;
+const portuguese = language === 'pt-BR';
+const label = portuguese
+  ? 'O BFF em Node.js escolhe a ordem das seções e os valores no JSON. O app Swift instalado implementa statusCard, button e openOrderTracking. Enviar esses nomes seleciona código existente. Implementar outra view ou fluxo exige uma alteração no app.'
+  : englishLabel;
+const text = {
+  "Installed Swift app": "App Swift instalado",
+  "Screen description": "Descrição da tela",
+  "Supported names": "Nomes suportados",
+  "Chooses order and values": "Escolhe ordem e valores",
+  "Implements views and flows": "Implementa views e fluxos"
+};
+const localize = (value: keyof typeof text) => portuguese ? text[value] : value;
+
+---
+
+<div class="contract-owners">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 592 : 1728} minLargura={260}>
+        <div class="no regiao" style={`--x:32;--y:32;--w:${wide ? 400 : 936};--h:${wide ? 528 : 728}`}></div>
+        <div
+          class="no regiao"
+          style={`--x:${wide ? 568 : 32};--y:${wide ? 32 : 968};--w:${wide ? 400 : 936};--h:${wide ? 528 : 728}`}
+        ></div>
+        <span class="no txt heading" style={`--x:64;--y:64;--w:${wide ? 336 : 872};--h:64`}>
+          Node.js BFF
+        </span>
+        <span
+          class="no txt heading"
+          style={`--x:${wide ? 600 : 64};--y:${wide ? 64 : 1000};--w:${wide ? 336 : 872};--h:64`}
+        >
+          {localize('Installed Swift app')}
+        </span>
+        <div class="no nodo" style={`--x:64;--y:160;--w:${wide ? 336 : 872};--h:${wide ? 240 : 400}`}>
+          <span class="pq ink2">{localize('Screen description')}</span>
+          <span class="t4">statusCard</span>
+          <span class="t4">button</span>
+          <span class="t4">openOrderTracking</span>
+        </div>
+        <div
+          class="no nodo"
+          style={`--x:${wide ? 600 : 64};--y:${wide ? 160 : 1096};--w:${wide ? 336 : 872};--h:${wide ? 240 : 400}`}
+        >
+          <span class="pq ink2">{localize('Supported names')}</span>
+          <span class="t4">statusCard</span>
+          <span class="t4">button</span>
+          <span class="t4">openOrderTracking</span>
+        </div>
+        <span class="no pq note" style={`--x:64;--y:${wide ? 432 : 600};--w:${wide ? 336 : 872};--h:${wide ? 72 : 96}`}>
+          {localize('Chooses order and values')}
+        </span>
+        <span
+          class="no pq note"
+          style={`--x:${wide ? 600 : 64};--y:${wide ? 432 : 1536};--w:${wide ? 336 : 872};--h:${wide ? 72 : 96}`}
+        >
+          {localize('Implements views and flows')}
+        </span>
+        <span
+          class="no pq transfer"
+          style={`--x:${wide ? 436 : 548};--y:${wide ? 208 : 816};--w:${wide ? 128 : 360};--h:64`}
+        >
+          JSON
+        </span>
+        <svg class="setas" viewBox={`0 0 1000 ${wide ? 592 : 1728}`} aria-hidden="true" focusable="false">
+          {wide ? (
+            <Seta tipo="neutra" x1={432} y1={304} x2={568} y2={304} />
+          ) : (
+            <Seta tipo="neutra" x1={500} y1={760} x2={500} y2={968} />
+          )}
+        </svg>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+
+<style>
+  .contract-owners {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading,
+  .note,
+  .transfer {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  .transfer {
+    justify-content: center;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

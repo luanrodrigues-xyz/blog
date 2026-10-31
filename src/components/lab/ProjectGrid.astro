@@ -1,0 +1,15 @@
+---
+---
+
+<div class="project-grid">
+  <slot />
+</div>
+
+<style>
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17.5rem, 24rem));
+    gap: var(--space-6);
+    margin: var(--space-8) 0;
+  }
+</style>

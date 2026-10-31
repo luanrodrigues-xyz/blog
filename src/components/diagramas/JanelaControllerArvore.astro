@@ -1,0 +1,158 @@
+---
+// Primeira tela UIKit (artigo uikit-tela-sem-storyboard): a janela aponta para o controller por
+// rootViewController e o controller aponta para a raiz por view; a árvore de views liga a janela à
+// raiz e a raiz aos labels. O controller fica fora da região da árvore: ele não é uma subview.
+// Setas azuis = propriedades (quem guarda aponta para o objeto); linhas cinza = superview → subview.
+// Duas composições: controller ao lado da árvore com 680px; controller acima dela abaixo disso.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const labels = [
+  { nome: 'Café', lado: 72, pilha: 874 },
+  { nome: 'Despesa', lado: 240, pilha: 994 },
+  { nome: '-R$ 7,50', lado: 408, pilha: 1114 },
+];
+---
+
+<div class="janela-controller">
+  <div class="composicao lado">
+    <Diagrama plano rotulo={rotulo} altura={640}>
+      <slot slot="legenda" />
+      <div class="no regiao" style="--x:32; --y:32; --w:560; --h:576"></div>
+      <span class="no cab titulo" style="--x:72; --y:44; --w:480; --h:40">Árvore de views</span>
+      <div class="no nodo" style="--x:72; --y:96; --w:480; --h:72"><span class="txt forte">UIWindow</span></div>
+      <div class="no nodo fantasma" style="--x:72; --y:216; --w:480; --h:72">
+        <span class="pq">views do UIKit (duas nesta execução)</span>
+      </div>
+      <div class="no nodo" style="--x:72; --y:336; --w:480; --h:88">
+        <span class="txt forte">UIView</span>
+        <span class="pq ink2">raiz criada em loadView</span>
+      </div>
+      {labels.map(({ nome, lado }) => (
+        <div class="no nodo" style={`--x:${lado}; --y:480; --w:144; --h:88`}>
+          <span class="t4 ink2">UILabel</span>
+          <span class="txt">{nome}</span>
+        </div>
+      ))}
+      <div class="no nodo controller" style="--x:656; --y:216; --w:312; --h:88">
+        <span class="txt forte">Transacao<wbr />ViewController</span>
+      </div>
+      <span class="no etq rel" style="--x:600; --y:92; --w:240; --h:36">rootViewController</span>
+      <span class="no etq rel" style="--x:600; --y:340; --w:120; --h:36">view</span>
+      <svg class="setas" viewBox="0 0 1000 640" aria-hidden="true" focusable="false">
+        <g class="arvore">
+          <line x1="312" y1="168" x2="312" y2="216"></line>
+          <line x1="312" y1="288" x2="312" y2="336"></line>
+          <line x1="312" y1="424" x2="312" y2="480"></line>
+          <line x1="144" y1="452" x2="480" y2="452"></line>
+          <line x1="144" y1="452" x2="144" y2="480"></line>
+          <line x1="480" y1="452" x2="480" y2="480"></line>
+        </g>
+        <g class="referencia">
+          <line x1="552" y1="132" x2="812" y2="132"></line>
+          <line x1="812" y1="304" x2="812" y2="380"></line>
+        </g>
+        <Seta x1={812} y1={132} x2={812} y2={214} />
+        <Seta x1={812} y1={380} x2={554} y2={380} />
+      </svg>
+    </Diagrama>
+  </div>
+
+  <div class="composicao pilha">
+    <Diagrama plano rotulo={rotulo} altura={1280} minLargura={300}>
+      <slot slot="legenda" />
+      <div class="no nodo controller" style="--x:24; --y:24; --w:952; --h:136">
+        <span class="txt forte">TransacaoViewController</span>
+      </div>
+      <span class="no etq rel" style="--x:56; --y:184; --w:460; --h:72">rootViewController</span>
+      <div class="no regiao" style="--x:24; --y:270; --w:952; --h:980"></div>
+      <span class="no cab titulo" style="--x:56; --y:274; --w:420; --h:64">Árvore de views</span>
+      <div class="no nodo" style="--x:56; --y:344; --w:560; --h:100"><span class="txt forte">UIWindow</span></div>
+      <div class="no nodo fantasma" style="--x:56; --y:500; --w:560; --h:100">
+        <span class="pq">views do UIKit (duas aqui)</span>
+      </div>
+      <div class="no nodo" style="--x:56; --y:664; --w:560; --h:150">
+        <span class="txt forte">UIView</span>
+        <span class="pq ink2">raiz de loadView</span>
+      </div>
+      <span class="no etq rel direita" style="--x:640; --y:652; --w:210; --h:72">view</span>
+      {labels.map(({ nome, pilha }) => (
+        <div class="no nodo linha" style={`--x:160; --y:${pilha}; --w:456; --h:90`}>
+          <span class="t4 ink2">UILabel</span>
+          <span class="txt">{nome}</span>
+        </div>
+      ))}
+      <svg class="setas" viewBox="0 0 1000 1280" aria-hidden="true" focusable="false">
+        <g class="arvore">
+          <line x1="120" y1="444" x2="120" y2="500"></line>
+          <line x1="120" y1="600" x2="120" y2="664"></line>
+          <line x1="120" y1="814" x2="120" y2="1159"></line>
+          {labels.map(({ pilha }) => <line x1="120" y1={pilha + 45} x2="160" y2={pilha + 45}></line>)}
+        </g>
+        <g class="referencia">
+          <line x1="880" y1="160" x2="880" y2="739"></line>
+        </g>
+        <Seta x1={560} y1={344} x2={560} y2={162} />
+        <Seta x1={880} y1={739} x2={618} y2={739} />
+      </svg>
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .janela-controller {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width: 679px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .titulo,
+  .rel {
+    display: flex;
+    align-items: center;
+  }
+  .rel.direita {
+    justify-content: flex-end;
+  }
+  .forte {
+    font-weight: 600;
+  }
+  :global(.diagrama) .no.nodo.controller {
+    align-items: center;
+    text-align: center;
+  }
+  :global(.diagrama) .no.nodo.linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: calc(var(--u) * 24);
+  }
+  .arvore line {
+    stroke: var(--d-line);
+    stroke-width: 2;
+  }
+  /* No celular, 1 unidade vale ~0,33px: traços mais grossos para não ficarem abaixo de 1,5px. */
+  .pilha .arvore line {
+    stroke-width: 4;
+  }
+  .pilha .referencia line,
+  .pilha :global(.seta line) {
+    stroke-width: 6;
+  }
+  .referencia line {
+    stroke: var(--d-blue);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+</style>

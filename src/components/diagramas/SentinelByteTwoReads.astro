@@ -1,0 +1,122 @@
+---
+// One raw byte from the coolant characteristic (0xFF, the dongle's reserved sentinel), read under
+// two decode policies. Same input both times: only the operation between the chip and the end
+// cell changes. Top row casts it straight to a signed byte; bottom row checks the sentinel first.
+// Distances are schematic, not proportional to anything measured.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+type Tipo = 'resolvido' | 'conflito';
+type Cenario = {
+  titulo: string;
+  operacao: string;
+  codigo: string;
+  motivo: string;
+  tipo: Tipo;
+};
+
+const cenarios: Cenario[] = [
+  {
+    titulo: 'Decoding without checking the sentinel',
+    operacao: 'Int8(bitPattern:)',
+    codigo: '-1',
+    motivo: 'reads like a cold but real temperature',
+    tipo: 'conflito',
+  },
+  {
+    titulo: 'Checking the sentinel before decoding',
+    operacao: 'raw == notReportedYet',
+    codigo: '.notReportedYet',
+    motivo: 'the sensor has nothing to report yet',
+    tipo: 'resolvido',
+  },
+];
+
+const ALTURA_CENARIO = 190;
+const GAP = 24;
+const altura = cenarios.length * (ALTURA_CENARIO + GAP) - GAP;
+
+const CHIP = { w: 170, h: 64 };
+const FIM = { w: 320, h: 92 };
+const INICIO = 24;
+const CHEGADA = 640;
+
+const quadros = cenarios.map((cenario, i) => {
+  const top = i * (ALTURA_CENARIO + GAP);
+  const cy = top + 118;
+  return {
+    cenario,
+    regiao: { x: 0, y: top, w: 1000, h: ALTURA_CENARIO },
+    titulo: { x: 24, y: top + 14, w: 700, h: 28 },
+    chip: { x: INICIO, y: cy - CHIP.h / 2, w: CHIP.w, h: CHIP.h },
+    fim: { x: CHEGADA, y: cy - FIM.h / 2, w: FIM.w, h: FIM.h },
+    etiqueta: { x: INICIO + CHIP.w + 20, y: cy - 32, w: CHEGADA - (INICIO + CHIP.w) - 40, h: 24 },
+    seta: { x1: INICIO + CHIP.w, y1: cy, x2: CHEGADA, y2: cy },
+  };
+});
+---
+
+<Diagrama plano rotulo={rotulo} altura={altura}>
+  <slot slot="legenda" />
+
+  {
+    quadros.map(({ cenario, regiao, titulo, chip, fim, etiqueta }) => (
+      <>
+        <div class="no regiao" style={`--x:${regiao.x}; --y:${regiao.y}; --w:${regiao.w}; --h:${regiao.h}`} />
+        <span class="no cab" style={`--x:${titulo.x}; --y:${titulo.y}; --w:${titulo.w}; --h:${titulo.h}`}>
+          {cenario.titulo}
+        </span>
+
+        <div class="no celula" style={`--x:${chip.x}; --y:${chip.y}; --w:${chip.w}; --h:${chip.h}`}>
+          <span class="t3">0xFF</span>
+        </div>
+
+        <span class="no pq ink2 etiqueta" style={`--x:${etiqueta.x}; --y:${etiqueta.y}; --w:${etiqueta.w}; --h:${etiqueta.h}`}>
+          {cenario.operacao}
+        </span>
+
+        <div class="no celula" style={`--x:${fim.x}; --y:${fim.y}; --w:${fim.w}; --h:${fim.h}`}>
+          <span class="t3">{cenario.codigo}</span>
+          <span class="pq ink2">{cenario.motivo}</span>
+        </div>
+      </>
+    ))
+  }
+
+  <svg class="setas" viewBox={`0 0 1000 ${altura}`} aria-hidden="true" focusable="false">
+    {
+      quadros.map(({ cenario, seta }) => (
+        <Seta x1={seta.x1} y1={seta.y1} x2={seta.x2} y2={seta.y2} tipo={cenario.tipo} />
+      ))
+    }
+  </svg>
+</Diagrama>
+
+<style>
+  .cab {
+    display: flex;
+    align-items: center;
+  }
+
+  .etiqueta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  :global(.diagrama) .celula {
+    align-items: center;
+    text-align: center;
+  }
+
+  :global(.diagrama) .celula .t3 {
+    white-space: nowrap;
+  }
+</style>

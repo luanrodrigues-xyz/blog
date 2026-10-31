@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #CB30E0; --principal-texto: #9E2AAF; --principal-tinta: #F7DEFA; --sobre-principal: #fff;
+      --destaque: #FF383C; --destaque-texto: #C61226; --destaque-tinta: #FFDFE0; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #DB34F2; --principal-texto: #E25DF5; --principal-tinta: color-mix(in srgb, var(--principal) 22%, var(--card)); --sobre-principal: #fff;
+        --destaque: #FF4245; --destaque-texto: #FF686A; --destaque-tinta: color-mix(in srgb, var(--destaque) 22%, var(--card)); --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .destaque { fill: var(--destaque); }
+    .destaque-tinta { fill: var(--destaque-tinta); }
+    .texto-principal { fill: var(--principal-texto); }
+    .texto-destaque { fill: var(--destaque-texto); }
+    .linha { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .ponta { fill: var(--principal); }
+    .rotulo { font-family: -apple-system, system-ui, Helvetica, sans-serif; font-size: 20px; font-weight: 600; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- LoadingButtonState: the shared contract, three known cases and a fourth just added. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="508" y="88" width="184" height="160" rx="32"/>
+  </g>
+  <rect class="neutro" x="528" y="112" width="72" height="14" rx="7"/>
+  <rect class="neutro" x="528" y="136" width="96" height="14" rx="7"/>
+  <rect class="neutro" x="528" y="160" width="84" height="14" rx="7"/>
+  <rect class="destaque-tinta" x="528" y="184" width="64" height="14" rx="7"/>
+  <circle class="destaque" cx="676" cy="104" r="18"/>
+  <path d="M676 96V112M668 104H684" stroke="var(--sobre-destaque)" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- The new case travels down the same two lines to both consumers at once. -->
+  <path class="linha" d="M600 248V288H410V344"/>
+  <polygon class="ponta" points="410,352 402,336 418,336"/>
+  <path class="linha" d="M600 248V288H790V344"/>
+  <polygon class="ponta" points="790,352 782,336 798,336"/>
+
+  <!-- UIKit: a switch over LoadingButtonState, now missing the fourth case. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="300" y="360" width="220" height="180" rx="32"/>
+  </g>
+  <text class="texto-principal rotulo" x="324" y="400">UIKit</text>
+  <rect class="neutro" x="324" y="420" width="80" height="14" rx="7"/>
+  <rect class="neutro" x="324" y="444" width="120" height="14" rx="7"/>
+  <rect class="neutro" x="324" y="468" width="96" height="14" rx="7"/>
+  <circle class="destaque" cx="484" cy="510" r="20"/>
+  <path d="M476 502 492 518M492 502 476 518" stroke="var(--sobre-destaque)" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- SwiftUI: an independent switch over the same type, broken the same way. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="680" y="360" width="220" height="180" rx="32"/>
+  </g>
+  <text class="texto-principal rotulo" x="704" y="400">SwiftUI</text>
+  <rect class="neutro" x="704" y="420" width="80" height="14" rx="7"/>
+  <rect class="neutro" x="704" y="444" width="120" height="14" rx="7"/>
+  <rect class="neutro" x="704" y="468" width="96" height="14" rx="7"/>
+  <circle class="destaque" cx="864" cy="510" r="20"/>
+  <path d="M856 502 872 518M872 502 856 518" stroke="var(--sobre-destaque)" stroke-width="5" stroke-linecap="round"/>
+</svg>

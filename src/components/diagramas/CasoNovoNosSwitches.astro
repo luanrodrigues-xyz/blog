@@ -1,0 +1,298 @@
+---
+// O enum ganha .pixOnCredit.
+//
+// description(for:) sem default deixa de ser exhaustive.
+// hasBarcode(_:) e usesCardLimit(_:) continuam compilando porque
+// default já cobre qualquer case não listado.
+//
+// Para este exemplo:
+// - hasBarcode(.pixOnCredit) == false continua correto
+// - usesCardLimit(.pixOnCredit) == false fica errado
+//
+// Em telas largas, os três caminhos ficam lado a lado.
+// Em telas estreitas, cada função fica ao lado do seu resultado.
+
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+type SwitchCase = {
+  nome: string[];
+  cobertura: string;
+  resultado: string;
+  motivo: string;
+  tom: 'laranja' | 'verde' | 'vermelho';
+};
+
+const switches: SwitchCase[] = [
+  {
+    nome: ['description', '(for:)'],
+    cobertura: 'sem default',
+    resultado: 'não compila',
+    motivo: 'falta .pixOnCredit',
+    tom: 'laranja',
+  },
+  {
+    nome: ['hasBarcode', '(_:)'],
+    cobertura: 'default → false',
+    resultado: 'false',
+    motivo: 'correto neste case',
+    tom: 'verde',
+  },
+  {
+    nome: ['usesCardLimit', '(_:)'],
+    cobertura: 'default → false',
+    resultado: 'false',
+    motivo: 'errado neste case',
+    tom: 'vermelho',
+  },
+];
+
+const largo = {
+  altura: 600,
+
+  novo: {
+    x: 220,
+    y: 20,
+    w: 560,
+    h: 120,
+  },
+
+  colunas: [20, 350, 680],
+  w: 300,
+
+  funcao: {
+    y: 190,
+    h: 160,
+  },
+
+  resultado: {
+    y: 420,
+    h: 140,
+  },
+};
+
+const estreito = {
+  altura: 1600,
+
+  novo: {
+    x: 20,
+    y: 20,
+    w: 960,
+    h: 220,
+  },
+
+  linhas: [300, 740, 1180],
+  h: 360,
+
+  funcao: {
+    x: 20,
+    w: 460,
+  },
+
+  resultado: {
+    x: 560,
+    w: 420,
+  },
+};
+
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+
+// hasBarcode e usesCardLimit compartilham o mesmo mecanismo (default já cobre o case que
+// falta); description é o único sem default. O tronco entre novo case e as duas colunas de
+// default deixa esse agrupamento visível, em vez de três setas paralelas e equivalentes.
+const semDefaultX = largo.novo.x + 80;
+const comDefaultForkY = (largo.novo.y + largo.novo.h + largo.funcao.y) / 2;
+const comDefaultX1 = largo.colunas[1] + largo.w / 2;
+const comDefaultX2 = largo.colunas[2] + largo.w / 2;
+const comDefaultTroncoX = (comDefaultX1 + comDefaultX2) / 2;
+---
+
+<div class="caso-novo">
+  <div class="composicao largo">
+    <Diagrama plano rotulo={rotulo} altura={largo.altura} minLargura={540}>
+      <slot slot="legenda" />
+
+      <div class="no nodo novo" style={pos(largo.novo.x, largo.novo.y, largo.novo.w, largo.novo.h)}>
+        <div class="pq ink2">novo case no enum</div>
+        <div class="t3">.pixOnCredit(key:installments:)</div>
+      </div>
+
+      {switches.map((s, i) => (
+        <>
+          <div class="no nodo funcao" style={pos(largo.colunas[i], largo.funcao.y, largo.w, largo.funcao.h)}>
+            <div class="t3 nome-funcao">
+              {s.nome.map((parte) => (
+                <span>{parte}</span>
+              ))}
+            </div>
+
+            <div class="t4 ink2">{s.cobertura}</div>
+          </div>
+
+          <div
+            class={`no nodo resultado ${s.tom}`}
+            style={pos(largo.colunas[i], largo.resultado.y, largo.w, largo.resultado.h)}
+          >
+            <div class="txt forte">{s.resultado}</div>
+
+            <div class="txt">{s.motivo}</div>
+          </div>
+        </>
+      ))}
+
+      <svg class="setas" viewBox={`0 0 1000 ${largo.altura}`} aria-hidden="true" focusable="false">
+        {/* sem default: ramo independente até description, o único switch sem default. */}
+        <Seta
+          tipo="neutra"
+          x1={semDefaultX}
+          y1={largo.novo.y + largo.novo.h}
+          x2={largo.colunas[0] + largo.w / 2}
+          y2={largo.funcao.y}
+        />
+
+        {/* com default: um tronco só se divide entre hasBarcode e usesCardLimit, que
+            compartilham o mesmo mecanismo e só divergem no resultado. */}
+        <line
+          class="tronco"
+          x1={comDefaultTroncoX}
+          y1={largo.novo.y + largo.novo.h}
+          x2={comDefaultTroncoX}
+          y2={comDefaultForkY}
+        />
+        <line class="tronco" x1={comDefaultX1} y1={comDefaultForkY} x2={comDefaultX2} y2={comDefaultForkY} />
+        <Seta tipo="neutra" x1={comDefaultX1} y1={comDefaultForkY} x2={comDefaultX1} y2={largo.funcao.y} />
+        <Seta tipo="neutra" x1={comDefaultX2} y1={comDefaultForkY} x2={comDefaultX2} y2={largo.funcao.y} />
+
+        {largo.colunas.map((x) => {
+          const centro = x + largo.w / 2;
+
+          return (
+            <Seta tipo="neutra" x1={centro} y1={largo.funcao.y + largo.funcao.h} x2={centro} y2={largo.resultado.y} />
+          );
+        })}
+      </svg>
+    </Diagrama>
+  </div>
+
+  <div class="composicao estreito">
+    <Diagrama plano rotulo={rotulo} altura={estreito.altura} minLargura={260}>
+      <slot slot="legenda" />
+
+      <div class="no nodo novo" style={pos(estreito.novo.x, estreito.novo.y, estreito.novo.w, estreito.novo.h)}>
+        <div class="pq ink2">novo case no enum</div>
+
+        <div class="t3">.pixOnCredit(key:installments:)</div>
+      </div>
+
+      {switches.map((s, i) => (
+        <>
+          <div class="no nodo funcao" style={pos(estreito.funcao.x, estreito.linhas[i], estreito.funcao.w, estreito.h)}>
+            <div class="t3 nome-funcao">
+              {s.nome.map((parte) => (
+                <span>{parte}</span>
+              ))}
+            </div>
+
+            <div class="t4 ink2">{s.cobertura}</div>
+          </div>
+
+          <div
+            class={`no nodo resultado ${s.tom}`}
+            style={pos(estreito.resultado.x, estreito.linhas[i], estreito.resultado.w, estreito.h)}
+          >
+            <div class="txt forte">{s.resultado}</div>
+
+            <div class="txt">{s.motivo}</div>
+          </div>
+        </>
+      ))}
+
+      <svg class="setas" viewBox={`0 0 1000 ${estreito.altura}`} aria-hidden="true" focusable="false">
+        {estreito.linhas.map((y) => (
+          <Seta
+            tipo="neutra"
+            x1={estreito.funcao.x + estreito.funcao.w + 16}
+            y1={y + estreito.h / 2}
+            x2={estreito.resultado.x - 16}
+            y2={y + estreito.h / 2}
+          />
+        ))}
+      </svg>
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .caso-novo {
+    container-type: inline-size;
+  }
+
+  /* Tronco do agrupamento "com default": associação, sem direção própria a marcar. */
+  .tronco {
+    fill: none;
+    stroke: var(--d-ink2);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .composicao.estreito {
+    display: none;
+  }
+
+  @container (max-width: 539px) {
+    .composicao.largo {
+      display: none;
+    }
+
+    .composicao.estreito {
+      display: block;
+    }
+  }
+
+  .novo,
+  .funcao,
+  .resultado {
+    align-items: center;
+    text-align: center;
+  }
+
+  .nome-funcao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .forte {
+    font-weight: 600;
+  }
+
+  .funcao .t4 {
+    white-space: normal;
+  }
+
+  .resultado {
+    background: var(--d-bg);
+    border-width: 2px;
+  }
+
+  :global(.diagrama) .resultado.laranja.no {
+    border: 2px solid var(--d-laranja);
+    background: color-mix(in srgb, var(--d-laranja) 12%, var(--d-bg));
+  }
+
+  :global(.diagrama) .resultado.verde.no {
+    border: 2px solid var(--d-verde);
+    background: color-mix(in srgb, var(--d-verde) 12%, var(--d-bg));
+  }
+
+  :global(.diagrama) .resultado.vermelho.no {
+    border: 2px solid var(--d-vermelho);
+    background: color-mix(in srgb, var(--d-vermelho) 12%, var(--d-bg));
+  }
+</style>

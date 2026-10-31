@@ -1,0 +1,94 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'For JSON with page_count minus 8, JSONDecoder succeeds and produces BookPayload with pageCount minus 8, since the field is an integer. The separate makeBook function requires pageCount greater than zero and throws BookValidationError.invalidPageCount. No accepted Book is returned for this input. Decoding success and app acceptance are separate outcomes.';
+---
+
+<div class="book-validation">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 940 : 1920} minLargura={260}>
+        <div class="no nodo" style={`--x:32;--y:32;--w:${wide ? 400 : 936};--h:${wide ? 180 : 240}`}>
+          <span class="pq">Data with JSON</span>
+          <span class="t4">page_count = -8</span>
+        </div>
+        <div
+          class="no nodo"
+          style={`--x:${wide ? 568 : 32};--y:${wide ? 32 : 560};--w:${wide ? 400 : 936};--h:${wide ? 180 : 240}`}
+        >
+          <span class="pq">BookPayload</span>
+          <span class="t4">pageCount = -8</span>
+        </div>
+        <span
+          class="no pq operation"
+          style={`--x:${wide ? 32 : 32};--y:${wide ? 268 : 300};--w:${wide ? 400 : 936};--h:${wide ? 144 : 200}`}
+        >
+          <span>JSONDecoder.decode</span>
+          <span>succeeds</span>
+        </span>
+        <div
+          class="no nodo fantasma operation"
+          style={`--x:${wide ? 568 : 32};--y:${wide ? 432 : 1080};--w:${wide ? 400 : 936};--h:${wide ? 160 : 240}`}
+        >
+          <span class="t4">makeBook</span>
+          <span class="t4">pageCount &gt; 0</span>
+        </div>
+        <div
+          class="no nodo outcome"
+          style={`--x:${wide ? 568 : 32};--y:${wide ? 744 : 1610};--w:${wide ? 400 : 936};--h:${wide ? 160 : 240}`}
+        >
+          <span class="t4">BookValidationError</span>
+          <span class="t4">.invalidPageCount</span>
+        </div>
+        <svg class="setas" viewBox={`0 0 1000 ${wide ? 940 : 1920}`} aria-hidden="true" focusable="false">
+          {wide ? (
+            <>
+              <Seta x1={432} y1={122} x2={568} y2={122} />
+              <Seta x1={768} y1={212} x2={768} y2={432} />
+              <Seta x1={768} y1={592} x2={768} y2={744} />
+            </>
+          ) : (
+            <>
+              <line class="connector" x1="500" y1="272" x2="500" y2="290" />
+              <Seta x1={500} y1={510} x2={500} y2={560} />
+              <Seta x1={500} y1={800} x2={500} y2={1080} />
+              <Seta x1={500} y1={1320} x2={500} y2={1610} />
+            </>
+          )}
+        </svg>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .book-validation {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .operation,
+  .outcome {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .connector {
+    stroke: var(--d-blue);
+    stroke-width: 6;
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+  @container (max-width: 539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+</style>

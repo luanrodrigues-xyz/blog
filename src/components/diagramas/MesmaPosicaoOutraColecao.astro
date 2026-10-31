@@ -1,0 +1,333 @@
+---
+// Artigo "A página 2 repetiu um pagamento e pulou outro". Mesma coleção, oito posições fixas por
+// identidade (pay_101 em slot 0, pay_100 em slot 1, ..., pay_94 em slot 7), em três momentos:
+// página 1, a criação de pay_101 e página 2. O slot de cada id nunca muda entre as linhas; o que muda
+// é quais slots cada estratégia pede na página 2.
+//
+// offset conta posições: depois que pay_101 ocupa o slot 0, "offset 3" aponta para os slots 3-5
+// (98, 97, 96) em vez dos slots 4-6 que teriam a continuação de página 1. O slot 3 (98) está nas
+// duas seleções: a de página 1 e a de offset na página 2. A linha tracejada liga as duas aparições.
+//
+// cursor compara valor: "sequence < 98" sempre aponta para os slots 4-6 (97, 96, 95), com ou sem
+// pay_101 na coleção, porque a comparação não depende de quantos itens existem antes do slot 3.
+//
+// Composição larga (>= 680px): oito posições lado a lado, a mesma coluna nas três linhas, com a
+// barra de cada busca sob a linha de página 2 e a linha tracejada ligando as duas aparições de 98.
+// Composição estreita (abaixo disso): a mesma informação reorganizada em quatro grupos empilhados,
+// cada um com só os itens que aquela busca pediu; a posição fixa se perde, mas a repetição continua
+// visível pelo rótulo "repetida" no mesmo id.
+import Diagrama from './Diagrama.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+const pos = (x: number, y: number, w: number, h: number) => `--x:${x}; --y:${y}; --w:${w}; --h:${h}`;
+
+type Estado = 'vazio' | 'neutro' | 'selecionada' | 'novo' | 'repetida';
+type Slot = { sequence: number; estado: Estado };
+
+const linha = {
+  x0: 150,
+  w: 95,
+  gap: 9,
+  h: 72,
+};
+const slotX = (i: number) => linha.x0 + i * (linha.w + linha.gap);
+
+const rotuloX = 20;
+const rotuloW = 110;
+
+type Faixa = {
+  titulo: string;
+  slots: Slot[];
+  y: number;
+};
+
+const faixas: Faixa[] = [
+  {
+    titulo: 'Página 1',
+    y: 56,
+    slots: [
+      { sequence: 101, estado: 'vazio' },
+      { sequence: 100, estado: 'selecionada' },
+      { sequence: 99, estado: 'selecionada' },
+      { sequence: 98, estado: 'selecionada' },
+      { sequence: 97, estado: 'neutro' },
+      { sequence: 96, estado: 'neutro' },
+      { sequence: 95, estado: 'neutro' },
+      { sequence: 94, estado: 'neutro' },
+    ],
+  },
+  {
+    titulo: 'pay_101 é criado',
+    y: 196,
+    slots: [
+      { sequence: 101, estado: 'novo' },
+      { sequence: 100, estado: 'neutro' },
+      { sequence: 99, estado: 'neutro' },
+      { sequence: 98, estado: 'neutro' },
+      { sequence: 97, estado: 'neutro' },
+      { sequence: 96, estado: 'neutro' },
+      { sequence: 95, estado: 'neutro' },
+      { sequence: 94, estado: 'neutro' },
+    ],
+  },
+  {
+    titulo: 'Página 2',
+    y: 316,
+    slots: [
+      { sequence: 101, estado: 'neutro' },
+      { sequence: 100, estado: 'neutro' },
+      { sequence: 99, estado: 'neutro' },
+      { sequence: 98, estado: 'repetida' },
+      { sequence: 97, estado: 'selecionada' },
+      { sequence: 96, estado: 'selecionada' },
+      { sequence: 95, estado: 'selecionada' },
+      { sequence: 94, estado: 'neutro' },
+    ],
+  },
+];
+
+const paginaA = faixas[0];
+const criacao = faixas[1];
+const paginaB = faixas[2];
+
+const barraOffsetA = { x1: slotX(1), x2: slotX(3) + linha.w, y: paginaA.y + linha.h + 18 };
+const barraOffsetB = { x1: slotX(3), x2: slotX(5) + linha.w, y: paginaB.y + linha.h + 18 };
+const barraCursorB = { x1: slotX(4), x2: slotX(6) + linha.w, y: paginaB.y + linha.h + 56 };
+
+const slot3Cx = slotX(3) + linha.w / 2;
+const conector1 = { x: slot3Cx, y1: paginaA.y + linha.h, y2: criacao.y };
+const conector2 = { x: slot3Cx, y1: criacao.y + linha.h, y2: paginaB.y };
+
+const alturaLarga = 540;
+
+// Composição estreita: quatro grupos empilhados, só com os itens que aquela busca pediu.
+type Item = { sequence: number; tag?: 'novo' | 'repetida' };
+type Grupo = { titulo: string; itens: Item[] };
+
+const grupos: Grupo[] = [
+  { titulo: 'Página 1 · offset 0', itens: [{ sequence: 100 }, { sequence: 99 }, { sequence: 98 }] },
+  { titulo: 'pay_101 é criado', itens: [{ sequence: 101, tag: 'novo' }] },
+  {
+    titulo: 'Página 2 · offset 3',
+    itens: [{ sequence: 98, tag: 'repetida' }, { sequence: 97 }, { sequence: 96 }],
+  },
+  { titulo: 'Página 2 · cursor 98', itens: [{ sequence: 97 }, { sequence: 96 }, { sequence: 95 }] },
+];
+
+// A largura mínima desta composição (280px, ver minLargura abaixo) é bem menor que a da larga
+// (680px). Como 1 unidade sempre vale minLargura / 1000 px nas duas dimensões, as mesmas alturas
+// em unidades da largura ficariam minúsculas aqui. Os valores abaixo são dimensionados para 280px,
+// não reaproveitados da composição larga.
+const estreita = (() => {
+  const x = 56;
+  const w = 1000 - x * 2;
+  const tituloH = 70;
+  const itemH = 160;
+  const gapTitulo = 16;
+  const gapGrupo = 90;
+  let y = 40;
+  const posicoes = grupos.map((g) => {
+    const tituloY = y;
+    const boxY = tituloY + tituloH + gapTitulo;
+    const boxH = g.itens.length * itemH;
+    y = boxY + boxH + gapGrupo;
+    return { tituloY, boxY, boxH };
+  });
+  return { x, w, tituloH, itemH, posicoes, altura: y - gapGrupo + 40 };
+})();
+---
+
+<div class="colecao">
+  <div class="composicao larga">
+    <Diagrama plano rotulo={rotulo} altura={alturaLarga} minLargura={680}>
+      {
+        faixas.map((f) => (
+          <>
+            <span class="no cab rotuloLinha" style={pos(rotuloX, f.y + linha.h / 2 - 12, rotuloW, 24)}>
+              {f.titulo}
+            </span>
+            {f.slots.map((s, i) => (
+              <span class:list={['no slot', s.estado]} style={pos(slotX(i), f.y, linha.w, linha.h)}>
+                {s.estado !== 'vazio' && <span class="t4">pay_{s.sequence}</span>}
+                {s.estado === 'novo' && <span class="etq verde pq">novo</span>}
+                {s.estado === 'repetida' && <span class="etq laranja pq">repetida</span>}
+              </span>
+            ))}
+          </>
+        ))
+      }
+
+      <span
+        class="no barra azul"
+        style={pos(barraOffsetA.x1, barraOffsetA.y, barraOffsetA.x2 - barraOffsetA.x1, 8)}
+      />
+      <span
+        class="no legendaBarra txt"
+        style={pos(barraOffsetA.x1, barraOffsetA.y + 12, barraOffsetA.x2 - barraOffsetA.x1, 24)}
+      >
+        offset 0 · pede 100, 99, 98
+      </span>
+
+      <span
+        class="no barra azul"
+        style={pos(barraOffsetB.x1, barraOffsetB.y, barraOffsetB.x2 - barraOffsetB.x1, 8)}
+      />
+      <span
+        class="no legendaBarra txt"
+        style={pos(barraOffsetB.x1, barraOffsetB.y + 12, barraOffsetB.x2 - barraOffsetB.x1, 24)}
+      >
+        offset 3 · pede 98, 97, 96
+      </span>
+
+      <span
+        class="no barra indigo"
+        style={pos(barraCursorB.x1, barraCursorB.y, barraCursorB.x2 - barraCursorB.x1, 8)}
+      />
+      <span
+        class="no legendaBarra txt"
+        style={pos(barraCursorB.x1, barraCursorB.y + 12, barraCursorB.x2 - barraCursorB.x1, 24)}
+      >
+        cursor 98 · pede 97, 96, 95
+      </span>
+
+      <svg class="setas" viewBox={`0 0 1000 ${alturaLarga}`} aria-hidden="true" focusable="false">
+        <line class="conector" x1={conector1.x} y1={conector1.y1} x2={conector1.x} y2={conector1.y2} />
+        <line class="conector" x1={conector2.x} y1={conector2.y1} x2={conector2.x} y2={conector2.y2} />
+      </svg>
+    </Diagrama>
+  </div>
+
+  <div class="composicao estreita">
+    <Diagrama plano rotulo={rotulo} altura={estreita.altura} minLargura={280}>
+      {
+        grupos.map((g, i) => {
+          const { tituloY, boxY, boxH } = estreita.posicoes[i];
+          return (
+            <>
+              <span class="no cab" style={pos(estreita.x, tituloY, estreita.w, estreita.tituloH)}>
+                {g.titulo}
+              </span>
+              <div class="no nodo lista" style={pos(estreita.x, boxY, estreita.w, boxH)}>
+                {g.itens.map((item) => (
+                  <div class="item">
+                    <span class="t4">pay_{item.sequence}</span>
+                    {item.tag === 'novo' && <span class="etq verde pq">novo</span>}
+                    {item.tag === 'repetida' && <span class="etq laranja pq">repetida</span>}
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })
+      }
+    </Diagrama>
+  </div>
+</div>
+
+<style>
+  .colecao {
+    container-type: inline-size;
+  }
+
+  .composicao.estreita {
+    display: none;
+  }
+
+  @container (max-width: 679px) {
+    .composicao.larga {
+      display: none;
+    }
+
+    .composicao.estreita {
+      display: block;
+    }
+  }
+
+  .rotuloLinha {
+    display: flex;
+    align-items: center;
+  }
+
+  .slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: calc(var(--u) * 2);
+    padding: calc(var(--u) * 6) calc(var(--u) * 4);
+  }
+
+  .slot.vazio {
+    background: transparent;
+    border: 1.5px dashed var(--d-line);
+  }
+
+  .slot.neutro {
+    color: var(--d-ink2);
+  }
+
+  .slot.selecionada {
+    border: 2px solid var(--d-blue);
+    background: linear-gradient(var(--d-blue-tint), var(--d-blue-tint)), var(--d-bg);
+  }
+
+  .slot.novo {
+    border: 2px dashed var(--d-verde);
+  }
+
+  .slot.repetida {
+    border: 2px solid var(--d-laranja);
+    background: linear-gradient(var(--d-laranja-tint), var(--d-laranja-tint)), var(--d-bg);
+  }
+
+  .etq {
+    margin-top: 2px;
+  }
+
+  /* .diagrama.plano força color no par .etq.etq (mesma especificidade); o ancestral .colecao desempata. */
+  .colecao .etq.verde {
+    color: var(--d-verde);
+    background: transparent;
+  }
+
+  .colecao .etq.laranja {
+    color: var(--d-laranja);
+    background: transparent;
+  }
+
+  .barra {
+    border-radius: 999px;
+  }
+
+  .barra.azul {
+    background: var(--d-blue);
+  }
+
+  .barra.indigo {
+    background: var(--d-indigo);
+  }
+
+  .legendaBarra {
+    color: var(--d-ink2);
+  }
+
+  .conector {
+    stroke: var(--d-laranja);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+  }
+
+  .estreita :global(.item) {
+    justify-content: flex-start;
+    gap: calc(var(--u) * 12);
+  }
+
+  .estreita :global(.item .etq) {
+    margin-top: 0;
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+import { topicName, topicRoute, type Topic } from '../../lib/topics';
+import { interfaceLanguage, ui } from '../../config/site';
+
+interface Props {
+  topic: Topic;
+  active?: boolean;
+  count?: number;
+  href?: string;
+  muted?: boolean;
+}
+
+const { topic, active = false, count, href, muted = false } = Astro.props;
+const text = ui;
+---
+
+<a
+  class="category-badge"
+  class:list={{ 'is-muted': muted }}
+  data-analytics-label={topicName(topic)}
+  lang={interfaceLanguage}
+  href={href ?? topicRoute(topic)}
+  aria-current={active ? 'page' : undefined}
+  style={`--badge-color: var(--apple-${topic.tile})`}
+>
+  <span class="category-badge__dot" aria-hidden="true"></span>
+  <span class="category-badge__label">{topicName(topic)}</span>
+
+  {count !== undefined && (
+    <span class="category-badge__count">
+      <span aria-hidden="true">·</span> {count} {count === 1 ? text.notesOne : text.notes}
+    </span>
+  )}
+</a>
+
+<style>
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    min-height: 2.75rem;
+    padding: 0.6rem 0.8rem;
+    color: var(--fg);
+    background: color-mix(in srgb, var(--badge-color) 16%, var(--canvas));
+    border-radius: var(--radius-m);
+    font: 600 0.8125rem/1.2 var(--font-ui);
+    text-decoration: none;
+  }
+  .category-badge__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .category-badge__dot {
+    flex: 0 0 0.5rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--badge-color);
+    border-radius: 50%;
+  }
+  .category-badge__count {
+    flex-shrink: 0;
+    color: var(--fg-muted);
+    font-weight: 500;
+  }
+  .category-badge:hover {
+    color: var(--fg);
+    background: color-mix(in srgb, var(--badge-color) 21%, var(--canvas));
+    text-decoration: none;
+  }
+  .category-badge[aria-current='page'] {
+    background: color-mix(in srgb, var(--badge-color) 20%, var(--canvas));
+    outline: 1px solid color-mix(in srgb, var(--badge-color) 58%, var(--canvas));
+  }
+  @media (prefers-color-scheme: dark) {
+    .category-badge {
+      background: color-mix(in srgb, var(--badge-color) 18%, var(--apple-gray6));
+    }
+    .category-badge:hover,
+    .category-badge[aria-current='page'] {
+      background: color-mix(in srgb, var(--badge-color) 24%, var(--apple-gray6));
+    }
+  }
+  .category-badge.is-muted {
+    background: var(--fill);
+  }
+  .category-badge.is-muted:hover {
+    background: var(--surface-hover);
+  }
+  .category-badge.is-muted .category-badge__dot {
+    background: var(--fg-muted);
+  }
+</style>

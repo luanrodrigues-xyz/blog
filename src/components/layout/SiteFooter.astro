@@ -1,0 +1,15 @@
+---
+import { interfaceLanguage, site } from '../../config/site';
+---
+
+<footer class="site-footer shell" lang={interfaceLanguage} transition:name="site-footer" transition:persist>
+  <p>
+    © {new Date().getUTCFullYear()} {site.name}
+  </p>
+  <nav aria-label="Follow Luan Rodrigues">
+    {site.links.map((link) => (
+      <a href={link.href}>{link.label}</a>
+    ))}
+    <a href="/rss.xml">RSS</a>
+  </nav>
+</footer>

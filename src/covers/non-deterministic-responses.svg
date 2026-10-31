@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+svg{--fundo:#F2F2F7;--card:#fff;--neutro:#E5E5EA;--principal:#6155F5;--tinta:#E3E0FD;--texto:#564ADE;--secundario:#34C759}
+@media(prefers-color-scheme:dark){svg{--fundo:#1C1C1E;--card:#2C2C2E;--neutro:#3A3A3C;--principal:#6D7CFF;--tinta:color-mix(in srgb,var(--principal) 30%,var(--card));--texto:#8390FF;--secundario:#30D158}.sombreado{filter:none}}
+.fundo{fill:var(--fundo)}.card{fill:var(--card)}.neutro{fill:var(--neutro)}.principal{fill:var(--principal)}.tinta{fill:var(--tinta)}.linha{fill:none;stroke:var(--principal);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.interrompida{fill:none;stroke:var(--neutro);stroke-width:4;stroke-dasharray:8 12;stroke-linecap:round}.aprovacao{fill:none;stroke:var(--secundario);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.rotulo{fill:var(--texto);font:600 25px SF Mono,ui-monospace,Menlo,monospace}
+</style>
+<defs><filter id="sombra" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity=".07"/></filter></defs>
+<rect class="fundo" width="1200" height="630"/>
+<!-- A rejected generated answer leaves the existing search intact. -->
+<rect class="card" x="336" y="168" width="176" height="144" rx="32"/>
+<rect class="tinta" x="360" y="192" width="128" height="14" rx="7"/>
+<rect class="neutro" x="360" y="232" width="96" height="14" rx="7"/>
+<path class="linha" d="M528 240H584M608 224l32 32m0-32-32 32"/>
+<rect class="card" x="704" y="168" width="160" height="296" rx="32"/>
+<rect class="tinta" x="728" y="192" width="112" height="24" rx="8"/>
+<rect class="neutro" x="728" y="256" width="112" height="14" rx="7"/>
+<rect class="neutro" x="728" y="296" width="88" height="14" rx="7"/>
+<rect class="neutro" x="728" y="336" width="112" height="14" rx="7"/>
+<!-- The manual route stays available. -->
+<rect class="principal" x="336" y="384" width="176" height="80" rx="24"/>
+<rect class="card" x="360" y="408" width="96" height="14" rx="7"/>
+<path class="aprovacao" d="M528 424H688"/>
+<path style="fill:var(--secundario)" d="m680 416 16 8-16 8z"/>
+</svg>

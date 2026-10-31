@@ -1,0 +1,121 @@
+---
+// O débito exige var na cópia struct. Na class, ambas as referências alcançam um só saldo.
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+---
+
+<div class="comparacao">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const largo = layout === 'lado';
+    const h = largo ? 100 : 180;
+    const w = largo ? 460 : 960;
+    const y2 = largo ? 20 : 690;
+    const x2 = largo ? 520 : 20;
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={largo ? 450 : 1200} minLargura={largo ? 540 : 260}>
+          <slot slot="legenda" />
+          <div class="no txt titulo" style={`--x:20;--y:20;--w:${w};--h:${largo ? 50 : 90}`}>
+            struct Conta
+          </div>
+          {[
+            { nome: 'let doResumo', saldo: '150_000' },
+            { nome: 'var doExtrato', saldo: '141_050' },
+          ].map((v, i) => (
+            <div class="no caixa" style={`--x:20;--y:${(largo ? 90 : 130) + i * (h + 30)};--w:${w};--h:${h}`}>
+              <div class="t4">{v.nome}</div>
+              <div class:list={['t4', { mudou: i === 1 }]}>saldo: {v.saldo}</div>
+            </div>
+          ))}
+          <div class="no txt nota" style={`--x:20;--y:${largo ? 350 : 560};--w:${w};--h:${largo ? 70 : 100}`}>
+            o débito altera apenas a cópia
+          </div>
+          <div class="no txt titulo" style={`--x:${x2};--y:${y2};--w:${w};--h:${largo ? 50 : 90}`}>
+            class Conta
+          </div>
+          {['doResumo', 'doExtrato'].map((nome, i) => (
+            <div
+              class="no nome t4"
+              style={`--x:${x2};--y:${y2 + (largo ? 70 : 110) + i * (largo ? 90 : 140)};--w:${largo ? 150 : 370};--h:${largo ? 60 : 100}`}
+            >
+              {nome}
+            </div>
+          ))}
+          <div
+            class="no caixa objeto"
+            style={`--x:${x2 + (largo ? 220 : 470)};--y:${y2 + (largo ? 70 : 120)};--w:${largo ? 240 : 490};--h:${largo ? 150 : 230}`}
+          >
+            <div class="txt titulo">um objeto Conta</div>
+            <div class="t4 mudou">saldo: 141_050</div>
+          </div>
+          <div class="no txt nota" style={`--x:${x2};--y:${y2 + (largo ? 330 : 380)};--w:${w};--h:${largo ? 70 : 100}`}>
+            as duas referências leem o mesmo saldo
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${largo ? 450 : 1200}`} aria-hidden="true" focusable="false">
+            {[0, 1].map((i) => (
+              <Seta
+                tipo="neutra"
+                x1={x2 + (largo ? 160 : 380)}
+                y1={y2 + (largo ? 100 : 160) + i * (largo ? 90 : 140)}
+                x2={x2 + (largo ? 210 : 460)}
+                y2={y2 + (largo ? 100 : 170) + i * (largo ? 90 : 120)}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .comparacao {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .caixa {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 18);
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+  .nome {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--d-line);
+  }
+  .titulo {
+    font-weight: 600;
+  }
+  .no.titulo,
+  .nota {
+    display: flex;
+    align-items: center;
+  }
+  .nota {
+    color: var(--d-ink2);
+  }
+  .mudou {
+    font-weight: 600;
+  }
+  .t4 {
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import AreaLinks from '../shared/AreaLinks.astro';
+import { homeContent } from '../../lib/home';
+import { interfaceLanguage, ui } from '../../config/site';
+
+import LatestArticleCard from './LatestArticleCard.astro';
+
+interface Props {
+  entry: CollectionEntry<'sitePages'>;
+}
+
+const { entry } = Astro.props;
+const text = ui;
+const { articles, latest } = await homeContent();
+---
+
+<section class="home-intro">
+  <h1>{entry.data.heroTitle}</h1>
+  <p class="lead">{entry.data.intro ?? entry.data.description}</p>
+  {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
+</section>
+
+{latest.length > 0 && (
+  <section class="home-featured" aria-labelledby="featured-title">
+    <header class="notes-head" lang={interfaceLanguage}>
+      <h2 id="featured-title">Latest articles</h2>
+    </header>
+    <div class="featured-grid">
+      {latest.map((article, index) => (
+        <LatestArticleCard article={article} priority={index === 0} />
+      ))}
+    </div>
+  </section>
+)}
+
+<section class="home-topics" aria-labelledby="home-topics-title">
+  <h2 id="home-topics-title">Explore by area</h2>
+  <AreaLinks articles={articles} />
+</section>
+
+<p class="home-all-articles" lang={interfaceLanguage}>
+  <a href={text.articlesUrl}>{text.allArticles} →</a>
+</p>
+
+<style>
+  .home-featured {
+    margin-bottom: var(--space-10);
+  }
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+  @media (max-width: 599px) {
+    .featured-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .home-topics {
+    margin-bottom: var(--space-10);
+  }
+  .home-topics h2 {
+    margin: 0 0 var(--space-4);
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+  }
+  .home-all-articles {
+    margin: 0 0 var(--space-12);
+  }
+</style>

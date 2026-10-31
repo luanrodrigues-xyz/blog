@@ -1,0 +1,161 @@
+:root {
+  /* Colors */
+  --apple-red: #ff383c;
+  --apple-orange: #ff8d28;
+  --apple-yellow: #ffcc00;
+  --apple-green: #34c759;
+  --apple-mint: #00c8b3;
+  --apple-teal: #00c3d0;
+  --apple-cyan: #00c0e8;
+  --apple-blue: #0088ff;
+  --apple-indigo: #6155f5;
+  --apple-purple: #cb30e0;
+  --apple-pink: #ff2d55;
+  --apple-brown: #ac7f5e;
+
+  /* Grays */
+  --apple-gray: #8e8e93;
+  --apple-gray2: #aeaeb2;
+  --apple-gray3: #c7c7cc;
+  --apple-gray4: #d1d1d6;
+  --apple-gray5: #e5e5ea;
+  --apple-gray6: #f2f2f7;
+
+  /* Text colors */
+  --apple-red-text: #c61226;
+  --apple-orange-text: #a74700;
+  --apple-yellow-text: #915f00;
+  --apple-green-text: #00742b;
+  --apple-mint-text: #007163;
+  --apple-teal-text: #006e81;
+  --apple-cyan-text: #006b94;
+  --apple-blue-text: #1a5ecf;
+  --apple-indigo-text: #564ade;
+  --apple-purple-text: #9e2aaf;
+  --apple-pink-text: #c40f41;
+  --apple-brown-text: #7f5d45;
+  --apple-gray-text: #616165;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Colors */
+    --apple-red: #ff4245;
+    --apple-orange: #ff9230;
+    --apple-yellow: #ffd600;
+    --apple-green: #30d158;
+    --apple-mint: #00dac3;
+    --apple-teal: #00d2e0;
+    --apple-cyan: #3cd3fe;
+    --apple-blue: #0091ff;
+    --apple-indigo: #6d7cff;
+    --apple-purple: #db34f2;
+    --apple-pink: #ff375f;
+    --apple-brown: #b78a66;
+
+    /* Grays */
+    --apple-gray: #8e8e93;
+    --apple-gray2: #636366;
+    --apple-gray3: #48484a;
+    --apple-gray4: #3a3a3c;
+    --apple-gray5: #2c2c2e;
+    --apple-gray6: #1c1c1e;
+
+    /* Text colors */
+    --apple-red-text: #ff686a;
+    --apple-orange-text: #ff9230;
+    --apple-yellow-text: #ffd600;
+    --apple-green-text: #30d158;
+    --apple-mint-text: #00dac3;
+    --apple-teal-text: #00d2e0;
+    --apple-cyan-text: #3cd3fe;
+    --apple-blue-text: #1a9cff;
+    --apple-indigo-text: #8390ff;
+    --apple-purple-text: #e25df5;
+    --apple-pink-text: #ff5f7f;
+    --apple-brown-text: #be9675;
+    --apple-gray-text: #aeaeb2;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    /* Colors */
+    --apple-red: #e9152d;
+    --apple-orange: #c55300;
+    --apple-yellow: #a16a00;
+    --apple-green: #008932;
+    --apple-mint: #008575;
+    --apple-teal: #008198;
+    --apple-cyan: #007eae;
+    --apple-blue: #1e6ef4;
+    --apple-indigo: #564ade;
+    --apple-purple: #b02fc2;
+    --apple-pink: #e7124d;
+    --apple-brown: #956d51;
+
+    /* Grays */
+    --apple-gray: #6c6c70;
+    --apple-gray2: #8e8e93;
+    --apple-gray3: #aeaeb2;
+    --apple-gray4: #bcbcc0;
+    --apple-gray5: #d8d8dc;
+    --apple-gray6: #ebebf0;
+
+    /* Text colors */
+    --apple-red-text: #8c0d1b;
+    --apple-orange-text: #803600;
+    --apple-yellow-text: #694500;
+    --apple-green-text: #005921;
+    --apple-mint-text: #00564c;
+    --apple-teal-text: #005463;
+    --apple-cyan-text: #005271;
+    --apple-blue-text: #14489f;
+    --apple-indigo-text: #4138a7;
+    --apple-purple-text: #7b2188;
+    --apple-pink-text: #8b0b2e;
+    --apple-brown-text: #614735;
+    --apple-gray-text: #4c4c4e;
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root {
+    /* Colors */
+    --apple-red: #ff6165;
+    --apple-orange: #ffa056;
+    --apple-yellow: #fedf43;
+    --apple-green: #4ad968;
+    --apple-mint: #54dfcb;
+    --apple-teal: #3bddec;
+    --apple-cyan: #6dd9ff;
+    --apple-blue: #5cb8ff;
+    --apple-indigo: #a7aaff;
+    --apple-purple: #ea8dff;
+    --apple-pink: #ff8ac4;
+    --apple-brown: #dba679;
+
+    /* Grays */
+    --apple-gray: #aeaeb2;
+    --apple-gray2: #7c7c80;
+    --apple-gray3: #545456;
+    --apple-gray4: #444446;
+    --apple-gray5: #363638;
+    --apple-gray6: #1c1c1e;
+
+    /* Text colors */
+    --apple-red-text: #ffa0a3;
+    --apple-orange-text: #ffb880;
+    --apple-yellow-text: #fedf43;
+    --apple-green-text: #6ee186;
+    --apple-mint-text: #65e2d0;
+    --apple-teal-text: #45dfed;
+    --apple-cyan-text: #74dbff;
+    --apple-blue-text: #8dcdff;
+    --apple-indigo-text: #c1c4ff;
+    --apple-purple-text: #f0afff;
+    --apple-pink-text: #ffadd6;
+    --apple-brown-text: #e6c1a1;
+    --apple-gray-text: #bababe;
+  }
+}

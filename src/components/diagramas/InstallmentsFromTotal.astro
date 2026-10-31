@@ -1,0 +1,185 @@
+---
+// English version of ParcelasDoTotal.astro; visible strings translated, the function call in the
+// second row mirrors the English article's installments(for:count:) signature.
+// 24_999 / 6 produz seis parcelas base de 4_166 e deixa resto 3.
+// installments(of:into:) distribui um centavo extra para as três primeiras parcelas.
+// As larguras são esquemáticas e não representam proporção de valor.
+
+import Diagrama from './Diagrama.astro';
+
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+
+const larguraCelula = 140;
+const passo = 155;
+
+const x = (i: number) => 20 + i * passo;
+
+const linhas = [
+  {
+    y: 20,
+    codigo: '24_999 / 6',
+    valores: ['4_166', '4_166', '4_166', '4_166', '4_166', '4_166'],
+    soma: 'sum 24_996',
+    resto: 'remainder 3',
+    distribuida: false,
+  },
+  {
+    y: 235,
+    codigo: 'installments(for: 24_999, count: 6) -> Optional<[Int]>',
+    valores: ['4_167', '4_167', '4_167', '4_166', '4_166', '4_166'],
+    soma: 'sum 24_999',
+    resto: null,
+    distribuida: true,
+  },
+];
+---
+
+<Diagrama plano rotulo={label} altura={455} minLargura={300}>
+  <slot slot="legenda" />
+
+  {linhas.map((linha) => (
+    <>
+      <span
+        class="no t3 rotulo"
+        style={`
+          --x:20;
+          --y:${linha.y};
+          --w:960;
+          --h:48;
+        `}
+      >
+        {linha.codigo}
+      </span>
+
+      {linha.valores.map((valor, i) => (
+        <span
+          class:list={[
+            'no cel t3',
+            {
+              recebeu: linha.distribuida && i < 3,
+            },
+          ]}
+          style={`
+            --x:${x(i)};
+            --y:${linha.y + 58};
+            --w:${larguraCelula};
+            --h:72;
+          `}
+        >
+          {valor}
+        </span>
+      ))}
+
+      <span
+        class="no txt soma"
+        style={`
+          --x:20;
+          --y:${linha.y + 142};
+          --w:300;
+          --h:40;
+        `}
+      >
+        {linha.soma}
+      </span>
+
+      {linha.resto && (
+        <span
+          class="no resto txt"
+          style={`
+            --x:690;
+            --y:${linha.y + 128};
+            --w:210;
+            --h:44;
+          `}
+        >
+          {linha.resto}
+        </span>
+      )}
+
+      {linha.distribuida && (
+        <>
+          <span
+            class="no txt distribuicao"
+            style={`
+              --x:430;
+              --y:${linha.y + 142};
+              --w:470;
+              --h:40;
+            `}
+          >
+            +1 cent on the first three
+          </span>
+          <span
+            class="no txt tipo-retorno"
+            style={`
+              --x:20;
+              --y:${linha.y + 186};
+              --w:360;
+              --h:28;
+            `}
+          >
+            returns Optional&lt;[Int]&gt;
+          </span>
+        </>
+      )}
+    </>
+  ))}
+</Diagrama>
+
+<style>
+  .rotulo,
+  .soma,
+  .distribuicao,
+  .resto,
+  .tipo-retorno {
+    display: flex;
+    align-items: center;
+  }
+
+  .soma {
+    color: var(--d-ink2);
+  }
+
+  .distribuicao {
+    justify-content: flex-end;
+    color: var(--d-blue);
+  }
+
+  .tipo-retorno {
+    font-size: 0.85em;
+    color: var(--d-ink2);
+    opacity: 0.9;
+  }
+
+  .cel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+
+  .cel.recebeu {
+    background:
+      linear-gradient(
+        var(--d-blue-tint),
+        var(--d-blue-tint)
+      ),
+      var(--d-card);
+
+    border: 2px solid var(--d-blue);
+  }
+
+  .resto {
+    justify-content: center;
+
+    background: var(--d-bg);
+    border: 1.5px dashed var(--d-line);
+    color: var(--d-ink);
+  }
+</style>

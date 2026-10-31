@@ -1,0 +1,60 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'The input array contains Dawn, Echo and Night. Filtering availability removes Echo and keeps Dawn before Night. Sorting the retained songs by duration moves Night, 180 seconds, before Dawn, 240 seconds. Mapping to titles returns Night then Dawn. Sorting uses song fields before mapping removes them.';
+const stages = [
+  { operation: 'Input · [Song]', values: 'Dawn · Echo · Night', detail: '3 songs in catalog order' },
+  { operation: 'filter · [Song]', values: 'Dawn · Night', detail: '2 available songs, input order' },
+  { operation: 'sorted · [Song]', values: 'Night · Dawn', detail: '180 seconds before 240 seconds' },
+  { operation: 'map · [String]', values: '"Night" · "Dawn"', detail: '2 titles, duration order' },
+];
+---
+
+<div class="song-pipeline">
+  {[true, false].map((wide) => {
+    const gap = wide ? 270 : 430;
+    const boxHeight = wide ? 180 : 290;
+    const height = wide ? 1080 : 1720;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          {stages.map((stage, i) => (
+            <div class="no nodo" style={`--x:32;--y:${32 + i * gap};--w:936;--h:${boxHeight}`}>
+              <span class="pq heading">{stage.operation}</span>
+              <span class="t4">{stage.values}</span>
+              <span class="pq">{stage.detail}</span>
+            </div>
+          ))}
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {[0, 1, 2].map((i) => (
+              <Seta tipo="neutra" x1={500} y1={32 + i * gap + boxHeight} x2={500} y2={30 + (i + 1) * gap} />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .song-pipeline {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

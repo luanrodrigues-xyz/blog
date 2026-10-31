@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --neutro:#E5E5EA; --principal:#0088FF; --texto:#005FB3; --destaque:#FF383C; }
+    @media(prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --neutro:#3A3A3C; --principal:#35A4FF; --texto:#B8DEFF; --destaque:#FF4245; }
+      .sombreado {filter:none;}
+    }
+    .fundo {fill:var(--fundo);} .card {fill:var(--card);} .neutro {fill:var(--neutro);}
+    .principal {fill:var(--principal);} .texto {fill:var(--texto);font:600 24px 'SF Mono',ui-monospace,Menlo,monospace;}
+    .linha {fill:none;stroke:var(--principal);stroke-width:4;stroke-linecap:round;}
+    .bloqueada {fill:none;stroke:var(--destaque);stroke-width:4;stroke-linecap:round;}
+  </style>
+  <defs><filter id="sombra" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- The array is reached through the queue's operation. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="320" y="208" width="168" height="104" rx="24"/>
+    <rect class="card" x="568" y="144" width="312" height="336" rx="32"/>
+  </g>
+  <text class="texto" x="344" y="268">enqueue</text>
+  <text class="texto" x="608" y="216">songIDs</text>
+  <rect class="principal" x="608" y="252" width="224" height="14" rx="7"/>
+  <rect class="neutro" x="608" y="308" width="176" height="14" rx="7"/>
+  <rect class="neutro" x="608" y="364" width="224" height="14" rx="7"/>
+  <path class="linha" d="M488 260H584"/><path class="principal" d="M584 252L600 260L584 268Z"/>
+  <!-- Direct writing stops before the property boundary. -->
+  <rect class="neutro" x="328" y="392" width="112" height="14" rx="7"/>
+  <path class="bloqueada" d="M456 400H536M528 388L552 412M552 388L528 412"/>
+</svg>

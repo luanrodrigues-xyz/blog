@@ -1,0 +1,19 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+---
+<Diagrama plano altura={1080} minLargura={300} rotulo="ComponentView recebe um ScreenComponent e descreve um controle nativo. Ao ativar Button, a closure onAction envia ArticleAction para handle, que atualiza feedback. Descrever o botão não executa a ação.">
+  <div class="no nodo" style="--x:80; --y:40; --w:840; --h:160"><span class="t3">ScreenComponent.button</span><span class="pq ink2">título e ArticleAction</span></div>
+  <div class="no nodo" style="--x:80; --y:310; --w:840; --h:160"><span class="t3">ComponentView → Button</span><span class="pq ink2">descreve o controle nativo</span></div>
+  <div class="no nodo" style="--x:80; --y:650; --w:840; --h:160"><span class="t3">onAction(model.action)</span><span class="pq ink2">somente ao ativar o botão</span></div>
+  <div class="no nodo" style="--x:80; --y:900; --w:840; --h:130"><span class="t3">handle → feedback</span></div>
+  <span class="no pq activation" style="--x:600; --y:500; --w:320; --h:110">ativação</span>
+  <svg class="setas" viewBox="0 0 1000 1080" aria-hidden="true">
+    <Seta x1={500} y1={200} x2={500} y2={310} tipo="neutra" />
+    <Seta x1={500} y1={470} x2={500} y2={650} tipo="neutra" />
+    <Seta x1={500} y1={810} x2={500} y2={900} tipo="neutra" />
+  </svg>
+</Diagrama>
+<style>
+  .activation { display: flex; align-items: center; }
+</style>

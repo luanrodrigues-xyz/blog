@@ -1,0 +1,53 @@
+---
+// Régua de medida horizontal. `ativa`: linha sólida e cápsula preenchida; `ref`: tracejada, só contorno.
+interface Props {
+  x: number;
+  y: number;
+  w: number;
+  rotulo?: string;
+  tipo?: 'ativa' | 'ref';
+}
+const { x, y, w, rotulo = '', tipo = 'ativa' } = Astro.props;
+---
+
+<div class={`regua ${tipo}`} style={`--x:${x}; --y:${y}; --w:${w}`}>
+  {rotulo && <span class={`cap ${tipo}`}>{rotulo}</span>}
+</div>
+
+<style>
+  .regua {
+    position: absolute;
+    left: calc(var(--x) * 0.1%);
+    top: calc(var(--y) / var(--H) * 100%);
+    width: calc(var(--w) * 0.1%);
+    border-top: 1.5px solid var(--d-ink);
+  }
+  .regua.ref {
+    border-top: 1.5px dashed var(--d-ink3);
+  }
+  .regua::before,
+  .regua::after {
+    content: '';
+    position: absolute;
+    top: -7px;
+    height: 12px;
+    border-left: 1.5px solid currentColor;
+    color: var(--d-ink);
+  }
+  .regua.ref::before,
+  .regua.ref::after {
+    color: var(--d-ink3);
+  }
+  .regua::before {
+    left: 0;
+  }
+  .regua::after {
+    right: 0;
+  }
+  span {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -50%);
+  }
+</style>

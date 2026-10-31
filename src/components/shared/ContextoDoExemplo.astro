@@ -1,0 +1,67 @@
+---
+interface Props {
+  titulo: string;
+}
+const { titulo } = Astro.props;
+---
+
+<aside class="example-context" aria-label={titulo}>
+  <span class="example-context__icon" aria-hidden="true">
+    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="3" />
+      <path d="M10 5h4M10 19h4M9 10l-2 2 2 2m6-4 2 2-2 2" />
+    </svg>
+  </span>
+  <div class="example-context__content">
+    <strong class="example-context__title">{titulo}</strong>
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .example-context {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-6);
+    margin-block: var(--space-8);
+    border: 1px solid color-mix(in srgb, var(--apple-indigo) 22%, var(--border));
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--apple-indigo) 7%, var(--canvas));
+  }
+  .example-context__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    color: var(--apple-indigo-text);
+    background: color-mix(in srgb, var(--apple-indigo) 13%, var(--canvas));
+  }
+  .example-context__title {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--fg);
+    font-size: var(--text-base);
+  }
+  .example-context__content :global(p) {
+    margin: 0;
+    color: var(--fg-muted);
+    font-size: var(--text-base);
+    line-height: 1.65;
+  }
+  .example-context__content :global(a) {
+    color: var(--apple-indigo-text);
+  }
+  @media (max-width: 479px) {
+    .example-context {
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--space-4);
+    }
+  }
+  @media (prefers-contrast: more) {
+    .example-context {
+      border-color: var(--apple-indigo-text);
+    }
+  }
+</style>

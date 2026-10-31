@@ -1,0 +1,58 @@
+{
+  "name": "swift-decodificado",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run tests",
+    "test:browser": "node scripts/check-site-experience.mjs",
+    "new": "node scripts/new-article.mjs",
+    "covers": "node scripts/make-covers.mjs",
+    "publicar": "node scripts/publish-article.mjs",
+    "despublicar": "node scripts/publish-article.mjs --undo",
+    "exemplo": "node scripts/examples.mjs novo",
+    "testar-exemplos": "node scripts/examples.mjs testar",
+    "conferir-exemplos": "node scripts/examples.mjs conferir",
+    "auditar-diagramas": "node scripts/audit-diagrams.mjs",
+    "postinstall": "puppeteer browsers install chrome && puppeteer browsers install chrome-headless-shell",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "auditar-editorial": "node scripts/audit-editorial.mjs",
+    "postbuild": "node scripts/compress-site.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "0.4.2",
+    "@astrojs/mdx": "8.0.2",
+    "astro": "7.3.5",
+    "github-slugger": "2.0.0",
+    "highlight.js": "11.11.1",
+    "satteri": "0.10.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@eslint/js": "10.0.1",
+    "@types/node": "^22.20.4",
+    "eslint": "10.11.0",
+    "eslint-plugin-astro": "3.2.1",
+    "globals": "17.12.0",
+    "htmlparser2": "10.0.0",
+    "prettier": "3.9.9",
+    "prettier-plugin-astro": "1.1.0",
+    "puppeteer": "25.12.0",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.70.1",
+    "vitest": "3.2.7"
+  },
+  "overrides": {
+    "lodash-es": "4.18.1",
+    "nanoid@3.3.3": "3.3.19",
+    "nanoid@4.0.2": "5.1.16"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "type": "module"
+}

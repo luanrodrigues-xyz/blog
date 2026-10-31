@@ -1,0 +1,202 @@
+---
+title: "Functions. What does the signature promise before the body?"
+description: "debit(2_500, from: &balance). Before opening the function, the & already tells us that balance can come back with a different value."
+date: "2023-02-01"
+topic: "swift"
+readingOrder: 3
+draft: false
+cover: "funcoes-em-swift.png"
+coverAlt: "Two calls start from the same balance. In the first one, the result comes back from the function and something outside stores it. In the second one, the call returns and updates the balance itself."
+tags: ["Swift", "Functions", "inout", "Fundamentals"]
+language: "en"
+translationKey: "functions-in-swift"
+---
+
+import FontesDoArtigo from '../../../../../src/components/shared/FontesDoArtigo.astro';
+import WhoWritesTheBalance from '../../../../../src/components/diagramas/WhoWritesTheBalance.astro';
+
+I like when a function call already tells me part of what can happen before I need to open the implementation.
+
+```swift fragment
+debit(2_500, from: &balance)
+```
+
+`2_500` goes in without a label. `from:` gives context to the second argument. And the `&` before `balance` gets more attention than both.
+
+It tells us, in the call itself, that this variable can come back with a different value.
+
+## The signature behind the call
+
+Swift separates the name used in the call from the name used inside the function.
+
+```swift
+func debit(_ amount: Int, from balance: inout Int) {
+    balance -= amount
+}
+
+var balance = 150_000
+
+debit(2_500, from: &balance)
+
+print(balance) // 147500
+
+// debit(2_500, from: balance) // Error — missing &
+// debit(2_500, &balance) // Error — missing from label
+```
+
+Here, `from` is the argument label and `balance` is the parameter name. The `_` in the first parameter removes the label from that position.
+
+So the call looks like this:
+
+```swift
+debit(2_500, from: &balance)
+```
+
+instead of:
+
+```swift
+debit(amount: 2_500, balance: &balance)
+```
+
+In this case, I prefer the first one. `debit(2_500, from: &balance)` already describes the operation well without opening the function body.
+
+`inout` is what requires the `&`. Without it, the compiler rejects the call.
+
+```bash
+passing value of type 'Int' to an inout parameter
+requires explicit '&'
+```
+
+Inside the function, `balance` can receive another value. When the call ends, this result is written back to the variable passed by the caller.
+
+This is also why a `let` cannot be used as an `inout` argument.
+
+```swift
+func debit(_ amount: Int, from balance: inout Int) {
+    balance -= amount
+}
+
+let limit = 500_000
+
+// debit(2_500, from: &limit) // Error — limit is let
+
+print(limit) // 500000
+```
+
+The compiler does not allow a function call to break the guarantee made by `let`.
+
+```bash
+cannot pass immutable value as
+inout argument: 'limit' is a 'let' constant
+```
+
+It is the same idea from the [article about let and var](/articles/let-and-var-in-swift/), but now it appears at the boundary of a function.
+
+## Without `inout`, someone needs to receive the result
+
+The same operation can be written without changing the argument.
+
+```swift
+func debited(_ amount: Int, from balance: Int) -> Int {
+    return balance - amount
+}
+
+var balance = 150_000
+
+balance = debited(2_500, from: balance)
+
+print(balance) // 147500
+```
+
+In this case, the `balance` parameter cannot be assigned a new value inside the function.
+
+```swift
+func debited(_ amount: Int, from balance: Int) -> Int {
+    // balance -= amount // Error
+    return balance - amount
+}
+```
+
+Function parameters are constants by default. The function receives the value, calculates another value, and returns it with `-> Int`.
+
+The difference appears outside the function.
+
+With a return value:
+
+```swift
+balance = debited(2_500, from: balance)
+```
+
+the caller receives the new value and decides to store it.
+
+With `inout`:
+
+```swift
+debit(2_500, from: &balance)
+```
+
+the call itself already says that `balance` is part of the operation as something that can be updated.
+
+<WhoWritesTheBalance label="With a return value, debited receives the balance value and returns 147_500, and the caller stores the result. With inout, debit receives &balance and, when the call ends, the new value 147_500 goes back to balance.">
+
+Both versions end with `147_500`.
+
+The blue arrows show the value going into the function. The dashed arrows show the result coming back.
+
+What changes is who writes the final value into `balance`.
+
+</WhoWritesTheBalance>
+
+## I would start with a return value
+
+Both forms work, but they leave different decisions to the caller.
+
+With a return value, I can calculate a new balance without changing the original one.
+
+```swift
+func debited(_ amount: Int, from balance: Int) -> Int {
+    balance - amount
+}
+
+let balance = 150_000
+let simulation = debited(40_000, from: balance)
+
+print(simulation) // 110000
+print(balance) // 150000
+```
+
+This fits well on a confirmation screen. I can show how much money would remain after the purchase without changing the current balance.
+
+If I call `debited` and ignore the result, the compiler also warns me about it.
+
+```swift
+debited(40_000, from: balance)
+// warning — result of call is unused
+```
+
+With `inout`, the intention is different. The function exists to update the value that was passed in.
+
+```swift
+var balance = 150_000
+
+debit(40_000, from: &balance)
+
+print(balance) // 110000
+```
+
+The Swift API Design Guidelines use pairs like `sort()` and `sorted()` to separate operations that change the value itself from operations that return a new value.
+
+I would follow the same idea here.
+
+I would start with a function that returns a new value when the caller still needs to decide what to do with it. I would use `inout` when updating that variable is part of the operation contract.
+
+What I like is that this is not hidden inside the function. The `&` appears exactly where the effect matters: in the call.
+
+<FontesDoArtigo>
+
+For anyone who wants to read more:
+
+- [Functions](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/functions/)
+- [API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/)
+
+</FontesDoArtigo>

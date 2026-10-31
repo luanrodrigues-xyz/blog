@@ -1,0 +1,99 @@
+---
+// Dois lugares para o init? produzem conjuntos diferentes de caminhos de criação.
+import Diagrama from './Diagrama.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const paineis = [
+  {
+    titulo: 'init? no corpo da struct',
+    linhas: [
+      { codigo: 'init?(id:…)', resultado: 'id -1 → nil', tom: 'confere' },
+      { codigo: 'memberwise', resultado: 'não existe', tom: 'ausente' },
+    ],
+  },
+  {
+    titulo: 'init? numa extension',
+    linhas: [
+      { codigo: 'init?(validandoId:…)', resultado: 'id -1 → nil', tom: 'confere' },
+      { codigo: 'memberwise', resultado: 'id -1 → Transacao', tom: 'furo' },
+    ],
+  },
+];
+---
+
+<div class="comparacao">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const largo = layout === 'lado';
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama plano rotulo={rotulo} altura={largo ? 450 : 1420} minLargura={largo ? 540 : 260}>
+          <slot slot="legenda" />
+          {paineis.map((p, i) => {
+            const x = largo ? 20 + i * 500 : 20;
+            const y = largo ? 20 : 20 + i * 720;
+            const w = largo ? 460 : 960;
+            return (
+              <>
+                <div class="no txt titulo" style={`--x:${x};--y:${y};--w:${w};--h:${largo ? 70 : 110}`}>
+                  {p.titulo}
+                </div>
+                {p.linhas.map((l, j) => (
+                  <div
+                    class={`no linha ${l.tom}`}
+                    style={`--x:${x};--y:${y + (largo ? 90 : 150) + j * (largo ? 170 : 270)};--w:${w};--h:${largo ? 150 : 230}`}
+                  >
+                    <div class="t4">{l.codigo}</div>
+                    <div class="txt">{l.resultado}</div>
+                  </div>
+                ))}
+              </>
+            );
+          })}
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .comparacao {
+    container-type: inline-size;
+  }
+  .composicao.pilha {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .composicao.lado {
+      display: none;
+    }
+    .composicao.pilha {
+      display: block;
+    }
+  }
+  .titulo {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+  .linha {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(var(--u) * 6);
+    padding: 0 calc(var(--u) * 20);
+    border: 1px solid var(--d-line);
+    background: var(--d-card);
+  }
+  .linha.furo {
+    border: 2px solid var(--d-vermelho);
+    background: color-mix(in srgb, var(--d-vermelho) 10%, var(--d-bg));
+  }
+  .linha.ausente {
+    border-style: dashed;
+    background: var(--d-bg);
+  }
+  .t4 {
+    overflow-wrap: anywhere;
+  }
+</style>

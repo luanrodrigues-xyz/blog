@@ -1,0 +1,34 @@
+---
+// Ciclo de referências fortes (artigo arc-em-swift): depois de pedirCodigo(), o fluxo tem duas
+// referências fortes (a variável e a propriedade fluxo da tela) e a tela, uma. `fluxo = nil` tira só a
+// da variável; as duas que sobram formam o ciclo, e nenhuma contagem chega a zero.
+import ReferenciasDoLogin, { type Painel } from './ReferenciasDoLogin.astro';
+interface Props {
+  rotulo: string;
+}
+const { rotulo } = Astro.props;
+const paineis: Painel[] = [
+  {
+    titulo: 'depois de <code>pedirCodigo()</code>',
+    resultado: 'O fluxo tem duas referências fortes',
+    fluxo: 'aponta',
+    objetoFluxo: { vivo: true, linhas: ['referências fortes: 2'] },
+    objetoTela: { vivo: true, linhas: ['referências fortes: 1'] },
+    ida: true,
+    volta: 'forte',
+  },
+  {
+    titulo: 'depois de <code>fluxo = nil</code>',
+    resultado: 'Ninguém de fora aponta; os dois continuam vivos',
+    fluxo: 'nil',
+    objetoFluxo: { vivo: true, linhas: ['referências fortes: 1'] },
+    objetoTela: { vivo: true, linhas: ['referências fortes: 1'] },
+    ida: true,
+    volta: 'forte',
+  },
+];
+---
+
+<ReferenciasDoLogin rotulo={rotulo} paineis={paineis}>
+  <slot />
+</ReferenciasDoLogin>

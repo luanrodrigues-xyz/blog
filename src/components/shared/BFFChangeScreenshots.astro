@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+import original from '../../../contents/notebook/architecture/demonstrating-bff-changes-in-an-old-ios-app/pt-br/original.png';
+import reordered from '../../../contents/notebook/architecture/demonstrating-bff-changes-in-an-old-ios-app/pt-br/reordered.png';
+import optionalVideo from '../../../contents/notebook/architecture/demonstrating-bff-changes-in-an-old-ios-app/pt-br/optional-video.png';
+import requiredVideo from '../../../contents/notebook/architecture/demonstrating-bff-changes-in-an-old-ios-app/pt-br/required-video.png';
+interface Props { comparison: 'reorder' | 'compatibility'; }
+const { comparison } = Astro.props;
+const frames = comparison === 'reorder' ? [
+  { src: original, label: 'Composição original', alt: 'Reading tips aberto antes do botão Read article. Status Screen accepted.' },
+  { src: reordered, label: 'Após reordenar no BFF', alt: 'Read article aparece antes de Reading tips, que continua aberto. Status Screen accepted.' },
+] : [
+  { src: optionalVideo, label: 'Vídeo opcional', alt: 'Título, botão e dicas abertas permanecem. Status Screen accepted; omitted: intro-video.' },
+  { src: requiredVideo, label: 'Vídeo obrigatório', alt: 'Os componentes remotos desapareceram. This screen is unavailable e This app cannot display the response são mensagens locais.' },
+];
+---
+<figure class="bff-result">
+  <div class="comparison">
+    {frames.map(({ src, label, alt }) => <div><p>{label}</p><Image src={src} alt={alt} /></div>)}
+  </div>
+  <figcaption>Recortes do mesmo app em uma única execução no simulador iPhone 18 Pro, iOS 27.0. Mesmo enquadramento e escala; app sem recompilação durante as mudanças no BFF.</figcaption>
+</figure>
+<style>
+  .bff-result { max-width: var(--width-reading); margin-inline: auto; }
+  .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  .comparison p { font-size: var(--text-sm); margin-block: 0 0.75rem; }
+  .comparison img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: var(--text-sm); color: var(--fg-muted); margin-top: 1rem; }
+  @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,51 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getArticles, type Article } from '../lib/articles';
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+import ContentPage from '../components/shared/ContentPage.astro';
+import TopicPage from '../components/topic/TopicPage.astro';
+import { pageExists, topicRoute, topics, type Topic } from '../lib/topics';
+import { features, routeOf } from '../config/site';
+
+type RouteProps =
+  | { kind: 'article'; entry: Article }
+  | { kind: 'page'; entry: CollectionEntry<'sitePages'> }
+  | { kind: 'topic'; topic: Topic; articles: Article[] };
+
+export async function getStaticPaths() {
+  function pathFor(canonical: string | undefined, id: string): string {
+    const pathname = canonical ? new URL(canonical).pathname : routeOf(id);
+    return pathname.replace(/^\/+|\/+$/g, '');
+  }
+
+  // Rascunho nunca tem página, nem no `astro dev`: sem URL para revisar, a prévia é o próprio arquivo.
+  const [articles, pages] = await Promise.all([getArticles(({ data }) => !data.draft), getCollection('sitePages')]);
+  const articlePaths = articles.flatMap((entry) => {
+    const slug = pathFor(entry.data.canonical, entry.id);
+    return slug ? [{ params: { slug }, props: { entry, kind: 'article' as const } }] : [];
+  });
+  const pagePaths = pages.flatMap((entry) => {
+    const { data } = entry;
+    if (data.isHome) return [];
+    if (data.isLab && !features.lab) return [];
+    const slug = pathFor(data.canonical, entry.id);
+    return slug ? [{ params: { slug }, props: { entry, kind: 'page' as const } }] : [];
+  });
+  // Uma categoria por assunto, com artigos dos dois idiomas; só existe quando o assunto tem artigo publicado.
+  const published = articles.filter(({ data }) => !data.draft);
+  const topicPaths = topics
+    .filter((topic) => pageExists(published, topic))
+    .map((topic) => ({
+      params: { slug: topicRoute(topic).replace(/^\/+|\/+$/g, '') },
+      props: { kind: 'topic' as const, topic, articles: published },
+    }));
+  return [...articlePaths, ...pagePaths, ...topicPaths];
+}
+
+const props = Astro.props as RouteProps;
+const page = props.kind === 'page' ? props.entry : undefined;
+---
+
+{props.kind === 'topic' && <TopicPage topic={props.topic} articles={props.articles} />}
+{props.kind === 'article' && <ArticleLayout entry={props.entry} />}
+{page && <ContentPage entry={page} />}

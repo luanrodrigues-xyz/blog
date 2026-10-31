@@ -1,0 +1,20 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+interface Props { rotulo: string; }
+const { rotulo } = Astro.props;
+---
+<Diagrama plano rotulo={rotulo} altura={1140} minLargura={540}>
+<div class="no nodo" style="--x:64; --y:40; --w:872; --h:148"><span class="txt strong">Bean definitions</span><span class="pq">registration and definition processors</span></div>
+<div class="no nodo" style="--x:64; --y:260; --w:872; --h:148"><span class="txt strong">Construction</span><span class="pq">resolve dependencies and create object</span></div>
+<div class="no nodo" style="--x:64; --y:480; --w:872; --h:148"><span class="txt strong">Initialization</span><span class="pq">populate and process the instance</span></div>
+<div class="no nodo" style="--x:64; --y:700; --w:872; --h:148"><span class="txt strong">Exposed bean</span><span class="pq">may be a proxy</span></div>
+<div class="no nodo" style="--x:64; --y:920; --w:872; --h:148"><span class="txt strong">Context close</span><span class="pq">supported destruction callbacks</span></div>
+<svg class="setas" viewBox="0 0 1000 1140" aria-hidden="true" focusable="false">
+<Seta tipo="neutra" x1={500} y1={188} x2={500} y2={258} />
+<Seta tipo="neutra" x1={500} y1={408} x2={500} y2={478} />
+<Seta tipo="neutra" x1={500} y1={628} x2={500} y2={698} />
+<Seta tipo="neutra" x1={500} y1={848} x2={500} y2={918} />
+</svg>
+</Diagrama>
+<style>.strong { font-weight: 600; } .nodo { text-align: center; align-items: center; } .pq { color: var(--d-ink2); }</style>

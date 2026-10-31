@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+:root{--bg:#F2F2F7;--card:#fff;--neutral:#E5E5EA;--primary:#0088FF;--ink:#005FB3;--tint:#D6EAFF;--accent:#6155F5}
+@media(prefers-color-scheme:dark){:root{--bg:#1C1C1E;--card:#2C2C2E;--neutral:#3A3A3C;--primary:#35A4FF;--ink:#B8DEFF;--tint:color-mix(in srgb,var(--primary) 30%,var(--card));--accent:#A29BFF}.shadow{filter:none}}
+.bg{fill:var(--bg)}.card{fill:var(--card)}.neutral{fill:var(--neutral)}.primary{fill:var(--primary)}.tint{fill:var(--tint)}.accent{fill:var(--accent)}.line{fill:none;stroke:var(--primary);stroke-width:4;stroke-linecap:round}.label{fill:var(--ink);font:600 25px 'SF Mono',ui-monospace,Menlo,monospace}
+</style>
+<defs><filter id="sombra"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/></filter></defs>
+<rect class="bg" width="1200" height="630"/>
+<path class="line" d="M600 250V310H440V350M600 310H760V350"/>
+<g class="shadow" filter="url(#sombra)"><rect class="card" x="470" y="128" width="260" height="122" rx="32"/><rect class="card" x="330" y="350" width="220" height="152" rx="32"/><rect class="card" x="650" y="350" width="220" height="152" rx="32"/></g>
+<text class="label" x="600" y="199" text-anchor="middle">Entry</text>
+<text class="label" x="440" y="403" text-anchor="middle">Song</text>
+<text class="label" x="760" y="403" text-anchor="middle">Episode</text>
+<rect class="primary" x="362" y="428" width="156" height="14" rx="7"/><rect class="neutral" x="362" y="460" width="156" height="14" rx="7"/>
+<rect class="primary" x="682" y="428" width="156" height="14" rx="7"/><rect class="neutral" x="682" y="460" width="156" height="14" rx="7"/>
+</svg>

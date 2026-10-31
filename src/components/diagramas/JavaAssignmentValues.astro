@@ -1,0 +1,113 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+const label =
+  'After decrementing the draft, primitive variables hold independent values, available 10 and draft 9. In the Stock example, original and draft both reference one object A whose quantity is now 9. Assignment copied the reference, not the object.';
+---
+
+<div class="assignment-values">
+  {[true, false].map((wide) => {
+    const height = wide ? 680 : 1620;
+    const referenceX = wide ? 530 : 20;
+    const referenceY = wide ? 90 : 930;
+    const objectX = wide ? 790 : 580;
+    const objectY = wide ? 170 : 1000;
+    return (
+      <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+        <Diagrama plano rotulo={label} altura={height} minLargura={260}>
+          <div class="no txt heading" style={`--x:20;--y:10;--w:${wide ? 440 : 960};--h:${wide ? 60 : 120}`}>
+            Primitive values
+          </div>
+          {['available', 'draft'].map((name, i) => (
+            <div
+              class="no nodo value"
+              style={`--x:20;--y:${wide ? 90 + i * 170 : 170 + i * 240};--w:${wide ? 440 : 960};--h:${wide ? 120 : 200}`}
+            >
+              <span class="t4">int {name}</span>
+              <span class="txt">{i === 0 ? '10' : '9'}</span>
+            </div>
+          ))}
+          <div
+            class="no pq note"
+            style={`--x:20;--y:${wide ? 440 : 640};--w:${wide ? 440 : 960};--h:${wide ? 100 : 100}`}
+          >
+            Two independent numbers
+          </div>
+          <div
+            class="no txt heading"
+            style={`--x:${referenceX};--y:${wide ? 10 : 790};--w:${wide ? 450 : 960};--h:${wide ? 60 : 120}`}
+          >
+            Reference values
+          </div>
+          {['original', 'draft'].map((name, i) => (
+            <div
+              class="no nodo value"
+              style={`--x:${referenceX};--y:${referenceY + i * (wide ? 230 : 310)};--w:${wide ? 190 : 360};--h:${wide ? 120 : 180}`}
+            >
+              <span class="t4">{name}</span>
+            </div>
+          ))}
+          <div
+            class="no nodo value object"
+            style={`--x:${objectX};--y:${objectY};--w:${wide ? 190 : 400};--h:${wide ? 210 : 340}`}
+          >
+            <span class="txt">Stock A</span>
+            <span class="t4">quantity</span>
+            <span class="txt">9</span>
+          </div>
+          <div
+            class="no pq note"
+            style={`--x:${referenceX};--y:${wide ? 500 : 1460};--w:${wide ? 450 : 960};--h:${wide ? 100 : 100}`}
+          >
+            Two references, one object
+          </div>
+          <svg class="setas" viewBox={`0 0 1000 ${height}`} aria-hidden="true" focusable="false">
+            {[0, 1].map((i) => (
+              <Seta
+                tipo="neutra"
+                x1={wide ? referenceX + 195 : 385}
+                y1={referenceY + i * (wide ? 230 : 310) + (wide ? 60 : 90)}
+                x2={objectX - 5}
+                y2={objectY + (wide ? 65 + i * 80 : 100 + i * 140)}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+<style>
+  .assignment-values {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width:599px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading,
+  .note {
+    display: flex;
+    align-items: center;
+  }
+  .heading {
+    font-weight: 600;
+  }
+  .value {
+    align-items: center;
+    text-align: center;
+  }
+  .object {
+    background: var(--d-verde-tint);
+  }
+  .stacked :global(.seta line) {
+    stroke-width: 6;
+  }
+</style>

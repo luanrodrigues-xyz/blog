@@ -1,0 +1,19 @@
+---
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+---
+<Diagrama plano altura={1030} rotulo="A revisão muda no BFF. Ao tocar Reload, o mesmo app faz GET reading-screen, verifica HTTP 200 e aplica acceptScreen. Componentes aceitos chegam ao renderer nativo. Um video opcional é omitido; obrigatório recusa toda a composição e apresenta uma mensagem local.">
+  <div class="no nodo" style="--x:40; --y:40; --w:920; --h:120"><span class="txt forte">BFF: revisão da composição</span><span class="pq ink2">original → reordered → optional-video → required-video</span></div>
+  <div class="no nodo" style="--x:40; --y:250; --w:920; --h:120"><span class="t3">GET /reading-screen</span><span class="pq ink2">Reload solicita a resposta atual; não há push</span></div>
+  <div class="no nodo" style="--x:40; --y:460; --w:920; --h:120"><span class="t3">fetchScreen → acceptScreen</span><span class="pq ink2">HTTP 200 não garante uma composição compatível</span></div>
+  <div class="no nodo" style="--x:40; --y:730; --w:440; --h:220"><span class="txt forte">AcceptedScreen</span><span class="pq">ordem e IDs preservados</span><span class="pq">video opcional omitido</span><span class="pq ink2">renderer SwiftUI nativo</span></div>
+  <div class="no nodo" style="--x:520; --y:730; --w:440; --h:220"><span class="txt forte">Contrato recusado</span><span class="pq">video obrigatório</span><span class="pq">nenhuma composição parcial</span><span class="pq ink2">mensagem local de falha</span></div>
+  <svg class="setas" viewBox="0 0 1000 1030" aria-hidden="true">
+    <Seta x1={500} y1={160} x2={500} y2={250} tipo="neutra" />
+    <Seta x1={500} y1={370} x2={500} y2={460} tipo="neutra" />
+    <Seta x1={360} y1={580} x2={260} y2={730} tipo="neutra" />
+    <Seta x1={640} y1={580} x2={740} y2={730} tipo="neutra" />
+  </svg>
+  <span slot="legenda">O servidor escolhe a composição; o cliente decide se consegue aceitá-la. Em telas estreitas, role para ver os dois resultados.</span>
+</Diagrama>
+<style>.forte { font-weight: 600; }</style>

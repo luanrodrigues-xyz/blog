@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg {
+      --fundo: #F2F2F7; --card: #fff; --neutro: #E5E5EA;
+      --principal: #6155F5; --principal-texto: #564ADE; --principal-tinta: #E7E4FD; --sobre-principal: #fff;
+      --destaque: #34C759; --destaque-texto: #00742B; --destaque-tinta: #DCF5E3; --sobre-destaque: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --fundo: #1C1C1E; --card: #2C2C2E; --neutro: #3A3A3C;
+        --principal: #6D7CFF; --principal-texto: #8390FF; --principal-tinta: color-mix(in srgb, var(--principal) 22%, var(--card)); --sobre-principal: #fff;
+        --destaque: #30D158; --destaque-texto: #30D158; --destaque-tinta: color-mix(in srgb, var(--destaque) 22%, var(--card)); --sobre-destaque: #fff;
+      }
+      .sombreado { filter: none; }
+    }
+    .fundo { fill: var(--fundo); }
+    .card { fill: var(--card); }
+    .neutro { fill: var(--neutro); }
+    .principal { fill: var(--principal); }
+    .principal-tinta { fill: var(--principal-tinta); }
+    .destaque { fill: var(--destaque); }
+    .destaque-tinta { fill: var(--destaque-tinta); }
+    .linha { fill: none; stroke: var(--principal); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect class="fundo" width="1200" height="630"/>
+
+  <!-- The shared model: two properties, one card, one instance. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="508" y="96" width="184" height="152" rx="32"/>
+  </g>
+  <rect x="508" y="96" width="184" height="152" rx="32" fill="none" stroke="var(--principal)" stroke-width="3"/>
+  <rect class="neutro" x="532" y="130" width="136" height="16" rx="8"/>
+  <rect class="principal-tinta" x="532" y="166" width="136" height="16" rx="8"/>
+  <rect class="principal" x="532" y="200" width="60" height="12" rx="6"/>
+
+  <!-- Two independent reads of the same instance. -->
+  <path class="linha" d="M600 248V288H360V344"/>
+  <polygon class="principal" points="360,352 352,336 368,336"/>
+  <path class="linha" d="M600 248V288H840V344"/>
+  <polygon class="principal" points="840,352 832,336 848,336"/>
+
+  <!-- Left consumer: reads the property that did not change. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="260" y="360" width="200" height="176" rx="32"/>
+  </g>
+  <rect class="neutro" x="284" y="396" width="104" height="14" rx="7"/>
+  <rect class="neutro" x="284" y="420" width="140" height="14" rx="7"/>
+  <rect class="neutro" x="284" y="444" width="88" height="14" rx="7"/>
+  <circle class="neutro" cx="420" cy="494" r="14"/>
+
+  <!-- Right consumer: reads the property that changed, so it updates. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="card" x="740" y="360" width="200" height="176" rx="32"/>
+  </g>
+  <rect class="neutro" x="764" y="396" width="104" height="14" rx="7"/>
+  <rect class="neutro" x="764" y="420" width="140" height="14" rx="7"/>
+  <rect class="neutro" x="764" y="444" width="88" height="14" rx="7"/>
+  <circle class="destaque" cx="900" cy="494" r="14"/>
+</svg>

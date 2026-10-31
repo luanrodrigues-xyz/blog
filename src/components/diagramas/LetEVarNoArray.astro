@@ -1,0 +1,290 @@
+---
+// O mesmo append(2_000) num array guardado por let e por var.
+// Em telas largas, os dois casos aparecem lado a lado.
+// Em telas estreitas, ficam empilhados.
+
+import Diagrama from './Diagrama.astro';
+import Seta from './Seta.astro';
+
+interface Props {
+  rotulo: string;
+}
+
+const { rotulo } = Astro.props;
+
+const antes = ['10_000', '-3_000', '5_000'];
+const depois = [...antes, '2_000'];
+
+const geometria = {
+  lado: {
+    cel: 100,
+    passo: 120,
+    painel: 460,
+
+    hNome: 40,
+
+    yCel: 50,
+    hCel: 72,
+
+    yCham: 146,
+    hCham: 36,
+    wCham: 200,
+    xCham: 0,
+
+    seta: [188, 210],
+
+    yDepois: 220,
+
+    yRes: 310,
+    hRes: 56,
+
+    segundo: {
+      x0: 520,
+      y0: 20,
+    },
+
+    altura: 390,
+  },
+
+  pilha: {
+    cel: 150,
+    passo: 200,
+    painel: 960,
+
+    hNome: 52,
+
+    yCel: 64,
+    hCel: 72,
+
+    yCham: 160,
+    hCham: 42,
+    wCham: 320,
+    xCham: 0,
+
+    seta: [208, 246],
+
+    yDepois: 260,
+
+    yRes: 350,
+    hRes: 78,
+
+    segundo: {
+      x0: 20,
+      y0: 470,
+    },
+
+    altura: 920,
+  },
+};
+
+const paineis = (layout: 'lado' | 'pilha') => [
+  {
+    x0: 20,
+    y0: 20,
+    nome: 'let movimentos: [Int]',
+    depois: antes,
+    recusado: true,
+  },
+  {
+    ...geometria[layout].segundo,
+    nome: 'var extrato: [Int]',
+    depois,
+    recusado: false,
+  },
+];
+---
+
+<div class="let-e-var">
+  {(['lado', 'pilha'] as const).map((layout) => {
+    const g = geometria[layout];
+
+    return (
+      <div class={`composicao ${layout}`}>
+        <Diagrama
+          plano
+          rotulo={rotulo}
+          altura={g.altura}
+          minLargura={layout === 'lado' ? 680 : 300}
+        >
+          <slot slot="legenda" />
+
+          {paineis(layout).map((p) => (
+            <>
+              <span
+                class="no t3 nome"
+                style={`
+                  --x:${p.x0};
+                  --y:${p.y0};
+                  --w:${g.painel};
+                  --h:${g.hNome};
+                `}
+              >
+                {p.nome}
+              </span>
+
+              {antes.map((valor, i) => (
+                <span
+                  class="no cel t4"
+                  style={`
+                    --x:${p.x0 + i * g.passo};
+                    --y:${p.y0 + g.yCel};
+                    --w:${g.cel};
+                    --h:${g.hCel};
+                  `}
+                >
+                  {valor}
+                </span>
+              ))}
+
+              <span
+                class="no etq chamada"
+                style={`
+                  --x:${p.x0 + g.xCham};
+                  --y:${p.y0 + g.yCham};
+                  --w:${g.wCham};
+                  --h:${g.hCham};
+                `}
+              >
+                append(2_000)
+              </span>
+
+              {p.depois.map((valor, i) => (
+                <span
+                  class:list={[
+                    'no cel t4',
+                    {
+                      novo: i === 3,
+                    },
+                  ]}
+                  style={`
+                    --x:${p.x0 + i * g.passo};
+                    --y:${p.y0 + g.yDepois};
+                    --w:${g.cel};
+                    --h:${g.hCel};
+                  `}
+                >
+                  {valor}
+                </span>
+              ))}
+
+              <span
+                class:list={[
+                  'no resultado txt',
+                  p.recusado ? 'recusado' : 'aceito',
+                ]}
+                style={`
+                  --x:${p.x0};
+                  --y:${p.y0 + g.yRes};
+                  --w:${g.painel};
+                  --h:${g.hRes};
+                `}
+              >
+                {p.recusado
+                  ? 'Recusado — continua com três valores'
+                  : 'Aceito — passa a ter quatro valores'}
+              </span>
+            </>
+          ))}
+
+          <svg
+            class="setas"
+            viewBox={`0 0 1000 ${g.altura}`}
+            aria-hidden="true"
+            focusable="false"
+          >
+            {paineis(layout).map((p) => (
+              <Seta
+                tipo="neutra"
+                x1={p.x0 + g.cel / 2}
+                y1={p.y0 + g.seta[0]}
+                x2={p.x0 + g.cel / 2}
+                y2={p.y0 + g.seta[1]}
+              />
+            ))}
+          </svg>
+        </Diagrama>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .let-e-var {
+    container-type: inline-size;
+  }
+
+  .composicao.pilha {
+    display: none;
+  }
+
+  @container (max-width: 679px) {
+    .composicao.lado {
+      display: none;
+    }
+
+    .composicao.pilha {
+      display: block;
+    }
+  }
+
+  .nome {
+    display: flex;
+    align-items: center;
+  }
+
+  .cel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--d-card);
+    border: 1px solid var(--d-line);
+  }
+
+  .cel.novo {
+    background:
+      linear-gradient(
+        var(--d-blue-tint),
+        var(--d-blue-tint)
+      ),
+      var(--d-card);
+
+    border: 2px solid var(--d-blue);
+  }
+
+  :global(.diagrama) .no.etq.chamada {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .resultado {
+    display: flex;
+    align-items: center;
+    padding: 0 calc(var(--u) * 18);
+    color: var(--d-ink);
+    border: 2px solid;
+  }
+
+  .recusado {
+    border-color: var(--d-vermelho);
+
+    background:
+      linear-gradient(
+        var(--d-vermelho-tint),
+        var(--d-vermelho-tint)
+      ),
+      var(--d-bg);
+  }
+
+  .aceito {
+    border-color: var(--d-verde);
+
+    background:
+      linear-gradient(
+        var(--d-verde-tint),
+        var(--d-verde-tint)
+      ),
+      var(--d-bg);
+  }
+</style>

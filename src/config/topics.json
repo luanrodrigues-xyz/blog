@@ -1,0 +1,269 @@
+{
+  "_comment": "Single source of truth for categories. tile uses one of the 12 Apple colors from src/styles/colors.css. sort accepts readingOrder or date. glyph contains SVG paths using viewBox 24. hidden removes the category from public cards.",
+  "topics": [
+    {
+      "slug": "frontend",
+      "pt": "Frontend",
+      "en": "Frontend",
+      "tile": "indigo",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Estado, identidade, layout e contratos para construir e investigar interfaces web.",
+        "en": "State, identity, layout, and contracts for building and investigating web interfaces."
+      },
+      "glyph": "<rect x='3' y='4' width='18' height='16' rx='2'/><path d='M3 9h18M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2M16 13l2 2-2 2'/>"
+    },
+    {
+      "slug": "swift",
+      "pt": "Swift",
+      "en": "Swift",
+      "tile": "blue",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Tipos, valores, contratos e invariantes para entender o que o Swift garante antes de o app chegar à interface.",
+        "en": "Types, values, contracts, and invariants that help explain what Swift guarantees before the code reaches the UI."
+      },
+      "glyph": "<path d='M9 4c-2 0-3 1-3 3v2c0 1.5-1 2.5-2.5 3 1.5.5 2.5 1.5 2.5v2c0 2 1 3 3 3'/><path d='M15 4c2 0 3 1 3 3v2c0 1.5 1 2.5 2.5 3-1.5.5-2.5 1.5-2.5 3v2c0 2-1 3-3 3'/>"
+    },
+    {
+      "slug": "modeling-and-state",
+      "pt": "Modelagem e estado",
+      "en": "Modeling and state",
+      "tile": "green",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Estados válidos, transições e efeitos que não se confundem com os dados que descrevem a situação atual.",
+        "en": "Valid states, transitions, and effects that don't get confused with the data describing the current situation."
+      },
+      "glyph": "<circle cx='6' cy='12' r='3'/><circle cx='18' cy='12' r='3'/><path d='M9 12h6'/><path d='m13 9 3 3-3 3'/>"
+    },
+    {
+      "slug": "swiftui",
+      "pt": "SwiftUI",
+      "en": "SwiftUI",
+      "tile": "indigo",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Estado, identidade, navegação, integração e desempenho em telas que precisam continuar corretas quando o app muda.",
+        "en": "State, identity, navigation, integration, and performance in screens that need to stay correct as the app changes."
+      },
+      "glyph": "<rect x='4' y='8' width='12' height='12' rx='3'/><path d='M9 4.5h8a3 3 0 0 1 3 3V15'/>"
+    },
+    {
+      "slug": "uikit",
+      "pt": "UIKit com View Code",
+      "en": "UIKit in code",
+      "tile": "pink",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Manutenção de telas UIKit em código: ciclo de vida, layout variável, reutilização, navegação, acessibilidade e integração com SwiftUI.",
+        "en": "Maintaining UIKit screens in code, with lifecycle, flexible layouts, reuse, navigation, accessibility, and SwiftUI integration."
+      },
+      "glyph": "<rect x='7' y='3' width='10' height='18' rx='2.5'/><path d='M11 18h2'/>"
+    },
+    {
+      "slug": "navigation",
+      "pt": "Navegação",
+      "en": "Navigation",
+      "tile": "purple",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Destino, entrada, retorno e o fim de um fluxo, representados como estado em vez de telas empilhadas por hábito.",
+        "en": "Destination, input, return, and the end of a flow, represented as state instead of screens stacked by habit."
+      },
+      "glyph": "<path d='M4 18c4-10 8 4 16-10'/><path d='M17 6l3 2-3 2'/>"
+    },
+    {
+      "slug": "data-structures",
+      "pt": "Estruturas de dados",
+      "en": "Data structures",
+      "tile": "mint",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Estruturas escolhidas pelas operações, invariantes e custos que um aplicativo realmente precisa preservar.",
+        "en": "Data structures chosen by the operations, invariants, and costs an app actually needs to preserve."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='5' rx='1.5'/><rect x='4' y='11' width='16' height='5' rx='1.5'/><path d='M8 19.5h8'/>"
+    },
+    {
+      "slug": "memory",
+      "pt": "Memória",
+      "en": "Memory",
+      "tile": "orange",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Ownership, cópias, referências e o que mantém um objeto vivo depois que uma tela sai do fluxo.",
+        "en": "Ownership, copies, references, and what can keep an object alive after a screen leaves the flow."
+      },
+      "glyph": "<rect x='6' y='6' width='12' height='12' rx='2'/><path d='M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3'/>"
+    },
+    {
+      "slug": "networking",
+      "pt": "Networking",
+      "en": "Networking",
+      "tile": "red",
+      "sort": "date",
+      "summary": {
+        "pt": "Requests, respostas, erros, cancelamento e sincronização de estado quando o app depende de dados vindos da rede.",
+        "en": "Requests, responses, errors, cancellation, and state updates when the app depends on data coming from the network."
+      },
+      "glyph": "<path d='M5 4h10l4 4v12H5z'/><path d='M15 4v4h4M8 12h8M8 16h5'/>"
+    },
+    {
+      "slug": "bluetooth",
+      "pt": "Bluetooth Low Energy",
+      "en": "Bluetooth Low Energy",
+      "tile": "teal",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Rádio, advertising, conexão e GATT como fronteiras independentes, e a identidade de um periférico que não é tão estável quanto parece.",
+        "en": "Radio state, advertising, connection, and GATT as independent failure boundaries, and a peripheral identity that is less stable than it looks."
+      },
+      "glyph": "<path d='M6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5'/>"
+    },
+    {
+      "slug": "persistence",
+      "pt": "Persistência",
+      "en": "Persistence",
+      "tile": "brown",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "O que precisa sobreviver, por quanto tempo e sob qual identidade, da memória até o disco.",
+        "en": "What needs to survive, for how long, and under which identity, from memory to disk."
+      },
+      "glyph": "<ellipse cx='12' cy='6' rx='7' ry='3'/><path d='M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6'/><path d='M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3'/>"
+    },
+    {
+      "slug": "security",
+      "pt": "Segurança",
+      "en": "Security",
+      "tile": "yellow",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Contra o que cada mecanismo de proteção realmente defende, e o que continua exposto mesmo depois dele.",
+        "en": "What each protection mechanism actually guards against, and what stays exposed even after it's applied."
+      },
+      "glyph": "<path d='M8 10V7a4 4 0 0 1 8 0v3'/><rect x='6' y='10' width='12' height='9' rx='2'/><circle cx='12' cy='14' r='1.3'/><path d='M12 15.3V17'/>"
+    },
+    {
+      "slug": "architecture",
+      "pt": "Arquitetura iOS",
+      "en": "iOS architecture",
+      "tile": "cyan",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Responsabilidades, dependências e testes que permitem mudar o app sem espalhar a mesma decisão por toda a base.",
+        "en": "Responsibilities, dependencies, and tests that let the app change without spreading the same decision across the codebase."
+      },
+      "glyph": "<rect x='3' y='13' width='7' height='7' rx='1.5'/><rect x='14' y='13' width='7' height='7' rx='1.5'/><rect x='8.5' y='4' width='7' height='7' rx='1.5'/>"
+    },
+    {
+      "slug": "modularization-and-delivery",
+      "pt": "Modularização e entrega",
+      "en": "Modularization and delivery",
+      "tile": "purple",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Fronteiras de build que valem a pena, e o caminho do código até um artefato instalável e rastreável.",
+        "en": "Build boundaries worth having, and the path from code to an installable, traceable artifact."
+      },
+      "glyph": "<rect x='5' y='8' width='14' height='12' rx='1.5'/><path d='M12 8V2M9 5l3-3 3 3'/>"
+    },
+    {
+      "slug": "ai",
+      "pt": "IA em apps Apple",
+      "en": "AI in Apple apps",
+      "tile": "mint",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Disponibilidade, domínio, cancelamento, privacidade e testes para recursos de IA que precisam funcionar além da demonstração.",
+        "en": "Availability, domain rules, cancellation, privacy, and testing for AI features that need to work beyond a demo."
+      },
+      "glyph": "<path d='M11 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1-5.1-1.9 5.1-1.9z'/><path d='M18 15l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z'/>"
+    },
+    {
+      "slug": "concurrency",
+      "pt": "Concorrência",
+      "en": "Concurrency",
+      "tile": "cyan",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Lifetime, cancelamento e isolamento para impedir que trabalho assíncrono atualize o estado errado.",
+        "en": "Lifetime, cancellation, and isolation to stop asynchronous work from updating the wrong state."
+      },
+      "glyph": "<path d='M4 8h12M4 16h12'/><path d='M13 5l3 3-3 3M13 13l3 3-3 3'/>"
+    },
+    {
+      "slug": "accessibility",
+      "pt": "Acessibilidade",
+      "en": "Accessibility",
+      "tile": "yellow",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Preservar significado e operação fora do modo visual padrão, desde o primeiro controle até o fluxo inteiro.",
+        "en": "Preserving meaning and operation outside the default visual mode, from the first control to the whole flow."
+      },
+      "glyph": "<circle cx='12' cy='5' r='2.5'/><path d='M12 8v6M6 10h12M8 20l4-6 4 6'/>"
+    },
+    {
+      "slug": "debugging-performance",
+      "pt": "Debugging e performance",
+      "en": "Debugging and performance",
+      "tile": "orange",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Hipótese, evidência e medição real antes de qualquer conclusão sobre o que está lento ou quebrado.",
+        "en": "Hypothesis, evidence, and real measurement before any conclusion about what's slow or broken."
+      },
+      "glyph": "<circle cx='10' cy='10' r='6'/><path d='M14.5 14.5 20 20'/><path d='M7 10l2-3 2 4 2-5 2 4'/>"
+    },
+    {
+      "slug": "testing",
+      "pt": "Testes",
+      "en": "Testing",
+      "tile": "teal",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Comportamento observável e controle das fontes de variação, não cobertura por si só.",
+        "en": "Observable behavior and control over sources of variation, not coverage for its own sake."
+      },
+      "glyph": "<path d='M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z'/><path d='M9 12l2 2 4-4'/>"
+    },
+    {
+      "slug": "language-features",
+      "pt": "Recursos da linguagem",
+      "en": "Swift language features",
+      "tile": "brown",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Sintaxe concisa sem esconder o modelo: armazenamento, transformação, expansão, key paths e ownership explícito.",
+        "en": "Concise Swift features without hiding the model, including storage, transformations, expansion, key paths, and explicit ownership."
+      },
+      "glyph": "<circle cx='12' cy='12' r='3.5'/><path d='M15.5 12v1.5a2.5 2.5 0 0 0 5 0V12a8.5 8.5 0 1 0-3.3 6.7'/>"
+    },
+    {
+      "slug": "payments",
+      "pt": "Pagamentos",
+      "en": "Payments",
+      "tile": "green",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Confiabilidade em pagamentos, idempotência, recuperação de falhas e contratos entre o app e o backend.",
+        "en": "Payment reliability, idempotency, failure recovery, and the contracts between the app and the backend."
+      },
+      "glyph": "<path d='M3 6h18v12H3zM7 10h4M7 14h6'/>"
+    },
+    {
+      "slug": "java-backend",
+      "pt": "Java backend",
+      "en": "Java backend",
+      "tile": "green",
+      "sort": "readingOrder",
+      "summary": {
+        "pt": "Dependências, ciclo de vida e contratos em aplicações Java com Spring.",
+        "en": "Dependencies, lifecycle, and contracts in Java applications with Spring."
+      },
+      "glyph": "<rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='14' width='7' height='7' rx='1'/><path d='M10 6h8v8M6 10v8h8'/>"
+    }
+  ]
+}

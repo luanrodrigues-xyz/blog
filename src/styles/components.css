@@ -1,0 +1,164 @@
+/* Shared interface: grouped lists in the style of iOS Settings, used as tables of contents. */
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--fg-muted);
+}
+
+.lead {
+  font-size: 1.1875rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+  max-width: var(--width-reading);
+  margin: 0 0 1.5rem;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.text-link span {
+  margin: 0;
+}
+
+/* Small caps header above a group, like a table view section header. */
+.list-header,
+.section-heading h2 {
+  margin: 0;
+  font: 600 0.8125rem/1.3 var(--font-ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0 var(--space-4) var(--space-2);
+}
+
+.section-heading a,
+.section-heading > span {
+  font-size: 0.8125rem;
+}
+
+.list-header {
+  padding: 0 var(--space-4) var(--space-2);
+}
+
+/* Inset grouped list: rounded surface, hairlines between rows. */
+.list-group {
+  background: var(--surface);
+  border-radius: var(--radius-l);
+  corner-shape: squircle;
+  overflow: hidden;
+}
+
+body.page-article .list-group {
+  border: 1px solid var(--border);
+}
+
+.list-group > * {
+  position: relative;
+}
+
+/* Hairline inset from the left, like table view separators. */
+.list-group > * + *::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--space-4);
+  right: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.list-group > .topic-row + .topic-row::before {
+  left: calc(var(--space-4) + 1.875rem + var(--space-3));
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.25rem;
+  padding: var(--space-2) var(--space-4);
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.list-row:hover {
+  background: var(--surface-hover);
+}
+
+.list-row::after {
+  content: '';
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 0.875rem;
+  height: 0.875rem;
+  background: var(--fg-muted);
+  opacity: 0.6;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* Colors and glyphs per subject arrive as --tile/--glyph from each [data-topic] element (src/lib/topics.ts). */
+.topic-icon {
+  flex: 0 0 auto;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.5rem;
+  corner-shape: squircle;
+  display: grid;
+  place-items: center;
+  background: var(--tile, var(--tile-blue));
+}
+
+.topic-icon::before {
+  content: '';
+  width: 1.5rem;
+  height: 1.5rem;
+  background: #fff;
+  -webkit-mask: var(--glyph, var(--glyph-default)) center / contain no-repeat;
+  mask: var(--glyph, var(--glyph-default)) center / contain no-repeat;
+}
+
+@media (max-width: 700px) {
+  .lead {
+    font-size: 1.0625rem;
+  }
+}
+
+/* Article subjects as gray tokens at the end of the article. */
+.article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+  margin: 0 0 1.5rem;
+}
+.article-tags li {
+  font-size: var(--text-xs);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--fg-muted);
+}

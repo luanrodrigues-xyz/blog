@@ -1,0 +1,261 @@
+:root {
+  color-scheme: light dark;
+  /* Container principal (cabeçalho, rodapé, páginas) e o teto de tabelas e imagens. */
+  --width-site: 800px;
+  --width-reading: 680px;
+  --width-breakout: 880px;
+  /* Diagramas: a mesma largura da coluna de leitura (680px), para que texto, código e figura
+     compartilhem as mesmas bordas. É o teto real (reading.css aplica este token a figure.diagrama);
+     não pode ficar abaixo de minLargura (Diagrama.astro), senão o quadro rola por dentro também no desktop. */
+  --width-diagram: 680px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --section-space: clamp(2rem, 5vw, 3.2rem);
+
+  /* Apple system typography: San Francisco (-apple-system) for text, SF Mono for code. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-body: var(--font-ui);
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Cores: a paleta de sistema da Apple fica em colors.css (--apple-*, com os quatro modos). Aqui só
+     papéis: nenhum hex de cor de sistema neste arquivo. Grouped lists sit on --canvas-grouped. */
+  --canvas: #ffffff;
+  --canvas-grouped: #ffffff;
+  --surface: var(--apple-gray6);
+  --surface-alt: var(--apple-gray6);
+  --surface-hover: var(--apple-gray5);
+  --fill: #7878801f;
+  --fg: #1d1d1f;
+  --fg-muted: var(--apple-gray-text);
+  --fg-subtle: var(--apple-gray-text);
+  --border: var(--apple-gray4);
+  --action: var(--apple-blue-text);
+  --focus: var(--apple-blue);
+  --swift: #f05138;
+  --fg-86: #424245;
+  --fg-10: var(--apple-gray4);
+  --fg-08: var(--apple-gray6);
+  /* Cores dos assuntos e das capas: as 12 cores da Apple. */
+  --tile-red: var(--apple-red);
+  --tile-orange: var(--apple-orange);
+  --tile-yellow: var(--apple-yellow);
+  --tile-green: var(--apple-green);
+  --tile-mint: var(--apple-mint);
+  --tile-teal: var(--apple-teal);
+  --tile-cyan: var(--apple-cyan);
+  --tile-blue: var(--apple-blue);
+  --tile-indigo: var(--apple-indigo);
+  --tile-purple: var(--apple-purple);
+  --tile-pink: var(--apple-pink);
+  --tile-brown: var(--apple-brown);
+  --glyph-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z'/%3E%3Cpath d='M4 8.5 12 13l8-4.5M12 13v7'/%3E%3C/svg%3E");
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-body: 1.0625rem;
+  --text-lead: 1.25rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --radius-s: 0.375rem;
+  --radius-m: 0.625rem;
+  --radius-l: 0.875rem;
+
+  --fig-surface: #fbfbfd;
+  --fig-dot: var(--apple-gray5);
+  --fig-line: var(--apple-gray);
+  --fig-ghost: var(--apple-gray-text);
+  --fig-relation: var(--apple-green-text);
+  --fig-relation-line: color-mix(in srgb, var(--apple-green-text) 53%, transparent);
+  --fig-relation-soft: color-mix(in srgb, var(--apple-green-text) 7%, transparent);
+  --fig-glow: 0 0 0 1px color-mix(in srgb, var(--apple-blue-text) 25%, transparent);
+
+  /* Code follows Xcode's Default (Light) and Default (Dark) themes: colors, SF Mono and its weights. */
+  --code-bg: #ffffff;
+  --code-fg: #000000d9;
+  --code-weight: 400;
+  --code-keyword-weight: 600;
+  --code-selection: #a4cdff;
+  --code-label-bg: #e8e8ed;
+  --code-inline-bg: #ececf0;
+  --code-line: #0000001a;
+  --code-shade: #00000024;
+  --fg-on-code: #5b5b60;
+  --code-focus: var(--apple-blue-text);
+  --xc-keyword: #9b2393;
+  --xc-string: #c41a16;
+  --xc-comment: #5d6c79;
+  --xc-doc-keyword: #4a5560;
+  --xc-number: #1c00cf;
+  --xc-attribute: #815f03;
+  --xc-preprocessor: #643820;
+  --xc-decl-type: #0b4f79;
+  --xc-decl-other: #0f68a0;
+  --xc-type: #1c464a;
+  --xc-type-system: #3900a0;
+  --xc-function: #326d74;
+  --xc-function-system: #6c36a9;
+  --note-bg: color-mix(in srgb, var(--apple-blue) 8%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #000000;
+    --canvas-grouped: #000000;
+    --surface-alt: var(--apple-gray5);
+    --fg-08: var(--apple-gray5);
+    --fig-dot: var(--apple-gray4);
+    --fill: #7878805c;
+    --fg: #f5f5f7;
+    --swift: #ff6a4d;
+    --fg-86: #d2d2d7;
+    --fig-surface: #1d1d1f;
+    --fig-glow: 0 0 0 1px #ff8f6b66;
+    --code-bg: #1f1f24;
+    --code-fg: #ffffffd9;
+    --code-weight: 500;
+    --code-keyword-weight: 700;
+    --code-selection: #515b70;
+    --code-label-bg: #2d2d2f;
+    --code-inline-bg: #2d2d2f;
+    --code-line: #ffffff26;
+    --code-shade: #ffffff30;
+    --fg-on-code: #a1a1a6;
+    --code-focus: #ffb59e;
+    --xc-keyword: #fc5fa3;
+    --xc-string: #fc6a5d;
+    --xc-comment: #6c7986;
+    --xc-doc-keyword: #92a1b1;
+    --xc-number: #d0bf69;
+    --xc-attribute: #bf8555;
+    --xc-preprocessor: #fd8f3f;
+    --xc-decl-type: #5dd8ff;
+    --xc-decl-other: #41a1c0;
+    --xc-type: #9ef1dd;
+    --xc-type-system: #d0a8ff;
+    --xc-function: #67b7a4;
+    --xc-function-system: #a167e6;
+    --note-bg: color-mix(in srgb, var(--apple-blue) 12%, transparent);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* No global smooth scrolling: Safari can drop keyboard scrolling (arrows, space) with it. The back-to-top button animates in JavaScript. The padding keeps anchor targets below the sticky header. */
+html {
+  scroll-padding-top: 4.5rem;
+}
+
+body {
+  margin: 0;
+  font: 1rem/1.6 var(--font-ui);
+  color: var(--fg);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--action);
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a,
+input,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+/* Browsers without :focus-visible (older Safari) still show where the keyboard is. */
+@supports not selector(:focus-visible) {
+  :focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 4px;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.022em;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  font-size: clamp(2.125rem, 5vw, 3rem);
+  margin: 0 0 1.5rem;
+}
+
+h2 {
+  font-size: 1.6rem;
+}
+
+h3 {
+  font-size: 1.35rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Text for assistive technology only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

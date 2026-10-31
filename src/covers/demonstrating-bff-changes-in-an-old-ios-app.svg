@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+:root{--bg:#F2F2F7;--card:#fff;--neutral:#E5E5EA;--primary:#00C0E8;--accent:#6155F5;--ink:#006F86;--tint:#D9F6FC}
+@media(prefers-color-scheme:dark){:root{--bg:#1C1C1E;--card:#2C2C2E;--neutral:#3A3A3C;--primary:#3CD3FE;--accent:#7D7AFF;--ink:#97E6FA;--tint:color-mix(in srgb,var(--primary) 30%,var(--card))}.shadow{filter:none}}
+.bg{fill:var(--bg)}.card{fill:var(--card)}.neutral{fill:var(--neutral)}.primary{fill:var(--primary)}.accent{fill:var(--accent)}.tint{fill:var(--tint)}.line{fill:none;stroke:var(--primary);stroke-width:4;stroke-linecap:round}.label{fill:var(--ink);font:600 25px 'SF Mono',ui-monospace,Menlo,monospace}
+</style>
+<defs><filter id="sombra"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.07"/></filter></defs>
+<rect class="bg" width="1200" height="630"/>
+<!-- Same sections, changed order across the BFF boundary. -->
+<g class="shadow" filter="url(#sombra)"><rect class="card" x="320" y="168" width="224" height="296" rx="32"/><rect class="card" x="656" y="120" width="224" height="392" rx="32"/></g>
+<text class="label" x="432" y="216" text-anchor="middle">original</text><text class="label" x="768" y="168" text-anchor="middle">reordered</text>
+<rect class="neutral" x="352" y="248" width="160" height="40" rx="16"/>
+<rect class="primary" x="352" y="312" width="160" height="40" rx="16"/>
+<rect class="accent" x="352" y="376" width="160" height="40" rx="16"/>
+<path class="line" d="M568 320h56"/><path class="primary" d="M640 320l-20-12v24z"/>
+<rect class="neutral" x="688" y="216" width="160" height="40" rx="16"/>
+<rect class="accent" x="688" y="280" width="160" height="40" rx="16"/>
+<rect class="primary" x="688" y="344" width="160" height="40" rx="16"/>
+<rect class="neutral" x="736" y="464" width="64" height="8" rx="4"/>
+</svg>

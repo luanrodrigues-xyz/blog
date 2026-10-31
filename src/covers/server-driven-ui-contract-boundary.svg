@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    svg { --fundo:#F2F2F7; --card:#fff; --principal:#00C0E8; --tinta:#D9F6FC; --destaque:#6155F5; --texto:#00596B; }
+    @media(prefers-color-scheme:dark) {
+      svg { --fundo:#1C1C1E; --card:#2C2C2E; --principal:#5CD7F5; --tinta:color-mix(in srgb,var(--principal) 30%,var(--card)); --destaque:#6D7CFF; --texto:#5CD7F5; }
+      .sombreado { filter:none; }
+    }
+    .fundo { fill:var(--fundo); } .card { fill:var(--card); } .principal { fill:var(--principal); }
+    .tinta { fill:var(--tinta); } .destaque { fill:var(--destaque); }
+    .linha { fill:none; stroke:var(--principal); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .limite { fill:none; stroke:var(--destaque); stroke-width:4; stroke-linecap:round; }
+  </style>
+  <defs><filter id="sombra" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#000" flood-opacity="0.07"/></filter></defs>
+  <rect class="fundo" width="1200" height="630"/>
+  <!-- Known components reach matching slots inside the app. -->
+  <g class="sombreado" filter="url(#sombra)">
+    <rect class="tinta" x="328" y="160" width="144" height="112" rx="24"/>
+    <rect class="tinta" x="328" y="304" width="144" height="64" rx="24"/>
+    <rect class="card" x="656" y="128" width="216" height="376" rx="32"/>
+  </g>
+  <rect class="principal" x="352" y="192" width="96" height="14" rx="7"/>
+  <rect class="principal" x="352" y="224" width="64" height="14" rx="7"/>
+  <rect class="principal" x="352" y="328" width="96" height="14" rx="7"/>
+  <rect class="tinta" x="680" y="160" width="168" height="112" rx="24"/>
+  <rect class="principal" x="704" y="192" width="120" height="14" rx="7"/>
+  <rect class="principal" x="704" y="224" width="88" height="14" rx="7"/>
+  <rect class="principal" x="680" y="304" width="168" height="64" rx="24"/>
+  <path class="linha" d="M488 216H632M488 336H632"/>
+  <path class="principal" d="M640 216l-16-8v16zM640 336l-16-8v16z"/>
+  <!-- An unknown shape has no matching capability beyond the boundary. -->
+  <path class="destaque" d="M400 408l40 40-40 40-40-40z"/>
+  <path class="limite" d="M488 448H552M576 424V472"/>
+</svg>

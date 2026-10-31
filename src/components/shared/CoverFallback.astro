@@ -1,0 +1,20 @@
+---
+import { topicStyle, type Topic } from '../../lib/topics';
+
+interface Props {
+  topic?: Topic;
+}
+
+// Fallback de capa: bloco só de CSS (cor e ícone do assunto), sem arquivo de imagem.
+// É decorativo; o título do artigo já está no cabeçalho logo acima.
+const { topic } = Astro.props;
+---
+
+<div
+  class="article-cover is-fallback"
+  data-topic={topic?.slug}
+  style={topic ? topicStyle(topic) : undefined}
+  aria-hidden="true"
+>
+  <span class="topic-icon"></span>
+</div>

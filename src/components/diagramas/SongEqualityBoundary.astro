@@ -1,0 +1,55 @@
+---
+import Diagrama from './Diagrama.astro';
+const label =
+  'The original song has ID s1 and title Night. The corrected song has ID s1 and title Night Drive. Comparing both stored fields returns false. Comparing just their IDs returns true.';
+---
+
+<div class="equality-boundary">
+  {[true, false].map((wide) => (
+    <div class:list={['composition', wide ? 'wide' : 'stacked']}>
+      <Diagrama plano rotulo={label} altura={wide ? 650 : 1250} minLargura={260}>
+        <div class="no txt heading" style="--x:32;--y:24;--w:936;--h:100">
+          Same ID, changed content
+        </div>
+        <div class="no nodo" style={`--x:32;--y:150;--w:${wide ? 440 : 936};--h:${wide ? 180 : 260}`}>
+          <span class="pq">Original Song</span>
+          <span class="t4">id = s1</span>
+          <span class="t4">title = Night</span>
+        </div>
+        <div
+          class="no nodo"
+          style={`--x:${wide ? 528 : 32};--y:${wide ? 150 : 470};--w:${wide ? 440 : 936};--h:${wide ? 180 : 260}`}
+        >
+          <span class="pq">Corrected Song</span>
+          <span class="t4">id = s1</span>
+          <span class="t4">title = Night Drive</span>
+        </div>
+        <div class="no nodo fantasma" style={`--x:32;--y:${wide ? 410 : 810};--w:936;--h:${wide ? 160 : 340}`}>
+          <span class="t4">Song == Song → false</span>
+          <span class="t4">id == id → true</span>
+        </div>
+      </Diagrama>
+    </div>
+  ))}
+</div>
+<style>
+  .equality-boundary {
+    container-type: inline-size;
+  }
+  .stacked {
+    display: none;
+  }
+  @container (max-width:539px) {
+    .wide {
+      display: none;
+    }
+    .stacked {
+      display: block;
+    }
+  }
+  .heading {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+</style>
