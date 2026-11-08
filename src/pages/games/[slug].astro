@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { games, type Game } from '../../data/games';
+export function getStaticPaths() {
+  return games.map((game) => ({ params: {slug: game.slug}, props: {game} }));
+}
+const { game } = Astro.props as { game: Game };
+---
+<BaseLayout title={game.title} description={game.description} language="en" isListingPage>
+  <article class="game-detail">
+    <p class="game-detail__breadcrumb"><a href="/games/">Games</a> / {game.status}</p>
+    <h1>{game.title}</h1>
+    <p class="game-detail__lead">{game.tagline}</p>
+    <div class:list={['game-card__visual', `game-card__visual--${game.slug}`]} role="img" aria-label={`Editorial illustration for ${game.title}`}>
+      <span class="game-card__symbol" aria-hidden="true">{game.slug === 'tessora' ? '◇ ◢ ◆' : game.slug === 'ruptura' ? '↗ ◼' : '▣'}</span>
+      <span class="game-card__visual-name" aria-hidden="true">{game.title}</span>
+    </div>
+    <div class="game-detail__links">
+      {game.playUrl && <a href={game.playUrl} target="_blank" rel="noopener noreferrer">Play game ↗</a>}
+      {game.sourceUrl && <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer">Source code ↗</a>}
+      <a href="/games/">All games →</a>
+    </div>
+    <section class="game-detail__section"><h2>The game</h2><p>{game.description}</p></section>
+    <section class="game-detail__section"><h2>Gameplay</h2><ul>{game.mechanics.map((mechanic) => <li>{mechanic}</li>)}</ul></section>
+    <section class="game-detail__section"><h2>Development</h2><p>{game.development}</p></section>
+    <section class="game-detail__section"><h2>Built with</h2><p>{game.technologies.join(' · ')}</p></section>
+  </article>
+</BaseLayout>
