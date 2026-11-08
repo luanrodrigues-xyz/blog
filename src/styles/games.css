@@ -41,3 +41,8 @@
 .game-detail__links { display:flex; gap:1.5rem; margin-top:var(--space-5); flex-wrap:wrap; font-size:.9rem; font-weight:600; }
 @media (max-width:599px) { .games-grid { grid-template-columns:minmax(0,1fr); } .game-card--featured .game-card__body { padding:var(--space-5); } }
 @media (prefers-reduced-motion:reduce) { .game-card__visual { transition:none; } }
+
+.game-detail__play > p { color:var(--fg-muted); line-height:1.6; }
+.game-detail__embed { width:100%; max-width:100%; margin-top:var(--space-4); overflow:hidden; border:1px solid var(--border); border-radius:var(--radius-m); background:#333; }
+.game-detail__embed iframe { display:block; width:100%; max-width:100%; height:auto; aspect-ratio:960 / 620; border:0; }
+.game-detail__embed-note { margin:var(--space-3) 0 0; font-size:.875rem; }

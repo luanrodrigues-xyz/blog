@@ -17,6 +17,7 @@ export const games: Game[] = [
     description: 'A geometric puzzle where you cut, move and rotate pieces to reconstruct shapes. The geometry engine accepts different valid solutions instead of checking against one fixed arrangement.',
     status: 'Playable · Browser', technologies: ['TypeScript', 'PixiJS', 'React'],
     development: 'Built around a geometry engine independent of React and PixiJS. Current work focuses on precision of cuts, touch interaction and real-device playtests.',
+    playUrl: 'https://luanrodrigues.itch.io/tessora',
     mechanics: ['Cut a shape into fragments', 'Move and rotate each piece', 'Reconstruct a target without gaps or overlaps']
   },
   {

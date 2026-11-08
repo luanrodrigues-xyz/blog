@@ -20,6 +20,28 @@ const { game } = Astro.props as { game: Game };
       {game.sourceUrl && <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer">Source code ↗</a>}
       <a href="/games/">All games →</a>
     </div>
+    {game.slug === 'tessora' && (
+      <section class="game-detail__section game-detail__play" aria-labelledby="play-tessora-heading">
+        <h2 id="play-tessora-heading">Play Tessora</h2>
+        <p>Play directly in the browser, or open the game on itch.io for a larger view.</p>
+        <div class="game-detail__embed">
+          <iframe
+            title="Play Tessora on itch.io"
+            src="https://itch.io/embed-upload/20356147?color=333333"
+            width="960"
+            height="620"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+          >
+            <a href="https://luanrodrigues.itch.io/tessora">Play Tessora on itch.io</a>
+          </iframe>
+        </div>
+        <p class="game-detail__embed-note">
+          On a small screen? <a href="https://luanrodrigues.itch.io/tessora" target="_blank" rel="noopener noreferrer">Open Tessora on itch.io ↗</a>
+        </p>
+      </section>
+    )}
     <section class="game-detail__section"><h2>The game</h2><p>{game.description}</p></section>
     <section class="game-detail__section"><h2>Gameplay</h2><ul>{game.mechanics.map((mechanic) => <li>{mechanic}</li>)}</ul></section>
     <section class="game-detail__section"><h2>Development</h2><p>{game.development}</p></section>
