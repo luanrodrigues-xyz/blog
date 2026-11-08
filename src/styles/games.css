@@ -46,3 +46,17 @@
 .game-detail__embed { width:100%; max-width:100%; margin-top:var(--space-4); overflow:hidden; border:1px solid var(--border); border-radius:var(--radius-m); background:#333; }
 .game-detail__embed iframe { display:block; width:100%; max-width:100%; height:auto; aspect-ratio:960 / 620; border:0; }
 .game-detail__embed-note { margin:var(--space-3) 0 0; font-size:.875rem; }
+
+/* Project journals are chronological editorial lists, not another card grid. */
+.game-journal__list { list-style:none; padding:0 !important; margin:var(--space-5) 0 var(--space-6); }
+.game-journal__item { border-bottom:1px solid var(--border); padding:var(--space-4) 0; }
+.game-journal__item:first-child { border-top:1px solid var(--border); }
+.game-journal__meta { display:flex; gap:1rem; flex-wrap:wrap; font:.75rem/1.5 var(--font-mono); color:var(--fg-muted); }
+.game-journal__item h2,.game-journal__item h3 { font-size:1.05rem; margin:var(--space-2) 0; }
+.game-journal__item h2 a,.game-journal__item h3 a { color:var(--fg); text-decoration:none; }
+.game-journal__item h2 a:hover,.game-journal__item h3 a:hover { text-decoration:underline; }
+.game-journal__item p,.game-journal__empty { margin:0; font-size:.9375rem; color:var(--fg-muted); line-height:1.65; }
+.game-journal-entry__body { line-height:1.75; }
+.game-journal-entry__body h2 { margin-top:var(--space-10); }
+.game-journal-entry__body img { max-width:100%; height:auto; }
+.game-journal-entry__back { margin-top:var(--space-10); }

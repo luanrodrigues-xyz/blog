@@ -88,4 +88,19 @@ const sitePages = defineCollection({
   schema: pageSchema,
 });
 
-export const collections = { articles, sitePages };
+const gameJournal = defineCollection({
+  loader: glob({
+    base: './contents/game-journal',
+    pattern: '**/*.md',
+  }),
+  schema: z.object({
+    game: z.enum(['tessora', 'ruptura', 'deploy-ou-ruina']),
+    title: z.string().min(1),
+    date: z.coerce.date(),
+    version: z.string().optional(),
+    summary: z.string().min(1),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { articles, sitePages, gameJournal };

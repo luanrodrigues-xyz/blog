@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { games, type Game } from '../../../../data/games';
+import { gameJournalUrl } from '../../../../lib/game-journal';
+
+export function getStaticPaths() {
+  return games.map((game) => ({ params: { game: game.slug }, props: { game } }));
+}
+
+const { game } = Astro.props as { game: Game };
+const journal = (await getCollection('gameJournal', ({ data }) => !data.draft && data.game === game.slug))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<BaseLayout title={`${game.title} — Development journal`} description={`Development updates for ${game.title}.`} language="en" isListingPage>
+  <div class="game-detail">
+    <p class="game-detail__breadcrumb"><a href={`/games/${game.slug}/`}>{game.title}</a> / Development journal</p>
+    <h1>Development journal</h1>
+    <p class="game-detail__lead">Updates and decisions from the development of {game.title}.</p>
+    {journal.length > 0 ? (
+      <ol class="game-journal__list">
+        {journal.map((entry) => (
+          <li class="game-journal__item">
+            <div class="game-journal__meta">
+              <time datetime={entry.data.date.toISOString().slice(0, 10)}>{entry.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</time>
+              {entry.data.version && <span>{entry.data.version}</span>}
+            </div>
+            <h2><a href={gameJournalUrl(entry)}>{entry.data.title}</a></h2>
+            <p>{entry.data.summary}</p>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="game-journal__empty">No development updates have been published yet.</p>
+    )}
+  </div>
+</BaseLayout>
