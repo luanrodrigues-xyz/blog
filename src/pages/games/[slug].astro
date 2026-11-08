@@ -47,10 +47,10 @@ const latestEntries = journal.slice(0, 3);
         </p>
       </section>
     )}
-    <section class="game-detail__section"><h2>The game</h2><p>{game.description}</p></section>
-    <section class="game-detail__section"><h2>Gameplay</h2><ul>{game.mechanics.map((mechanic) => <li>{mechanic}</li>)}</ul></section>
-    <section class="game-detail__section"><h2>Development</h2><p>{game.development}</p></section>
-    <section class="game-detail__section"><h2>Built with</h2><p>{game.technologies.join(' · ')}</p></section>
+    <section class="game-detail__overview" aria-label="About the game">
+      <p>{game.description}</p>
+      <p class="game-detail__stack">{game.technologies.join(' · ')}</p>
+    </section>
     <section class="game-detail__section" aria-labelledby="journal-title">
       <h2 id="journal-title">Development journal ({journal.length})</h2>
       {latestEntries.length > 0 ? (

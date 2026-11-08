@@ -60,3 +60,9 @@
 .game-journal-entry__body h2 { margin-top:var(--space-10); }
 .game-journal-entry__body img { max-width:100%; height:auto; }
 .game-journal-entry__back { margin-top:var(--space-10); }
+
+/* Compact project context; the journal carries the ongoing development story. */
+.game-detail__overview { padding:var(--space-5) 0; border-top:1px solid var(--border); }
+.game-detail__overview p { margin:0; line-height:1.65; }
+.game-detail__overview .game-detail__stack { margin-top:var(--space-3); font:.8rem/1.5 var(--font-mono); color:var(--fg-muted); }
+.game-detail__overview + .game-detail__section { margin-top:var(--space-3); }
