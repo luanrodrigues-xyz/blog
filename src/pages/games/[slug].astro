@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GameIllustration from '../../components/games/GameIllustration.astro';
+import { getCollection } from 'astro:content';
+import { gameJournalUrl } from '../../lib/game-journal';
+import { games, type Game } from '../../data/games';
+export function getStaticPaths() {
+  return games.map((game) => ({ params: {slug: game.slug}, props: {game} }));
+}
+const { game } = Astro.props as { game: Game };
+const journal = (await getCollection('gameJournal', ({ data }) => !data.draft && data.game === game.slug))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const latestEntries = journal.slice(0, 3);
+---
+<BaseLayout title={game.title} description={game.description} language="en" isListingPage>
+  <article class="game-detail">
+    <p class="game-detail__breadcrumb"><a href="/games/">Games</a> / {game.status}</p>
+    <h1>{game.title}</h1>
+    <p class="game-detail__lead">{game.tagline}</p>
+    <GameIllustration game={game} />
+    <div class="game-detail__links">
+      {game.playUrl && <a href={game.playUrl} target="_blank" rel="noopener noreferrer">Play game ↗</a>}
+      {game.sourceUrl && <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer">Source code ↗</a>}
+      <a href="/games/">All games →</a>
+    </div>
+    {game.slug === 'tessora' && (
+      <section class="game-detail__section game-detail__play" aria-labelledby="play-tessora-heading">
+        <h2 id="play-tessora-heading">Play Tessora</h2>
+        <p>Play directly in the browser, or open the game on itch.io for a larger view.</p>
+        <div class="game-detail__embed">
+          <iframe
+            title="Play Tessora on itch.io"
+            src="https://itch.io/embed-upload/20356147?color=333333"
+            width="960"
+            height="620"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+          >
+            <a href="https://luanrodrigues.itch.io/tessora">Play Tessora on itch.io</a>
+          </iframe>
+        </div>
+        <p class="game-detail__embed-note">
+          On a small screen? <a href="https://luanrodrigues.itch.io/tessora" target="_blank" rel="noopener noreferrer">Open Tessora on itch.io ↗</a>
+        </p>
+      </section>
+    )}
+    <section class="game-detail__overview" aria-label="About the game">
+      <p>{game.description}</p>
+      <p class="game-detail__stack">{game.technologies.join(' · ')}</p>
+    </section>
+    <section class="game-detail__section" aria-labelledby="journal-title">
+      <h2 id="journal-title">Development journal ({journal.length})</h2>
+      {latestEntries.length > 0 ? (
+        <>
+          <ol class="game-journal__list">
+            {latestEntries.map((entry) => (
+              <li class="game-journal__item">
+                <div class="game-journal__meta">
+                  <time datetime={entry.data.date.toISOString().slice(0, 10)}>{entry.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</time>
+                  {entry.data.version && <span>{entry.data.version}</span>}
+                </div>
+                <h3><a href={gameJournalUrl(entry)}>{entry.data.title}</a></h3>
+                <p>{entry.data.summary}</p>
+              </li>
+            ))}
+          </ol>
+          {journal.length > 3 && <a href={`/games/${game.slug}/journal/`}>View all updates →</a>}
+        </>
+      ) : (
+        <p class="game-journal__empty">Development updates will appear here as new versions are published.</p>
+      )}
+    </section>
+  </article>
+</BaseLayout>

@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GameCard from '../../components/games/GameCard.astro';
+import { games } from '../../data/games';
+---
+<BaseLayout title="Games" description="Independent 2D games by Luan Rodrigues." language="en" isListingPage>
+  <div class="game-index">
+    <h1>Games</h1>
+    <p class="game-index__intro">Independent 2D games, from geometric puzzles to precision platformers and narrative experiments.</p>
+    {games.map((game, index) => <GameCard game={game} featured={index === 0} />)}
+  </div>
+</BaseLayout>

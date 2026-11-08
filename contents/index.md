@@ -1,9 +1,9 @@
 ---
 title: "Luan Rodrigues"
-heroTitle: "Building software for iOS and the web."
-intro: "I'm Luan Rodrigues, a software developer working with Swift, React, and TypeScript."
-introDetail: "I write about application architecture, interfaces, state, and working with APIs in iOS and web apps."
-description: "Luan Rodrigues, iOS Developer working with Swift, SwiftUI and UIKit since 2019. Technical articles and examples on iOS and web development."
+heroTitle: "I build games and write about the code behind them."
+intro: "I am Luan, a software developer working with Swift, C++, and TypeScript."
+introDetail: "Currently building independent 2D games and exploring gameplay, graphics, and software architecture."
+description: "Independent 2D games and technical writing on game development, iOS, and software engineering."
 language: "en"
 isPortuguese: false
 canonical: "https://luanrodrigues.xyz/"

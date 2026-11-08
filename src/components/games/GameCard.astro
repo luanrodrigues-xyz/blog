@@ -1,0 +1,23 @@
+---
+import type { Game } from '../../data/games';
+import GameIllustration from './GameIllustration.astro';
+interface Props { game: Game; featured?: boolean }
+const { game, featured = false } = Astro.props;
+---
+<article class:list={['game-card', { 'game-card--featured': featured }]}>
+  <a href={`/games/${game.slug}/`} class="game-card__visual" aria-label={`Explore ${game.title}`}>
+    <GameIllustration game={game} />
+  </a>
+  <div class="game-card__body">
+    <div class="game-card__heading">
+      <h3><a href={`/games/${game.slug}/`}>{game.title}</a></h3>
+      <span class="game-card__status">{game.status}</span>
+    </div>
+    <p class="game-card__description">{featured ? game.description : game.tagline}</p>
+    <ul class="game-card__tech" role="list">{game.technologies.map((tag) => <li>{tag}</li>)}</ul>
+    <div class="game-card__links">
+      {game.playUrl && <a class="game-card__play" href={game.playUrl} target="_blank" rel="noopener noreferrer">Play game ↗</a>}
+      <a href={`/games/${game.slug}/`}>Project details →</a>
+    </div>
+  </div>
+</article>
