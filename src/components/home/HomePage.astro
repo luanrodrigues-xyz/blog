@@ -11,6 +11,9 @@ const { latest } = await homeContent();
 ---
 
 <section class="home-intro">
+  <div class="home-intro__scene" aria-hidden="true">
+    <svg viewBox="0 0 280 200" fill="none"><path d="M15 176H272" stroke="currentColor" stroke-width="2"/><path d="M48 173v-24l-21-21v-13h47v13l-21 21v24M38 115l12-53l12 53" stroke="#697450" stroke-width="3" stroke-linecap="round"/><path d="M22 115q-27-23 4-44q-7-32 20-27q18-25 31 2q33 10 13 39q10 29-16 30" fill="#9d9e70" stroke="#363d34" stroke-width="2"/><rect x="99" y="70" width="134" height="91" rx="6" fill="#4d4b54" stroke="#302e35" stroke-width="5"/><rect x="109" y="79" width="114" height="69" fill="#384055"/><path d="M115 131h20v-13h20v-14h24v-14h31" stroke="#9682bc" stroke-width="6"/><rect x="161" y="161" width="12" height="13" fill="#5c5961"/><path d="M133 175h68" stroke="#302e35" stroke-width="6"/><path d="M95 177h153" stroke="#855942" stroke-width="8" stroke-linecap="round"/><path d="M240 175v-35h19v35" stroke="#a37356" stroke-width="3"/><path d="M240 144h20" stroke="#a37356" stroke-width="2"/><path d="M248 130q-7-14 2-23m6 26q-4-10 1-19" stroke="#a68c78" stroke-width="2"/><path d="M125 55l22-20l22 20" stroke="#a16849" stroke-width="3" stroke-linecap="round"/><path d="M167 25l10-8l13 8" stroke="#a16849" stroke-width="2"/></svg>
+  </div>
   <p class="eyebrow">Software developer / Indie game dev</p>
   <h1>{entry.data.heroTitle}</h1>
   <p class="lead">{entry.data.intro}</p>
@@ -23,7 +26,7 @@ const { latest } = await homeContent();
 
 <section class="games-section" id="selected-games" aria-labelledby="selected-games-title">
   <header class="games-heading">
-    <h2 id="selected-games-title">Selected games</h2>
+    <h2 id="selected-games-title">My games</h2>
     <a href="/games/">All games →</a>
   </header>
   <GameCard game={games[0]} featured />
@@ -35,7 +38,7 @@ const { latest } = await homeContent();
 {latest.length > 0 && (
   <section class="home-writing" aria-labelledby="home-writing-title">
     <header class="games-heading">
-      <h2 id="home-writing-title">From the notebook</h2>
+      <h2 id="home-writing-title">Development notes</h2>
       <a href="/articles/">All writing →</a>
     </header>
     <div class="home-writing__list">

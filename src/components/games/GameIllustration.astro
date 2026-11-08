@@ -1,0 +1,58 @@
+---
+import type { Game } from '../../data/games';
+interface Props { game: Pick<Game, 'slug' | 'title'> }
+const { game } = Astro.props;
+---
+<div class:list={['game-illustration', `game-illustration--${game.slug}`]} role="img" aria-label={`Illustrated scene representing ${game.title}; not a gameplay screenshot`}>
+  {game.slug === 'tessora' && (
+    <svg viewBox="0 0 480 270" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+      <defs><pattern id="tessoraGrid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#757098" stroke-width=".7" opacity=".3"/></pattern></defs>
+      <rect width="480" height="270" fill="#2d2949"/>
+      <rect width="480" height="270" fill="url(#tessoraGrid)"/>
+      <path d="M75 176L150 64L249 112L261 202L104 216Z" fill="#7b649c" stroke="#edc7fd" stroke-width="3"/>
+      <path d="M150 64L181 156L261 202" fill="none" stroke="#efe2ff" stroke-dasharray="8 7" stroke-width="2"/>
+      <path d="M331 72L401 72L401 138Z" fill="#ed7dbc" stroke="#f1acd7" stroke-width="2"/>
+      <path d="M313 166L376 166L365 219L300 219Z" fill="#f8c34e"/>
+      <path d="M403 158L458 214L403 214Z" fill="#73c8ec"/>
+      <path d="M177 150l-10 19m0-19l10 19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  )}
+  {game.slug === 'ruptura' && (
+    <svg viewBox="0 0 480 270" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+      <defs><linearGradient id="rupturaBg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#292943"/><stop offset="1" stop-color="#55466f"/></linearGradient></defs>
+      <rect width="480" height="270" fill="url(#rupturaBg)"/>
+      <path d="M24 44V246M92 10V246M388 0V246M450 30V246" stroke="#76708d" opacity=".25" stroke-width="17"/>
+      <path d="M0 205H180V223H210V270H0Z" fill="#7964a4" stroke="#a68cc1" stroke-width="5"/>
+      <path d="M274 160H480V185H274Z" fill="#7964a4" stroke="#a68cc1" stroke-width="5"/>
+      <path d="M297 160l8-17l8 17m20 0l8-17l8 17m20 0l8-17l8 17" stroke="#f0c2c3" stroke-width="4" fill="none"/>
+      <g transform="translate(182 112) rotate(-12)">
+        <rect x="0" y="0" width="53" height="53" rx="16" fill="#5ccfc9" stroke="#23283a" stroke-width="7"/>
+        <path d="M32 0l24-17l8 12l-8 13Z" fill="#e99b5c" stroke="#23283a" stroke-width="4"/>
+        <circle cx="18" cy="24" r="4" fill="#243047"/><circle cx="37" cy="24" r="4" fill="#243047"/>
+      </g>
+      <path d="M158 178l-35 18M148 160l-29 7M164 195l-25 32" stroke="#ffd97f" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  )}
+  {game.slug === 'deploy-ou-ruina' && (
+    <svg viewBox="0 0 480 270" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+      <rect width="480" height="270" fill="#d1b9a4"/>
+      <rect x="30" y="22" width="145" height="125" fill="#3e5367" stroke="#80675f" stroke-width="11"/>
+      <path d="M80 22v125M30 90h145" stroke="#80675f" stroke-width="7"/>
+      <path d="M46 132V97h22v35m20 0V110h25v22m16 0V92h28v40" fill="#283748"/>
+      <path d="M0 216H480V270H0Z" fill="#746257"/>
+      <path d="M155 174H447V196H155Z" fill="#9d7158" stroke="#644b43" stroke-width="4"/>
+      <rect x="232" y="77" width="125" height="93" rx="7" fill="#293f4a" stroke="#66504b" stroke-width="7"/>
+      <rect x="244" y="89" width="101" height="68" fill="#aacbc6"/>
+      <rect x="253" y="99" width="80" height="8" fill="#658f88"/>
+      <rect x="253" y="115" width="59" height="8" fill="#658f88"/>
+      <path d="M282 170v10h34v-10" fill="#293f4a"/>
+      <path d="M124 270v-71q0-47 50-47t52 47v71" fill="#384b5c" stroke="#273642" stroke-width="7"/>
+      <circle cx="174" cy="126" r="35" fill="#c48e6d"/>
+      <path d="M138 132q-12-51 31-53q49-4 41 44q-20-11-31-28q-10 26-41 37" fill="#36363c"/>
+      <path d="M382 173h36v-23h-36Z" fill="#eee0cb" stroke="#785d4e" stroke-width="4"/>
+      <path d="M418 155q17-3 17 8t-17 8" stroke="#785d4e" stroke-width="5" fill="none"/>
+      <path d="M396 141q-9-15 2-25m12 24q-8-12 1-19" stroke="#eadccc" stroke-width="4" fill="none"/>
+    </svg>
+  )}
+  <span class="game-illustration__label" aria-hidden="true">{game.title}</span>
+</div>
