@@ -1,71 +1,71 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import AreaLinks from '../shared/AreaLinks.astro';
+import GameCard from '../games/GameCard.astro';
+import { games } from '../../data/games';
+import { articleUrl } from '../../config/site';
 import { homeContent } from '../../lib/home';
-import { interfaceLanguage, ui } from '../../config/site';
 
-import LatestArticleCard from './LatestArticleCard.astro';
-
-interface Props {
-  entry: CollectionEntry<'sitePages'>;
-}
-
+interface Props { entry: CollectionEntry<'sitePages'> }
 const { entry } = Astro.props;
-const text = ui;
-const { articles, latest } = await homeContent();
+const { latest } = await homeContent();
 ---
 
 <section class="home-intro">
+  <p class="eyebrow">Software developer / Indie game dev</p>
   <h1>{entry.data.heroTitle}</h1>
-  <p class="lead">{entry.data.intro ?? entry.data.description}</p>
+  <p class="lead">{entry.data.intro}</p>
   {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
+  <div class="home-intro__links">
+    <a href="#selected-games">Explore games ↓</a>
+    <a href="https://github.com/luanrodrigues-xyz" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+  </div>
+</section>
+
+<section class="games-section" id="selected-games" aria-labelledby="selected-games-title">
+  <header class="games-heading">
+    <h2 id="selected-games-title">Selected games</h2>
+    <a href="/games/">All games →</a>
+  </header>
+  <GameCard game={games[0]} featured />
+  <div class="games-grid">
+    {games.slice(1).map((game) => <GameCard game={game} />)}
+  </div>
 </section>
 
 {latest.length > 0 && (
-  <section class="home-featured" aria-labelledby="featured-title">
-    <header class="notes-head" lang={interfaceLanguage}>
-      <h2 id="featured-title">Latest articles</h2>
+  <section class="home-writing" aria-labelledby="home-writing-title">
+    <header class="games-heading">
+      <h2 id="home-writing-title">From the notebook</h2>
+      <a href="/articles/">All writing →</a>
     </header>
-    <div class="featured-grid">
-      {latest.map((article, index) => (
-        <LatestArticleCard article={article} priority={index === 0} />
+    <div class="home-writing__list">
+      {latest.slice(0, 3).map((article) => (
+        <article class="home-writing__item">
+          <h3 lang={article.data.language}>
+            <a href={articleUrl(article)}>{article.data.title}</a>
+          </h3>
+          <p>
+            <span>{article.data.topicLabel}</span>
+            <span aria-hidden="true"> · </span>
+            <time datetime={article.data.date.toISOString().slice(0, 10)}>{article.data.displayDate}</time>
+          </p>
+        </article>
       ))}
     </div>
   </section>
 )}
 
-<section class="home-topics" aria-labelledby="home-topics-title">
-  <h2 id="home-topics-title">Explore by area</h2>
-  <AreaLinks articles={articles} />
-</section>
-
-<p class="home-all-articles" lang={interfaceLanguage}>
-  <a href={text.articlesUrl}>{text.allArticles} →</a>
-</p>
-
 <style>
-  .home-featured {
-    margin-bottom: var(--space-10);
-  }
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-  @media (max-width: 599px) {
-    .featured-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  .home-topics {
-    margin-bottom: var(--space-10);
-  }
-  .home-topics h2 {
-    margin: 0 0 var(--space-4);
-    font-size: 1.3rem;
-    letter-spacing: -0.02em;
-  }
-  .home-all-articles {
-    margin: 0 0 var(--space-12);
-  }
+  .home-intro { padding-bottom:var(--space-6); }
+  .home-intro .eyebrow { margin:0 0 var(--space-4); }
+  .home-intro__links { display:flex; flex-wrap:wrap; gap:var(--space-6); font-size:.875rem; font-weight:600; }
+  .home-intro__links a { text-decoration:none; }
+  .home-intro__links a:hover { text-decoration:underline; }
+  .home-writing { margin-bottom:var(--space-16); }
+  .home-writing__item { padding:var(--space-4) 0; border-bottom:1px solid var(--border); }
+  .home-writing__item:first-child { border-top:1px solid var(--border); }
+  .home-writing__item h3 { margin:0 0 .35rem; font-size:1rem; line-height:1.45; }
+  .home-writing__item h3 a { color:var(--fg); text-decoration:none; }
+  .home-writing__item h3 a:hover { text-decoration:underline; }
+  .home-writing__item p { margin:0; color:var(--fg-muted); font-size:.8125rem; }
 </style>
