@@ -145,7 +145,7 @@ body.page-listing .game-detail > .game-illustration .game-illustration__label { 
   body.page-home .game-card--featured .game-card__visual, body.page-home .games-grid .game-card__visual { min-height:unset; }
 }
 @media(prefers-color-scheme:dark) {
-  body.page-home:not(:has(.none)), body.page-listing:has(.game-detail),body.page-listing:has(.game-index) {
+  body.page-home, body.page-listing:has(.game-detail), body.page-listing:has(.game-index) {
     --game-paper:#292725; --game-ink:#f4e9d8; --game-rule:#8e8172; --border:#66594b;
     --fg-muted:#c8bbad; --action:#ef9b79; --game-rust:#e8a07e;
   }
