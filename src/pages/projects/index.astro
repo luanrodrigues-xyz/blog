@@ -5,30 +5,33 @@ import { projects } from '../../lib/projects';
 
 <BaseLayout
   title="Projects"
-  description="Development notes and ongoing work on Vetra, Tessora, Ruptura, Unsealed and Deploy ou Ruína."
+  description="Games, tools and ongoing development work: Vetra, Tessora, Ruptura, Unsealed and Deploy ou Ruína."
   language="en"
 >
   <div class="projects-page">
     <header class="page-header">
       <h1>Projects</h1>
-      <p class="lead">Games, tools and experiments I'm working on. I keep the technical decisions and the rough edges here, not just polished screenshots.</p>
+      <p class="lead">Games, tools and experiments I'm working on. Each project has its own space for technical decisions, development notes and playtests.</p>
     </header>
-    {projects.map((project) => (
-      <section id={project.slug} class="project-entry" aria-labelledby={`title-${project.slug}`}>
-        <p class="project-kind">{project.kind} · {project.stack}</p>
-        <h2 id={`title-${project.slug}`}>{project.title}</h2>
-        <p class="project-summary">{project.summary}</p>
-        <p>{project.details}</p>
-      </section>
-    ))}
+    <div class="project-list">
+      {projects.map((project) => (
+        <a class="project-entry" href={`/projects/${project.slug}/`}>
+          <span class="project-kind">{project.kind} · {project.stack}</span>
+          <h2>{project.title} <span class="project-arrow" aria-hidden="true">↗</span></h2>
+          <p>{project.summary}</p>
+        </a>
+      ))}
+    </div>
   </div>
 </BaseLayout>
 
 <style>
   .projects-page { padding-bottom: var(--space-12); }
-  .project-entry { padding: var(--space-8) 0; border-top: 1px solid var(--border); scroll-margin-top: 6rem; }
-  .project-entry h2 { margin: 0 0 0.75rem; font: 700 1.6rem/1.25 var(--font-heading); }
-  .project-entry p { line-height: 1.7; color: var(--fg-muted); }
-  .project-entry .project-summary { color: var(--fg); font-size: 1.05rem; }
-  .project-kind { margin: 0 0 0.75rem; font: 0.8rem/1.5 var(--font-mono); }
+  .project-list { border-top: 1px solid var(--border); }
+  .project-entry { display: block; padding: var(--space-7) 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--fg); }
+  .project-entry h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: .6rem 0; font: 700 1.6rem/1.3 var(--font-heading); }
+  .project-arrow { color: var(--fg-muted); font-size: 1rem; }
+  .project-entry:hover h2, .project-entry:hover .project-arrow { color: var(--action); }
+  .project-entry p { max-width: 38rem; margin: 0; color: var(--fg-muted); line-height: 1.65; }
+  .project-kind { color: var(--fg-muted); font: .78rem/1.5 var(--font-mono); }
 </style>
