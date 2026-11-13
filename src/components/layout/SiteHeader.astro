@@ -18,7 +18,7 @@ const text = ui;
   {text.skip}
 </a>
 <header class="site-header shell" lang={interfaceLanguage}>
-  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Software engineering for iOS and the web.">
+  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Games and game development tools.">
     <Image
       class="wordmark-avatar"
       src={avatar}
@@ -34,18 +34,8 @@ const text = ui;
     </span>
   </a>
   <nav aria-label={text.navigation}>
-    <a
-      href={text.articlesUrl}
-      aria-current={Astro.url.pathname === text.articlesUrl ? 'page' : isArticle || isListingPage ? 'true' : undefined}
-    >
-      {text.articles}
-    </a>
-    {features.lab && (
-      <a href={text.labUrl} aria-current={isLab ? 'page' : undefined}>
-        {text.lab}
-      </a>
-    )}
-    <a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
+    <a href="/projects/" aria-current={Astro.url.pathname.startsWith('/projects/') ? 'page' : undefined}>Projects</a>
+<a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
       {text.about}
     </a>
     <button class="theme-toggle" type="button" aria-label="Switch to dark theme" hidden>
