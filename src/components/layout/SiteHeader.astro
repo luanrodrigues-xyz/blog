@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import avatar from '../../../public/brand/swift-decodificado.png';
-import { features, interfaceLanguage, ui } from '../../config/site';
+import { interfaceLanguage, ui } from '../../config/site';
 
 interface Props {
   isArticle?: boolean;
@@ -10,7 +10,7 @@ interface Props {
   isLab?: boolean;
 }
 
-const { isArticle = false, isListingPage = false, isAbout = false, isLab = false } = Astro.props;
+const { isAbout = false } = Astro.props;
 const text = ui;
 ---
 
@@ -35,7 +35,7 @@ const text = ui;
   </a>
   <nav aria-label={text.navigation}>
     <a href="/projects/" aria-current={Astro.url.pathname.startsWith('/projects/') ? 'page' : undefined}>Projects</a>
-<a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
+    <a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
       {text.about}
     </a>
     <button class="theme-toggle" type="button" aria-label="Switch to dark theme" hidden>
