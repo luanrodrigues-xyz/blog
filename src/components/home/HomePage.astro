@@ -22,7 +22,7 @@ const { entry } = Astro.props;
   </div>
   <div class="project-showcase">
     {projects.map((project) => (
-      <a class="showcase-card" href={`/projects/#${project.slug}`}>
+      <a class="showcase-card" href={`/projects/${project.slug}/`}>
         <span class="showcase-kind">{project.kind}</span>
         <h3>{project.title}</h3>
         <p>{project.summary}</p>
