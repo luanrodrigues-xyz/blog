@@ -1,18 +1,12 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import AreaLinks from '../shared/AreaLinks.astro';
-import { homeContent } from '../../lib/home';
-import { interfaceLanguage, ui } from '../../config/site';
-
-import LatestArticleCard from './LatestArticleCard.astro';
+import { projects } from '../../lib/projects';
 
 interface Props {
   entry: CollectionEntry<'sitePages'>;
 }
 
 const { entry } = Astro.props;
-const text = ui;
-const { articles, latest } = await homeContent();
 ---
 
 <section class="home-intro">
@@ -21,51 +15,40 @@ const { articles, latest } = await homeContent();
   {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
 </section>
 
-{latest.length > 0 && (
-  <section class="home-featured" aria-labelledby="featured-title">
-    <header class="notes-head" lang={interfaceLanguage}>
-      <h2 id="featured-title">Latest articles</h2>
-    </header>
-    <div class="featured-grid">
-      {latest.map((article, index) => (
-        <LatestArticleCard article={article} priority={index === 0} />
-      ))}
-    </div>
-  </section>
-)}
-
-<section class="home-topics" aria-labelledby="home-topics-title">
-  <h2 id="home-topics-title">Explore by area</h2>
-  <AreaLinks articles={articles} />
+<section class="home-projects" aria-labelledby="projects-title">
+  <div class="notes-head">
+    <h2 id="projects-title">Projects</h2>
+    <a href="/projects/">All projects →</a>
+  </div>
+  <div class="project-showcase">
+    {projects.map((project) => (
+      <a class="showcase-card" href={`/projects/${project.slug}/`}>
+        <span class="showcase-kind">{project.kind}</span>
+        <h3>{project.title}</h3>
+        <p>{project.summary}</p>
+        <span class="showcase-stack">{project.stack}</span>
+      </a>
+    ))}
+  </div>
 </section>
 
-<p class="home-all-articles" lang={interfaceLanguage}>
-  <a href={text.articlesUrl}>{text.allArticles} →</a>
-</p>
+<section class="home-notes" aria-labelledby="notes-title">
+  <h2 id="notes-title">Development notes</h2>
+  <p>I'm using this space to keep track of the work behind the projects: design decisions, profiling, bugs, experiments and playtests. Not everything here is finished.</p>
+  <a href="/projects/">See what I'm working on →</a>
+</section>
 
 <style>
-  .home-featured {
-    margin-bottom: var(--space-10);
-  }
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-  @media (max-width: 599px) {
-    .featured-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  .home-topics {
-    margin-bottom: var(--space-10);
-  }
-  .home-topics h2 {
-    margin: 0 0 var(--space-4);
-    font-size: 1.3rem;
-    letter-spacing: -0.02em;
-  }
-  .home-all-articles {
-    margin: 0 0 var(--space-12);
-  }
+  .home-projects { margin-bottom: var(--space-10); }
+  .project-showcase { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .showcase-card { display: flex; flex-direction: column; gap: 0.75rem; padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--canvas); text-decoration: none; color: var(--fg); }
+  .showcase-card:hover { border-color: var(--action); }
+  .showcase-kind, .showcase-stack { color: var(--fg-muted); font: 0.75rem/1.4 var(--font-mono); }
+  .showcase-kind { text-transform: uppercase; letter-spacing: 0.07em; }
+  .showcase-card h3 { margin: 0; font: 700 1.3rem/1.25 var(--font-heading); }
+  .showcase-card p { margin: 0; color: var(--fg-muted); line-height: 1.6; flex: 1; }
+  .home-notes { margin-bottom: var(--space-12); }
+  .home-notes h2 { font-size: 1.3rem; }
+  .home-notes p { color: var(--fg-muted); line-height: 1.7; }
+  @media (max-width: 599px) { .project-showcase { grid-template-columns: 1fr; } }
 </style>
