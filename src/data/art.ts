@@ -24,3 +24,11 @@ export const sketchbook: Artwork[] = [
   { title: 'Environment studies', caption: 'Visual development', panel: 'concrete' },
   { title: 'Speed art', caption: 'Sketchbook & process', panel: 'raised' },
 ];
+
+/** How a character goes from sketch to sprite (Art page). */
+export const process = [
+  { title: 'Thumbnail', text: 'Tiny silhouettes until one pose reads at a glance.' },
+  { title: 'Ink', text: 'Thick, angular outlines — the line does most of the talking.' },
+  { title: 'Flat colour', text: 'A small, warm palette with one loud accent.' },
+  { title: 'Into the game', text: 'The same character becomes a sprite in the prototype.' },
+];

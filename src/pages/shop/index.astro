@@ -1,40 +1,70 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProductGrid from '../../components/shop/ProductGrid.astro';
-import SectionHeading from '../../components/ui/SectionHeading.astro';
 import { site } from '../../config/site';
+
+const launchSteps = ['Artwork is chosen and revealed', 'Prices and shipping are announced', 'Orders open on this page'];
 ---
 
 <BaseLayout
   title="Shop"
   description="Original stickers, T-shirts and mugs by Art by Luan. First collection in preparation."
 >
-  <section class="section" aria-labelledby="shop-title">
-    <div class="shell">
-      <SectionHeading as="h1" eyebrow="Merch stand · Coming soon" title="Art for everyday life" id="shop-title">
-        <p>
+  <section class="section dots" aria-labelledby="shop-title">
+    <div class="shell split">
+      <div class="stack">
+        <span class="sticker">Merch stand · Coming soon</span>
+        <h1 class="display-xl" id="shop-title">
+          Art for <span class="highlight">everyday</span> life.
+        </h1>
+        <p class="lead">
           The first collection starts with original artwork from Deploy ou Ruína. Product designs, prices and shipping
           details will be announced before orders open.
         </p>
-      </SectionHeading>
-      <ProductGrid headingLevel="h2" />
+      </div>
+      <div style="flex: 0 1 360px">
+        <p class="stamp">
+          <span>
+            <small>Collection</small>
+            <strong>#01</strong>
+            <em>Deploy ou Ruína</em>
+          </span>
+        </p>
+      </div>
     </div>
   </section>
 
-  <section class="section section--concrete" aria-labelledby="follow-title">
+  <section class="section section--concrete" aria-labelledby="products-title">
+    <div class="shell">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">On the shelf soon</span>
+          <h2 class="display-l" id="products-title">
+            The first drop
+          </h2>
+        </div>
+      </div>
+      <ProductGrid />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="follow-title">
     <div class="shell split">
       <div class="stack">
         <span class="eyebrow">Be first in line</span>
         <h2 class="display-l" id="follow-title">
           Follow the first collection
         </h2>
-        <p class="lead">New artwork and product announcements land on Instagram first.</p>
-      </div>
-      <div>
-        <a class="btn btn--primary" href={site.instagram}>
+        <p class="lead">Designs, prices and shipping land on Instagram first — before orders open here.</p>
+        <a class="btn btn--primary" href={site.instagram} style="align-self: flex-start">
           Follow @artbyluan
         </a>
       </div>
+      <ol class="counter-list" aria-label="How the shop will open">
+        {launchSteps.map((step) => (
+          <li>{step}</li>
+        ))}
+      </ol>
     </div>
   </section>
 </BaseLayout>

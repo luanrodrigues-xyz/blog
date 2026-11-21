@@ -576,8 +576,9 @@
 
 .prose pre {
   overflow-x: auto;
-  padding: var(--space-4);
-  background: var(--ink);
+  padding: 18px 20px;
+  /* Shiki writes its theme colour inline; the design system's ink wins. */
+  background: var(--ink) !important;
   color: var(--paper);
   border-radius: var(--radius-m);
 }
@@ -585,4 +586,177 @@
 .prose pre code {
   padding: 0;
   background: none;
+}
+
+/* ---------- Numbered steps (process, mechanics) ---------- */
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 26px;
+  background: var(--paper-raised);
+  border: var(--outline);
+  border-radius: var(--radius-s);
+  box-shadow: var(--shadow-m);
+}
+
+.steps__item h3 {
+  font-size: var(--display-s);
+  line-height: 1.05;
+}
+
+/* A plain numbered checklist: big orange-brown numerals in an ink box. */
+.counter-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--paper-raised);
+  border: var(--outline);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-m);
+  overflow: hidden;
+  counter-reset: step;
+}
+
+.counter-list li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px var(--space-5);
+  font-weight: 800;
+  font-size: var(--text-l);
+  counter-increment: step;
+}
+
+.counter-list li + li {
+  border-top: var(--line-thin) solid var(--ink);
+}
+
+.counter-list li::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--link-hover);
+}
+
+/* ---------- Pills & stamps ---------- */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  padding: 6px 14px;
+  background: var(--peach);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: var(--text-s);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.stamp {
+  display: grid;
+  place-items: center;
+  width: min(300px, 80vw);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  background: var(--peach);
+  border: var(--line-heavy) solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 10px 10px 0 var(--ink);
+  text-align: center;
+  transform: rotate(-6deg);
+}
+
+.stamp > span {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stamp small {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stamp strong {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 6rem);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+.stamp em {
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Narrow column (journal entries) ---------- */
+
+.shell--narrow {
+  max-width: 920px;
+}
+
+/* ---------- More long-form text ---------- */
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose figure {
+  margin-inline: 0;
+}
+
+.prose figure img {
+  box-shadow: var(--shadow-l);
+}
+
+.prose figcaption {
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* A blockquote in a journal entry reads as a speech-bubble note ("Still to do"). */
+.prose blockquote {
+  margin-inline: 0;
+  padding: 18px 22px;
+  background: var(--paper-raised);
+  border: var(--outline);
+  border-radius: var(--radius-bubble);
+  box-shadow: 5px 5px 0 var(--ink);
+  font-weight: 700;
+  transform: rotate(-0.5deg);
+}
+
+.prose blockquote > * + * {
+  margin-top: 0.5em;
 }

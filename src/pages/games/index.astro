@@ -1,27 +1,124 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import GameArt from '../../components/games/GameArt.astro';
 import GameCard from '../../components/games/GameCard.astro';
-import SectionHeading from '../../components/ui/SectionHeading.astro';
-import { games } from '../../data/games';
+import Icon from '../../components/ui/Icon.astro';
+import { games, gameUrl } from '../../data/games';
+
+// The first playable game is the featured one; everything else is "coming next".
+const featured = games.find((game) => game.playUrl) ?? games[0];
+const others = games.filter((game) => game !== featured);
 ---
 
 <BaseLayout
   title="Games"
   description="Independent 2D games by Luan Rodrigues: puzzles, platformers and narrative experiments."
 >
-  <section class="section" aria-labelledby="games-title">
+  <section class="section dots" aria-labelledby="games-title">
     <div class="shell">
-      <SectionHeading as="h1" eyebrow="Level select" title="Games in the workshop" id="games-title">
+      <div class="section-heading">
+        <div class="stack" style="gap: 16px">
+          <span class="sticker">Press start</span>
+          <h1 class="display-xl" id="games-title">
+            Level <span class="highlight">select</span>
+          </h1>
+        </div>
         <p>
           Independent 2D games, from geometric puzzles to precision platformers and narrative experiments — each with a
           dev journal.
         </p>
-      </SectionHeading>
-      <div class="grid" style="--grid-min: 320px">
-        {games.map((game) => (
-          <GameCard game={game} headingLevel="h2" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--concrete" aria-labelledby="featured-title">
+    <div class="shell">
+      <article class="card featured">
+        <a class="featured__art" href={gameUrl(featured)} tabindex="-1" aria-hidden="true">
+          <GameArt game={featured} flat />
+          <span class="panel__tag" style="top: 0; bottom: auto">
+            Featured · Play now
+          </span>
+        </a>
+        <div class="card__body featured__body">
+          <span class:list={['badge', `badge--${featured.tone}`]}>{featured.status}</span>
+          <h2 class="display-l" id="featured-title">
+            <a href={gameUrl(featured)} style="text-decoration: none">
+              {featured.title}
+            </a>
+          </h2>
+          <p class="card__tagline">{featured.tagline}</p>
+          <p class="card__text">{featured.description}</p>
+          <ul class="chips" aria-label="Technologies">
+            {featured.technologies.map((technology) => (
+              <li class="chip">{technology}</li>
+            ))}
+          </ul>
+          <div class="btn-group" style="margin-top: 8px">
+            {featured.playUrl && (
+              <a class="btn btn--primary" href={featured.playUrl} rel="noopener noreferrer" target="_blank">
+                <Icon name="play" size={16} /> Play on itch.io
+              </a>
+            )}
+            <a class="btn" href={gameUrl(featured)}>
+              Project page
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="next-title">
+    <div class="shell">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">In the workshop</span>
+          <h2 class="display-l" id="next-title">
+            Coming next
+          </h2>
+        </div>
+      </div>
+      <div class="grid" style="--grid-min: 360px">
+        {others.map((game) => (
+          <GameCard game={game} />
         ))}
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .featured {
+    flex-direction: row;
+    flex-wrap: wrap;
+    box-shadow: 10px 10px 0 var(--ink);
+  }
+
+  .featured__art {
+    position: relative;
+    flex: 1 1 460px;
+    min-width: 0;
+    display: flex;
+  }
+
+  .featured__art :global(.panel) {
+    flex: 1;
+    aspect-ratio: auto;
+    min-height: 340px;
+    border-width: 0 var(--line) 0 0;
+  }
+
+  @media (max-width: 960px) {
+    .featured__art :global(.panel) {
+      border-width: 0 0 var(--line);
+      min-height: 260px;
+    }
+  }
+
+  .featured__body {
+    flex: 1 1 420px;
+    min-width: 0;
+    padding: clamp(24px, 4vw, 44px);
+  }
+</style>

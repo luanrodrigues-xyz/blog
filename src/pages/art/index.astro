@@ -2,32 +2,48 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArtWall from '../../components/art/ArtWall.astro';
 import ProjectBand from '../../components/art/ProjectBand.astro';
-import SectionHeading from '../../components/ui/SectionHeading.astro';
+import Steps from '../../components/ui/Steps.astro';
+import { process } from '../../data/art';
 import { site } from '../../config/site';
 ---
 
 <BaseLayout title="Art" description="Character design, comics and visual development by Luan Rodrigues.">
   <section class="section section--concrete" aria-labelledby="art-title">
     <div class="shell">
-      <SectionHeading
-        as="h1"
-        eyebrow="Art by Luan / Portfolio"
-        title="Illustration & visual development"
-        id="art-title"
-      >
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Art by Luan / Portfolio</span>
+          <h1 class="display-xl" id="art-title">
+            Illustration &amp; <span class="highlight">visual dev</span>
+          </h1>
+        </div>
         <p>Original characters, comic strips and drawing studies — the world of Silicon City, panel by panel.</p>
-      </SectionHeading>
+      </div>
       <ArtWall />
+    </div>
+  </section>
+
+  <section class="section" id="process" aria-labelledby="process-title">
+    <div class="shell">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">How a character is made</span>
+          <h2 class="display-l" id="process-title">
+            From sketch to Silicon City
+          </h2>
+        </div>
+      </div>
+      <Steps items={process} min="220px" />
     </div>
   </section>
 
   <ProjectBand />
 
-  <section class="section dots" aria-labelledby="process-title">
+  <section class="section dots" aria-labelledby="follow-title">
     <div class="shell split">
       <div class="stack">
-        <span class="eyebrow">Sketchbook & process</span>
-        <h2 class="display-l" id="process-title">
+        <span class="eyebrow">Sketchbook &amp; process</span>
+        <h2 class="display-l" id="follow-title">
           Follow the work in progress
         </h2>
         <p class="lead">Drawing studies, character explorations and speed art are shared first on Instagram.</p>

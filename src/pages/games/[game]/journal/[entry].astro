@@ -3,6 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import { formatDate } from '../../../../config/site';
 import { games, gameUrl } from '../../../../data/games';
+import { gameJournalUrl, publishedJournal } from '../../../../lib/game-journal';
 
 export async function getStaticPaths() {
   const entries = await getCollection('gameJournal', ({ data }) => !data.draft);
@@ -15,32 +16,67 @@ export async function getStaticPaths() {
 const { entry } = Astro.props as { entry: CollectionEntry<'gameJournal'> };
 const game = games.find((item) => item.slug === entry.data.game)!;
 const { Content } = await render(entry);
+// Journal is newest first: the previous (older) update is the next item in the list.
+const journal = await publishedJournal(game.slug);
+const index = journal.findIndex((item) => item.id === entry.id);
+const previous = journal[index + 1];
+const newer = journal[index - 1];
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.summary} ogType="article">
-  <article class="section" aria-labelledby="entry-title">
-    <div class="shell">
-      <div class="stack" style="max-width: 68ch">
-        <a class="eyebrow" href={`/games/${game.slug}/journal/`}>
-          {game.title} / Dev journal
-        </a>
-        <h1 class="display-l" id="entry-title">
-          {entry.data.title}
-        </h1>
-        <div class="btn-group" style="align-items: center">
-          <time class="badge" datetime={entry.data.date.toISOString().slice(0, 10)}>
-            {formatDate(entry.data.date)}
-          </time>
-          {entry.data.version && <span class="chip">{entry.data.version}</span>}
+  <article>
+    <header class="section dots">
+      <div class="shell shell--narrow">
+        <div class="stack">
+          <a class="eyebrow" href={`/games/${game.slug}/journal/`} style="text-decoration: none">
+            {game.title} / Dev journal
+          </a>
+          <h1 class="display-l">{entry.data.title}</h1>
+          <div class="btn-group" style="align-items: center; gap: 10px">
+            <time class="badge" datetime={entry.data.date.toISOString().slice(0, 10)}>
+              {formatDate(entry.data.date)}
+            </time>
+            {entry.data.version && <span class="chip">{entry.data.version}</span>}
+            <span class:list={['badge', `badge--${game.tone}`]}>{game.status}</span>
+          </div>
+          <p class="lead" style="max-width: 56ch">
+            {entry.data.summary}
+          </p>
         </div>
-        <p class="lead">{entry.data.summary}</p>
       </div>
-      <div class="prose">
-        <Content />
+    </header>
+
+    <div class="section">
+      <div class="shell shell--narrow">
+        <div class="prose">
+          <Content />
+        </div>
       </div>
-      <p>
-        <a href={gameUrl(game)}>← Back to {game.title}</a>
-      </p>
     </div>
   </article>
+
+  <nav class="section" aria-label="Journal entries">
+    <div
+      class="shell shell--narrow"
+      style="flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding-block: 40px"
+    >
+      {previous ? (
+        <a class="btn" href={gameJournalUrl(previous)} rel="prev">
+          ← Previous update
+        </a>
+      ) : (
+        <span></span>
+      )}
+      <div class="btn-group">
+        {newer && (
+          <a class="btn" href={gameJournalUrl(newer)} rel="next">
+            Next update →
+          </a>
+        )}
+        <a class="btn btn--primary" href={gameUrl(game)}>
+          Back to the game
+        </a>
+      </div>
+    </div>
+  </nav>
 </BaseLayout>

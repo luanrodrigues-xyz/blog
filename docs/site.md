@@ -39,9 +39,11 @@ um laranja forte e traço de tinta grosso. O visual deve parecer impresso, não 
   retícula (`.dots`), nunca degradê.
 - **Componentes** — `src/styles/components.css`: `.section`, `.split`, `.grid`, `.eyebrow`, `.highlight`,
   `.sticker`, `.bubble`, `.btn` (`--primary`, `--small`, `--row`), `.badge` (`--playable`, `--prototype`,
-  `--visual`), `.chip`, `.card`, `.panel` (`--hero`, `--flat` e uma cor), `.ticker`, `.entry-list`, `.prose`.
+  `--visual`), `.chip`, `.pills`, `.card`, `.panel` (`--hero`, `--flat` e uma cor), `.ticker`, `.entry-list`,
+  `.steps` (componente `Steps.astro`, para processos e mecânicas), `.counter-list`, `.stamp` e `.prose`
+  (num post do diário, um `> bloco de citação` vira um balão de nota).
 
-O canvas de design de referência (home, página de jogo e guia de estilo) fica nos Artifacts do claude.ai.
+O canvas de design de referência (home, todas as páginas internas e o guia de estilo) fica nos Artifacts do claude.ai.
 
 ## Arte e imagens
 

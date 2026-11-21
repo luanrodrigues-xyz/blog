@@ -1,0 +1,22 @@
+---
+/** Numbered panels for a process or a game's mechanics. Colours cycle through the accent palette. */
+interface Props {
+  items: { title: string; text: string }[];
+  min?: string;
+}
+
+const { items, min = '240px' } = Astro.props;
+const colours = ['orange', 'peach', 'khaki', 'concrete'];
+---
+
+<ol class="grid steps" style={`--grid-min: ${min}; --grid-gap: 24px`}>
+  {items.map((item, index) => (
+    <li class="steps__item">
+      <span class="numbered" style={`background: var(--${colours[index % colours.length]})`} aria-hidden="true">
+        {index + 1}
+      </span>
+      <h3>{item.title}</h3>
+      <p>{item.text}</p>
+    </li>
+  ))}
+</ol>
