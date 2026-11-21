@@ -1,11 +1,12 @@
 export const site = {
   name: 'Luan Rodrigues',
-  brand: 'Luan Rodrigues',
+  brand: 'Art by Luan',
   origin: 'https://luanrodrigues.xyz',
   author: 'Luan Rodrigues',
   avatar: '/brand/swift-decodificado.png',
   /** Canais públicos, usados no rodapé e na página 404. */
   links: [
+    { label: 'Instagram', href: 'https://www.instagram.com/artbyluan/' },
     { label: 'GitHub', href: 'https://github.com/luanrodrigues-xyz' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/luanrodrigues-xyz/' },
   ],

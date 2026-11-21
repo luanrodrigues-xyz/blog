@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Art" description="Character design, comics and visual development by Luan Rodrigues." language="en">
+  <section class="art-intro">
+    <p class="eyebrow">Art by Luan / Portfolio</p>
+    <h1>Illustration &amp; visual development</h1>
+    <p class="lead">Original characters, comics, fan art and drawing studies.</p>
+  </section>
+  <section class="art-project">
+    <p class="eyebrow">Original project</p>
+    <h2>Deploy ou Ruína</h2>
+    <p>Meet Carlos, a developer navigating the absurdities of the technology job market. The project brings together character design, comic strips and independent game development.</p>
+    <a href="https://www.instagram.com/artbyluan/">See the artwork on Instagram →</a>
+    <a href="/games/deploy-ou-ruina/">Game development →</a>
+    <a href="/shop/">Explore merchandise →</a>
+  </section>
+  <section class="art-intro">
+    <h2>Sketchbook &amp; process</h2>
+    <p>Drawing studies, character explorations and speed art are shared on <a href="https://www.instagram.com/artbyluan/">@artbyluan</a>.</p>
+  </section>
+</BaseLayout>
+<style>
+  .art-intro { padding: 3rem 0; }
+  .art-project { padding: clamp(1.5rem,5vw,3rem); background:#713bd0; color:white; border:3px solid #21182d; border-radius:1rem; }
+  .art-project h2 { color:#ffe173; font-size:clamp(2rem,6vw,4rem); line-height:1.1; }
+  .art-project a { color:white; display:block; margin-top:1rem; }
+  .art-project .eyebrow { color:white; }
+</style>

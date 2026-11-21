@@ -21,6 +21,8 @@ export async function GET() {
   const locations = [
     ...areas.map(({ id }) => ({ url: `${site.origin}${areaRoute(id)}`, date: undefined as Date | undefined })),
     { url: `${site.origin}${ui.articlesUrl}`, date: undefined as Date | undefined },
+    { url: `${site.origin}/art/`, date: undefined as Date | undefined },
+    { url: `${site.origin}/shop/`, date: undefined as Date | undefined },
     ...pages.map(({ data }) => ({ url: data.canonical!, date: undefined as Date | undefined })),
     ...articles.map(({ data }) => ({ url: data.canonical, date: data.updated ?? data.published })),
   ];

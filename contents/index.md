@@ -1,9 +1,9 @@
 ---
 title: "Luan Rodrigues"
-heroTitle: "I build games and write about the code behind them."
-intro: "I am Luan, a software developer working with Swift, C++, and TypeScript."
-introDetail: "Currently building independent 2D games and exploring gameplay, graphics, and software architecture."
-description: "Independent 2D games and technical writing on game development, iOS, and software engineering."
+heroTitle: "Characters, stories and independent games."
+intro: "I am Luan, a concept artist, illustrator and independent game developer."
+introDetail: "I create characters, comic strips and visual worlds, and build games with C++, TypeScript and PixiJS."
+description: "Art by Luan: character design, illustration, comics, independent games and original merchandise."
 language: "en"
 isPortuguese: false
 canonical: "https://luanrodrigues.xyz/"

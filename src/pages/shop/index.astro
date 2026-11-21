@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const products = [
+  { name: 'Stickers', description: 'Original character art for laptops, notebooks and sketchbooks.', kind: 'sticker', color: '#ffe173' },
+  { name: 'T-shirts', description: 'Wearable illustrations from the Art by Luan collection.', kind: 'shirt', color: '#b399f4' },
+  { name: 'Mugs', description: 'Illustrated mugs for your desk and coffee breaks.', kind: 'mug', color: '#f4a47e' },
+];
+---
+<BaseLayout title="Shop" description="Original stickers, T-shirts and mugs by Art by Luan. First collection in preparation." language="en">
+  <header class="shop-intro">
+    <p class="eyebrow">Art by Luan / Shop</p>
+    <h1>Art for everyday life.</h1>
+    <p class="lead">The first merchandise collection is in preparation, starting with original artwork from Deploy ou Ruína.</p>
+    <p class="notice">Coming soon · Product designs, prices and shipping details will be announced before orders open.</p>
+  </header>
+  <section class="shop-grid" aria-label="Upcoming product categories">
+    {products.map((product) => (
+      <article class="product">
+        <div class="product-image" style={`--product-color:${product.color}`}>
+          <svg viewBox="0 0 200 150" aria-hidden="true" fill="none" stroke="#21182d" stroke-width="4" stroke-linejoin="round">
+            {product.kind === 'sticker' && <path fill="white" d="M44 34 Q44 23 56 23 H145 Q156 23 156 35 V91 L117 128 H56 Q44 128 44 116 Z M117 128 V100 Q117 91 126 91 H156"/>}
+            {product.kind === 'shirt' && <path fill="white" d="M73 27 L39 41 L16 79 L49 96 L61 77 V130 H139 V77 L151 96 L184 79 L161 41 L127 27 Q100 55 73 27Z"/>}
+            {product.kind === 'mug' && <><path fill="white" d="M44 36 H136 V114 Q136 130 90 130 Q44 130 44 114Z"/><path d="M136 46 H149 Q181 46 181 76 Q181 106 136 106"/></>}
+            <path d="M79 73 L90 83 L115 59" stroke="#713bd0" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="product-copy">
+          <p class="eyebrow">Coming soon</p>
+          <h2>{product.name}</h2>
+          <p>{product.description}</p>
+        </div>
+      </article>
+    ))}
+  </section>
+  <section class="shop-follow">
+    <h2>Follow the first collection</h2>
+    <p>See new artwork and product announcements on Instagram.</p>
+    <a href="https://www.instagram.com/artbyluan/">Follow @artbyluan →</a>
+  </section>
+</BaseLayout>
+<style>
+  .shop-intro { padding:3rem 0 2rem; }
+  .notice { color:var(--fg-muted); max-width:60ch; }
+  .shop-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:1rem; }
+  .product { border:1px solid var(--border); border-radius:1rem; overflow:hidden; }
+  .product-image { background:var(--product-color); display:grid; place-items:center; aspect-ratio:4/3; }
+  .product-image svg { width:75%; max-height:180px; }
+  .product-copy { padding:1.25rem; }
+  .product-copy h2 { margin:.5rem 0; }
+  .shop-follow { padding:3rem 0; }
+</style>

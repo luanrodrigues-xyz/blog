@@ -11,19 +11,23 @@ const { latest } = await homeContent();
 ---
 
 <section class="home-intro">
-  <div class="home-intro__scene" aria-hidden="true">
-    <svg viewBox="0 0 280 200" fill="none"><path d="M15 176H272" stroke="currentColor" stroke-width="2"/><path d="M48 173v-24l-21-21v-13h47v13l-21 21v24M38 115l12-53l12 53" stroke="#697450" stroke-width="3" stroke-linecap="round"/><path d="M22 115q-27-23 4-44q-7-32 20-27q18-25 31 2q33 10 13 39q10 29-16 30" fill="#9d9e70" stroke="#363d34" stroke-width="2"/><rect x="99" y="70" width="134" height="91" rx="6" fill="#4d4b54" stroke="#302e35" stroke-width="5"/><rect x="109" y="79" width="114" height="69" fill="#384055"/><path d="M115 131h20v-13h20v-14h24v-14h31" stroke="#9682bc" stroke-width="6"/><rect x="161" y="161" width="12" height="13" fill="#5c5961"/><path d="M133 175h68" stroke="#302e35" stroke-width="6"/><path d="M95 177h153" stroke="#855942" stroke-width="8" stroke-linecap="round"/><path d="M240 175v-35h19v35" stroke="#a37356" stroke-width="3"/><path d="M240 144h20" stroke="#a37356" stroke-width="2"/><path d="M248 130q-7-14 2-23m6 26q-4-10 1-19" stroke="#a68c78" stroke-width="2"/><path d="M125 55l22-20l22 20" stroke="#a16849" stroke-width="3" stroke-linecap="round"/><path d="M167 25l10-8l13 8" stroke="#a16849" stroke-width="2"/></svg>
-  </div>
-  <p class="eyebrow">Software developer / Indie game dev</p>
+  <p class="eyebrow">Art by Luan / Independent studio</p>
   <h1>{entry.data.heroTitle}</h1>
   <p class="lead">{entry.data.intro}</p>
   {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
   <div class="home-intro__links">
-    <a href="#selected-games">Explore games ↓</a>
+    <a href="/art/">Explore artwork →</a>
+    <a href="/shop/">Visit the shop →</a>
     <a href="https://github.com/luanrodrigues-xyz" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
   </div>
 </section>
 
+<section class="studio-feature" aria-labelledby="studio-title">
+  <p class="eyebrow">Featured project</p>
+  <h2 id="studio-title">Deploy ou Ruína</h2>
+  <p>Original characters, comic strips and visual development about life in software.</p>
+  <a href="/art/">Explore the project →</a>
+</section>
 <section class="games-section" id="selected-games" aria-labelledby="selected-games-title">
   <header class="games-heading">
     <h2 id="selected-games-title">My games</h2>
@@ -59,6 +63,10 @@ const { latest } = await homeContent();
 )}
 
 <style>
+  .studio-feature { padding: 2rem; margin-bottom: 3rem; background: #713bd0; color: white; border: 3px solid #21182d; border-radius: 1rem; }
+  .studio-feature a, .studio-feature .eyebrow { color: white; }
+  .studio-feature h2 { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05; color: #ffe173; }
+
   .home-intro { padding-bottom:var(--space-6); }
   .home-intro .eyebrow { margin:0 0 var(--space-4); }
   .home-intro__links { display:flex; flex-wrap:wrap; gap:var(--space-6); font-size:.875rem; font-weight:600; }

@@ -272,3 +272,8 @@ body.page-list .site-header {
     width: 100%;
   }
 }
+
+@media (max-width: 700px) {
+  .site-header { flex-wrap: wrap; gap: 0; padding-block: .25rem; }
+  .site-header nav { flex-wrap: wrap; gap: .85rem; }
+}

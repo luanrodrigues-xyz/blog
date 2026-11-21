@@ -18,7 +18,7 @@ const text = ui;
   {text.skip}
 </a>
 <header class="site-header shell" lang={interfaceLanguage}>
-  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Software development and independent games.">
+  <a class="wordmark" href={text.homeUrl} aria-label="Art by Luan | Illustration and independent games.">
     <Image
       class="wordmark-avatar"
       src={avatar}
@@ -30,10 +30,12 @@ const text = ui;
       height="32"
     />
     <span class="wordmark-text">
-      <span class="wordmark-name">Luan Rodrigues</span>
+      <span class="wordmark-name">Art by Luan</span>
     </span>
   </a>
   <nav aria-label={text.navigation}>
+    <a href="/art/" aria-current={Astro.url.pathname.startsWith("/art/") ? "page" : undefined}>Art</a>
+    <a href="/shop/" aria-current={Astro.url.pathname.startsWith("/shop/") ? "page" : undefined}>Shop</a>
     <a href={text.gamesUrl} aria-current={Astro.url.pathname.startsWith(text.gamesUrl) ? 'page' : undefined}>{text.games}</a>
     <a
       href={text.articlesUrl}

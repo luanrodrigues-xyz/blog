@@ -29,9 +29,9 @@ export const games: Game[] = [
   },
   {
     slug: 'deploy-ou-ruina', title: 'Deploy ou Ruína', tagline: 'Starting over is a full-time job.',
-    description: 'A narrative 2D iPhone game about Carlos, a developer rebuilding his career in Silicon City while balancing time, decisions and limited resources.',
-    status: 'Internal alpha · iPhone', technologies: ['Swift 6', 'SpriteKit', 'SwiftUI'],
-    development: 'The alpha includes a room, desktop interface, job application flow, narrative clock and save system. The larger city and additional activities remain planned.',
-    mechanics: ['Explore Carlos’s room', 'Interact with a fictional computer and job listings', 'Manage time and decisions']
+    description: 'An original satirical project about Carlos and the absurdities of the technology job market, told through comics, character art and a 2D game in development.',
+    status: 'Visual development · Game prototype', technologies: ['C++20', 'SDL3'],
+    development: 'Current work includes character illustration, comic strips and a C++ gameplay prototype.',
+    mechanics: ['Character design and satire', 'Environmental storytelling', 'Gameplay experiments']
   }
 ];
