@@ -1,5 +1,5 @@
 {
-  "name": "swift-decodificado",
+  "name": "art-by-luan",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -8,28 +8,14 @@
     "check": "astro check",
     "test": "vitest run tests",
     "test:browser": "node scripts/check-site-experience.mjs",
-    "new": "node scripts/new-article.mjs",
-    "covers": "node scripts/make-covers.mjs",
-    "publicar": "node scripts/publish-article.mjs",
-    "despublicar": "node scripts/publish-article.mjs --undo",
-    "exemplo": "node scripts/examples.mjs novo",
-    "testar-exemplos": "node scripts/examples.mjs testar",
-    "conferir-exemplos": "node scripts/examples.mjs conferir",
-    "auditar-diagramas": "node scripts/audit-diagrams.mjs",
     "postinstall": "puppeteer browsers install chrome && puppeteer browsers install chrome-headless-shell",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "auditar-editorial": "node scripts/audit-editorial.mjs",
     "postbuild": "node scripts/compress-site.mjs"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "0.4.2",
-    "@astrojs/mdx": "8.0.2",
-    "astro": "7.3.5",
-    "github-slugger": "2.0.0",
-    "highlight.js": "11.11.1",
-    "satteri": "0.10.5"
+    "astro": "7.3.5"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

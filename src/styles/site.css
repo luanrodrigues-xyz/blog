@@ -1,8 +1,4 @@
-/* Shared foundations and interface. Reading styles load only on content pages. */
-@import url('colors.css');
+/* Silicon City design system: tokens → base elements → components. */
+@import url('tokens.css');
 @import url('base.css');
-@import url('layout.css');
 @import url('components.css');
-@import url('pages.css');
-
-@import url('games.css');

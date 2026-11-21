@@ -1,0 +1,74 @@
+/*
+ * Silicon City design tokens: ink & paper.
+ * Every colour is sampled from the key illustration (src/assets/art/silicon-city.webp).
+ * Text pairs are checked for WCAG AA contrast in tests/tokens.test.ts.
+ */
+:root {
+  /* Colour */
+  --ink: #1f1512;
+  --paper: #f4e8da;
+  --paper-raised: #fffdf8;
+  --concrete-light: #e9d6c4;
+  --concrete: #b9a19d;
+  --orange: #e2572a; /* hair — the one loud accent */
+  --peach: #f4a45f; /* skin */
+  --plum: #6b2547; /* jacket */
+  --khaki: #c9a86a; /* cargo shorts */
+  --green: #2f7a4f; /* "playable" status */
+  --muted: #6b4a43; /* secondary text on paper */
+  --on-ink-muted: #cdbbae; /* secondary text on ink */
+  --link-hover: #b8401a;
+  --city: #3a2a25; /* skyline on ink */
+
+  /* Type */
+  --font-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --font-body: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --text-s: 0.875rem;
+  --text-m: 1rem;
+  --text-l: 1.125rem;
+  --text-xl: clamp(1.125rem, 1.6vw, 1.3125rem);
+  --display-s: 1.875rem;
+  --display-m: 2.5rem;
+  --display-l: clamp(2.25rem, 6vw, 4.5rem);
+  --display-xl: clamp(2.75rem, 8vw, 6.5rem);
+
+  /* Ink lines: 3px on every card, button and panel; 4px on hero art */
+  --line: 3px;
+  --line-thin: 2px;
+  --line-heavy: 4px;
+  --outline: var(--line) solid var(--ink);
+
+  /* Hard offset shadows — printed, never blurred */
+  --shadow-s: 4px 4px 0 var(--ink);
+  --shadow-m: 6px 6px 0 var(--ink);
+  --shadow-l: 8px 8px 0 var(--ink);
+  --shadow-xl: 12px 12px 0 var(--ink);
+
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 14px;
+  --radius-bubble: 22px;
+  --radius-pill: 999px;
+
+  /* Halftone texture */
+  --dots: radial-gradient(rgb(31 21 18 / 0.16) 1.4px, transparent 1.6px);
+  --dots-on-dark: radial-gradient(rgb(244 232 218 / 0.14) 1.4px, transparent 1.6px);
+  --dots-size: 9px 9px;
+
+  /* Layout */
+  --max-width: 1280px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --section-y: clamp(56px, 7vw, 96px);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 56px;
+
+  color-scheme: light;
+}

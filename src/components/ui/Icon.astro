@@ -1,0 +1,79 @@
+---
+/** Inline stroke icons, inheriting the text colour. Always decorative: label the control instead. */
+interface Props {
+  name: 'arrow' | 'play' | 'sticker' | 'shirt' | 'mug';
+  size?: number;
+}
+
+const { name, size = 20 } = Astro.props;
+---
+
+{name === 'arrow' && (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+)}
+{name === 'play' && (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M7 4.5v15l12-7.5z" />
+  </svg>
+)}
+{name === 'sticker' && (
+  <svg
+    width={size}
+    height={size * 0.75}
+    viewBox="0 0 200 150"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="5"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path
+      fill="var(--paper-raised)"
+      d="M44 34 Q44 23 56 23 H145 Q156 23 156 35 V91 L117 128 H56 Q44 128 44 116 Z M117 128 V100 Q117 91 126 91 H156"
+    />
+  </svg>
+)}
+{name === 'shirt' && (
+  <svg
+    width={size}
+    height={size * 0.75}
+    viewBox="0 0 200 150"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="5"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path
+      fill="var(--paper-raised)"
+      d="M73 27 L39 41 L16 79 L49 96 L61 77 V130 H139 V77 L151 96 L184 79 L161 41 L127 27 Q100 55 73 27Z"
+    />
+  </svg>
+)}
+{name === 'mug' && (
+  <svg
+    width={size}
+    height={size * 0.75}
+    viewBox="0 0 200 150"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="5"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path fill="var(--paper-raised)" d="M44 36 H136 V114 Q136 130 90 130 Q44 130 44 114Z" />
+    <path d="M136 46 H149 Q181 46 181 76 Q181 106 136 106" />
+  </svg>
+)}

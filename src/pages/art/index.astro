@@ -1,29 +1,42 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArtWall from '../../components/art/ArtWall.astro';
+import ProjectBand from '../../components/art/ProjectBand.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import { site } from '../../config/site';
 ---
-<BaseLayout title="Art" description="Character design, comics and visual development by Luan Rodrigues." language="en">
-  <section class="art-intro">
-    <p class="eyebrow">Art by Luan / Portfolio</p>
-    <h1>Illustration &amp; visual development</h1>
-    <p class="lead">Original characters, comics, fan art and drawing studies.</p>
+
+<BaseLayout title="Art" description="Character design, comics and visual development by Luan Rodrigues.">
+  <section class="section section--concrete" aria-labelledby="art-title">
+    <div class="shell">
+      <SectionHeading
+        as="h1"
+        eyebrow="Art by Luan / Portfolio"
+        title="Illustration & visual development"
+        id="art-title"
+      >
+        <p>Original characters, comic strips and drawing studies — the world of Silicon City, panel by panel.</p>
+      </SectionHeading>
+      <ArtWall />
+    </div>
   </section>
-  <section class="art-project">
-    <p class="eyebrow">Original project</p>
-    <h2>Deploy ou Ruína</h2>
-    <p>Meet Carlos, a developer navigating the absurdities of the technology job market. The project brings together character design, comic strips and independent game development.</p>
-    <a href="https://www.instagram.com/artbyluan/">See the artwork on Instagram →</a>
-    <a href="/games/deploy-ou-ruina/">Game development →</a>
-    <a href="/shop/">Explore merchandise →</a>
-  </section>
-  <section class="art-intro">
-    <h2>Sketchbook &amp; process</h2>
-    <p>Drawing studies, character explorations and speed art are shared on <a href="https://www.instagram.com/artbyluan/">@artbyluan</a>.</p>
+
+  <ProjectBand />
+
+  <section class="section dots" aria-labelledby="process-title">
+    <div class="shell split">
+      <div class="stack">
+        <span class="eyebrow">Sketchbook & process</span>
+        <h2 class="display-l" id="process-title">
+          Follow the work in progress
+        </h2>
+        <p class="lead">Drawing studies, character explorations and speed art are shared first on Instagram.</p>
+      </div>
+      <div>
+        <a class="btn btn--primary" href={site.instagram}>
+          Follow @artbyluan
+        </a>
+      </div>
+    </div>
   </section>
 </BaseLayout>
-<style>
-  .art-intro { padding: 3rem 0; }
-  .art-project { padding: clamp(1.5rem,5vw,3rem); background:#713bd0; color:white; border:3px solid #21182d; border-radius:1rem; }
-  .art-project h2 { color:#ffe173; font-size:clamp(2rem,6vw,4rem); line-height:1.1; }
-  .art-project a { color:white; display:block; margin-top:1rem; }
-  .art-project .eyebrow { color:white; }
-</style>

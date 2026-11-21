@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { keyArt } from '../data/art';
+import { site } from '../config/site';
+---
+
+<BaseLayout title="About" description="Luan Rodrigues: concept artist, illustrator and independent game developer.">
+  <section class="section dots" aria-labelledby="about-title">
+    <div class="shell split">
+      <div class="stack">
+        <span class="eyebrow">About</span>
+        <h1 class="display-xl" id="about-title">
+          Hi, I'm <span class="highlight">Luan</span>
+        </h1>
+        <p class="bubble bubble--left">Concept artist, illustrator and independent game developer.</p>
+        <div class="prose">
+          <p>
+            I work on character design, visual development and digital illustration. <strong>Deploy ou Ruína</strong> is
+            my original project about Carlos and the absurdities of working in technology.
+          </p>
+          <p>
+            I also build independent games — puzzles and platformers in TypeScript, PixiJS, C++ and SDL3. My
+            professional background is in software development, which is why the developer side keeps showing up in the
+            art.
+          </p>
+        </div>
+      </div>
+      <figure class="panel panel--hero">
+        <Image
+          src={keyArt.image}
+          alt={keyArt.alt}
+          widths={[480, 800]}
+          sizes="(max-width: 900px) calc(100vw - 32px), 560px"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--concrete" aria-labelledby="find-title">
+    <div class="shell split">
+      <h2 class="display-l" id="find-title">
+        Find me online
+      </h2>
+      <ul class="btn-group" style="list-style: none; margin: 0; padding: 0">
+        {site.links.map((link) => (
+          <li>
+            <a class="btn" href={link.href} rel="me">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

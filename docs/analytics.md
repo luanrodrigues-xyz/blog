@@ -47,10 +47,11 @@ Referência: [configurar GA4 no GTM](https://support.google.com/tagmanager/answe
 
 ### Cliques de navegação
 
-O site envia `portfolio_navigation_click` à camada de dados para menu, cards e
-títulos de artigos, anterior/próximo, categorias e links GitHub/LinkedIn.
+O site envia `portfolio_navigation_click` à camada de dados para o menu, links
+para jogos, arte e loja, o botão de jogar no itch.io e os links Instagram/GitHub/LinkedIn.
 O evento GA4 correspondente é `navigation_click`, com `click_kind` (`menu`,
-`article`, `category`, `social`), `click_section`, `link_text`, `link_url`,
+`game`, `play`, `art`, `shop`, `social`), `click_section` (`header`, `footer` ou o `id`
+da seção da página), `link_text`, `link_url`,
 `link_anchor`, `page_location` e `page_title`. URLs de clique não incluem query
 strings; rótulos têm limite de 100 caracteres. Cliques por teclado e botão do
 meio também são registrados. Links editoriais comuns e o atalho “Skip to content”

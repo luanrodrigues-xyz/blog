@@ -1,0 +1,36 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../../config/site';
+import { gameJournalUrl } from '../../lib/game-journal';
+
+interface Props {
+  entries: CollectionEntry<'gameJournal'>[];
+  empty: string;
+  /** Show each entry's summary under its title (used on the archive page). */
+  withSummary?: boolean;
+}
+
+const { entries, empty, withSummary = false } = Astro.props;
+---
+
+<ol class="entry-list">
+  {entries.length === 0 ? (
+    <li>
+      <p class="entry-list__empty">{empty}</p>
+    </li>
+  ) : (
+    entries.map((entry) => (
+      <li>
+        <a href={gameJournalUrl(entry)}>
+          <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+          <strong>
+            {entry.data.title}
+            {entry.data.version && <span class="chip">{entry.data.version}</span>}
+          </strong>
+          <span aria-hidden="true">→</span>
+          {withSummary && <p>{entry.data.summary}</p>}
+        </a>
+      </li>
+    ))
+  )}
+</ol>

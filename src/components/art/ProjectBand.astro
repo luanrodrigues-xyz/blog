@@ -1,0 +1,30 @@
+---
+import { site } from '../../config/site';
+import Icon from '../ui/Icon.astro';
+---
+
+<section class="section section--plum" id="deploy-ou-ruina" aria-labelledby="project-band-title">
+  <div class="shell split">
+    <div class="stack">
+      <span class="eyebrow">Original project</span>
+      <h2 class="display-xl" id="project-band-title">
+        Deploy <span class="accent-text">ou</span> Ruína
+      </h2>
+      <p class="lead">
+        Meet Carlos, a developer navigating the absurdities of the technology job market. One world, three formats:
+        character design, comic strips and an independent game.
+      </p>
+    </div>
+    <nav class="stack" aria-label="Deploy ou Ruína" style="gap: 14px">
+      <a class="btn btn--row" href={site.instagram}>
+        See the artwork <Icon name="arrow" />
+      </a>
+      <a class="btn btn--row" href="/games/deploy-ou-ruina/">
+        Game development <Icon name="arrow" />
+      </a>
+      <a class="btn btn--row btn--primary" href="/shop/">
+        Explore merchandise <Icon name="arrow" />
+      </a>
+    </nav>
+  </div>
+</section>

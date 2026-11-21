@@ -1,23 +1,42 @@
 ---
-import type { Game } from '../../data/games';
-import GameIllustration from './GameIllustration.astro';
-interface Props { game: Game; featured?: boolean }
-const { game, featured = false } = Astro.props;
+import { gameUrl, type Game } from '../../data/games';
+import GameArt from './GameArt.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  game: Game;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { game, headingLevel: Heading = 'h3' } = Astro.props;
+const url = gameUrl(game);
 ---
-<article class:list={['game-card', { 'game-card--featured': featured }]}>
-  <a href={`/games/${game.slug}/`} class="game-card__visual" aria-label={`Explore ${game.title}`}>
-    <GameIllustration game={game} />
+
+<article class="card">
+  <a href={url} tabindex="-1" aria-hidden="true">
+    <GameArt game={game} flat />
   </a>
-  <div class="game-card__body">
-    <div class="game-card__heading">
-      <h3><a href={`/games/${game.slug}/`}>{game.title}</a></h3>
-      <span class="game-card__status">{game.status}</span>
-    </div>
-    <p class="game-card__description">{featured ? game.description : game.tagline}</p>
-    <ul class="game-card__tech" role="list">{game.technologies.map((tag) => <li>{tag}</li>)}</ul>
-    <div class="game-card__links">
-      {game.playUrl && <a class="game-card__play" href={game.playUrl} target="_blank" rel="noopener noreferrer">Play game ↗</a>}
-      <a href={`/games/${game.slug}/`}>Project details →</a>
-    </div>
+  <div class="card__body">
+    <span class:list={['badge', `badge--${game.tone}`]}>{game.status}</span>
+    <Heading class="card__title">
+      <a href={url}>{game.title}</a>
+    </Heading>
+    <p class="card__tagline">{game.tagline}</p>
+    <p class="card__text">{game.description}</p>
+    <ul class="chips" aria-label="Technologies">
+      {game.technologies.map((technology) => (
+        <li class="chip">{technology}</li>
+      ))}
+    </ul>
+    {game.playUrl ? (
+      <a class="btn btn--primary btn--small" href={game.playUrl} rel="noopener noreferrer" target="_blank">
+        <Icon name="play" size={16} />
+        Play on itch.io
+      </a>
+    ) : (
+      <a class="btn btn--small" href={url}>
+        Enter the project
+      </a>
+    )}
   </div>
 </article>

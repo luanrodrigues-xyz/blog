@@ -1,0 +1,82 @@
+---
+import type { Game } from '../../data/games';
+
+interface Props {
+  game: Pick<Game, 'slug' | 'title' | 'panel'>;
+  /** Flat panels sit inside a card; framed ones stand alone with outline and shadow. */
+  flat?: boolean;
+}
+
+const { game, flat = false } = Astro.props;
+---
+
+<div
+  class:list={['panel', 'dots', 'game-art', `panel--${game.panel}`, { 'panel--flat': flat }]}
+  role="img"
+  aria-label={`Ink drawing representing ${game.title}; not a gameplay screenshot`}
+>
+  {game.slug === 'tessora' && (
+    <svg viewBox="0 0 160 110" aria-hidden="true">
+      <path d="M14 100 L64 10 L64 100 Z" />
+      <path d="M80 30 L130 30 L130 80 L80 80 Z" transform="rotate(12 105 55)" />
+      <path class="game-art__cut" d="M30 72 L120 40" />
+    </svg>
+  )}
+  {game.slug === 'ruptura' && (
+    <svg viewBox="0 0 160 110" aria-hidden="true">
+      <rect x="10" y="82" width="140" height="20" />
+      <rect x="104" y="22" width="22" height="60" />
+      <circle class="game-art__accent" cx="56" cy="54" r="16" />
+      <path class="game-art__line" d="M22 66 L36 58 M18 50 L34 50" />
+      <path class="game-art__cut" d="M78 46 L96 36" />
+    </svg>
+  )}
+  {game.slug === 'deploy-ou-ruina' && (
+    <svg viewBox="0 0 160 110" aria-hidden="true">
+      <rect x="22" y="14" width="80" height="58" rx="4" />
+      <rect class="game-art__screen" x="32" y="24" width="60" height="38" />
+      <path class="game-art__line" d="M40 34 H80 M40 44 H70 M40 54 H76" />
+      <path d="M50 72 V84 H74 V72" />
+      <path d="M112 66 H138 V92 H112 Z" />
+      <path class="game-art__line" d="M138 72 Q150 72 150 79 Q150 86 138 86" />
+      <path class="game-art__line" d="M120 58 Q114 50 121 42 M130 58 Q124 50 131 42" />
+      <path d="M8 100 H152" />
+    </svg>
+  )}
+</div>
+
+<style>
+  .game-art {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+  }
+
+  svg {
+    width: 58%;
+    max-height: 72%;
+    fill: var(--paper-raised);
+    stroke: var(--ink);
+    stroke-width: 4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    overflow: visible;
+  }
+
+  .game-art__accent {
+    fill: var(--orange);
+  }
+
+  .game-art__screen {
+    fill: var(--concrete-light);
+  }
+
+  .game-art__line {
+    fill: none;
+  }
+
+  .game-art__cut {
+    fill: none;
+    stroke-dasharray: 5 7;
+  }
+</style>

@@ -1,10 +1,150 @@
 ---
-import { getCollection } from 'astro:content';
-import ContentPage from '../components/shared/ContentPage.astro';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GameCard from '../components/games/GameCard.astro';
+import ArtWall from '../components/art/ArtWall.astro';
+import ProjectBand from '../components/art/ProjectBand.astro';
+import ProductGrid from '../components/shop/ProductGrid.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Icon from '../components/ui/Icon.astro';
+import { games } from '../data/games';
+import { keyArt } from '../data/art';
+import { site } from '../config/site';
 
-const entries = await getCollection('sitePages', ({ data }) => data.isHome === true);
-const entry = entries[0];
-if (!entry) throw new Error('Home page not found in the sitePages collection.');
+const disciplines = ['Character design', 'Comic strips', 'Visual development', 'C++20 & SDL3', 'PixiJS', 'Indie games'];
 ---
 
-<ContentPage entry={entry} />
+<BaseLayout
+  title={site.name}
+  description="Art by Luan: character design, illustration, comics, independent 2D games and original merchandise."
+  isHome
+>
+  <section class="section dots hero" aria-labelledby="hero-title">
+    <div class="shell split">
+      <div class="stack">
+        <span class="sticker">Welcome to Silicon City</span>
+        <h1 class="display-xl" id="hero-title">
+          Characters, stories <span class="highlight">&amp; indie</span> games.
+        </h1>
+        <p class="lead" style="max-width: 36ch">
+          I'm Luan, a concept artist, illustrator and independent game developer. I draw characters, comic strips and
+          visual worlds — then build games around them with C++, TypeScript and PixiJS.
+        </p>
+        <div class="btn-group" style="margin-top: 8px">
+          <a class="btn btn--primary" href="/art/">
+            See the art <Icon name="arrow" />
+          </a>
+          <a class="btn" href="/games/">
+            <Icon name="play" /> Play the games
+          </a>
+        </div>
+      </div>
+      <div class="hero__art">
+        <svg class="hero__burst" viewBox="0 0 92 80" aria-hidden="true">
+          <path d="M40 10 L48 44 M70 12 L58 46 M10 40 L38 56"></path>
+        </svg>
+        <figure class="panel panel--hero">
+          <Image
+            src={keyArt.image}
+            alt={keyArt.alt}
+            widths={[480, 720, 1000, 1254]}
+            sizes="(max-width: 900px) calc(100vw - 64px), 600px"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <figcaption class="panel__tag">Panel 01 · Silicon City</figcaption>
+        </figure>
+        <p class="bubble hero__bubble">Starting over is a full-time job.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-label="What I do">
+    <ul>
+      {disciplines.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </div>
+
+  <section class="section" id="games" aria-labelledby="games-title">
+    <div class="shell">
+      <SectionHeading eyebrow="Level select" title="Games in the workshop" id="games-title">
+        <p>
+          Small, focused games — each one built around a single idea, with a dev journal that shows the work in
+          progress.
+        </p>
+      </SectionHeading>
+      <div class="grid" style="--grid-min: 320px">
+        {games.map((game) => (
+          <GameCard game={game} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--concrete" id="art" aria-labelledby="art-title">
+    <div class="shell">
+      <SectionHeading eyebrow="The sketchbook" title="Concept art & illustration" id="art-title">
+        <a href="/art/">Open the portfolio →</a>
+      </SectionHeading>
+      <ArtWall />
+    </div>
+  </section>
+
+  <ProjectBand />
+
+  <section class="section" id="shop" aria-labelledby="shop-title">
+    <div class="shell">
+      <SectionHeading eyebrow="Merch stand · Coming soon" title="Art for everyday life" id="shop-title">
+        <p>
+          The first collection starts with original artwork from Deploy ou Ruína. Designs, prices and shipping will be
+          announced before orders open.
+        </p>
+      </SectionHeading>
+      <ProductGrid />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero__art {
+    position: relative;
+    padding: 24px 12px 12px 24px;
+  }
+
+  .hero__art img {
+    aspect-ratio: 1;
+  }
+
+  .hero__burst {
+    position: absolute;
+    left: -18px;
+    top: -26px;
+    z-index: 2;
+    width: 92px;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 7;
+  }
+
+  .hero__bubble {
+    position: absolute;
+    right: -6px;
+    top: -8px;
+    z-index: 3;
+  }
+
+  @media (max-width: 560px) {
+    .hero__burst {
+      display: none;
+    }
+
+    .hero__bubble {
+      position: relative;
+      right: auto;
+      top: auto;
+      margin-top: var(--space-7);
+    }
+  }
+</style>

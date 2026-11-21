@@ -2,14 +2,10 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Parser } from 'htmlparser2';
-import { checkExamples } from '../../scripts/examples.mjs';
 
 const ORIGIN = 'https://luanrodrigues.xyz';
 // Marcadores que nunca podem chegar a uma página publicada (rascunhos são noindex e só avisam).
-const PLACEHOLDERS = ['RESULTADO_UI', 'CONFERENCIA', 'TODO:', 'FIXME'];
-// Um diagrama (src/components/diagramas/) só é descrito a leitores de tela pelo aria-label do quadro role="img":
-// uma frase com a conclusão. Menos que isto é vazio ou um rótulo solto, como "diagrama".
-const MIN_DIAGRAM_LABEL = 20;
+const PLACEHOLDERS = ['[YOUR ', 'TODO:', 'FIXME', 'lorem ipsum'];
 
 function parse(path) {
   const text = readFileSync(path, 'utf8');
@@ -21,30 +17,16 @@ function parse(path) {
     canonical: null,
     noindex: false,
     lang: null,
-    rawMermaid: false,
-    diagrams: 0,
-    diagramsWithoutLabel: [],
-    isArticle: false,
-    figuresWithoutAlt: [],
-    pendingFigures: [],
-    emptyArticle: /class="[^"]*\barticle-body\b[^"]*"><\/div>/.test(text),
+    imagesWithoutAlt: [],
     markers: PLACEHOLDERS.filter((marker) => text.includes(marker)),
   };
-  let diagram = null; // <figure class="diagrama"> aberto: procuramos o quadro role="img" com aria-label
   new Parser(
     {
       onopentag(tag, a) {
-        if (tag === 'figure' && (a.class ?? '').split(/\s+/).includes('diagrama')) {
-          page.diagrams += 1;
-          diagram = { index: page.diagrams, label: '' };
-        }
-        if (diagram && a.role === 'img') diagram.label = (a['aria-label'] ?? '').trim();
-        if (tag === 'img' && a.src?.startsWith('/figures/') && !(a.alt ?? '').trim())
-          page.figuresWithoutAlt.push(a.src);
-        if (tag === 'code' && (a.class ?? '').split(/\s+/).includes('language-mermaid')) page.rawMermaid = true;
+        // Every image is artwork here: decorative images must say so with alt="" explicitly.
+        if (tag === 'img' && a.alt === undefined) page.imagesWithoutAlt.push(a.src);
         if (a.id) page.ids.add(a.id);
         if (tag === 'html') page.lang = a.lang;
-        if (tag === 'meta' && a.property === 'og:type') page.isArticle = a.content === 'article';
         if (tag === 'h1') page.h1 += 1;
         if (tag === 'meta' && a.name === 'robots') page.noindex = (a.content ?? '').includes('noindex');
         if (tag === 'link' && a.rel === 'canonical') page.canonical = a.href;
@@ -63,15 +45,6 @@ function parse(path) {
           const value = a.href || a.src;
           if (value) page.links.push(value);
         }
-      },
-      onclosetag(tag) {
-        if (tag === 'figure' && diagram) {
-          if (diagram.label.length < MIN_DIAGRAM_LABEL) page.diagramsWithoutLabel.push(diagram.index);
-          diagram = null;
-        }
-      },
-      oncomment(data) {
-        if (data.includes('FIGURA PENDENTE')) page.pendingFigures.push(data.trim());
       },
     },
     { decodeEntities: true },
@@ -93,22 +66,11 @@ export function checkSite(dist) {
   const errors = [];
 
   for (const [path, page] of pages) {
-    for (const src of page.figuresWithoutAlt) errors.push(`${rel(path)}: figura ${src} sem texto alternativo (alt)`);
-    if (page.emptyArticle)
-      errors.push(`${rel(path)}: artigo sem conteúdo (falha ao processar o Markdown; veja o log do build)`);
-    if (page.rawMermaid)
-      errors.push(
-        `${rel(path)}: bloco mermaid: Mermaid não é mais convertido; use um componente de src/components/diagramas/`,
-      );
-    for (const index of page.diagramsWithoutLabel) {
-      const problem = `${rel(path)}: diagrama nº ${index} sem descrição acessível (role="img" com aria-label de uma frase)`;
-      if (page.noindex) console.log(`AVISO ${problem}`);
-      else errors.push(problem);
-    }
+    for (const src of page.imagesWithoutAlt) errors.push(`${rel(path)}: image ${src} without alt attribute`);
     if (!page.noindex) {
       if (page.h1 !== 1) errors.push(`${rel(path)}: ${page.h1} h1 headings`);
       if (!page.canonical?.startsWith(`${ORIGIN}/`)) errors.push(`${rel(path)}: missing production canonical`);
-      if (!['pt-BR', 'en'].includes(page.lang)) errors.push(`${rel(path)}: unsupported language ${page.lang}`);
+      if (page.lang !== 'en') errors.push(`${rel(path)}: unsupported language ${page.lang}`);
       const route = rel(dirname(path));
       const expected = `${ORIGIN}/${route === '' ? '' : `${route}/`}`;
       if (page.canonical && page.canonical !== expected)
@@ -136,10 +98,6 @@ export function checkSite(dist) {
       if (!other || other.lang !== alternate.hreflang) errors.push(`${rel(path)}: invalid language alternate`);
       else if (!other.alternates.some((item) => item.href === page.canonical))
         errors.push(`${rel(path)}: nonreciprocal language alternate`);
-    }
-    for (const marker of page.pendingFigures) {
-      if (page.noindex) console.log(`AVISO ${rel(path)}: ${marker}`);
-      else errors.push(`${rel(path)}: figura pendente em página publicada: ${marker.slice(0, 120)}`);
     }
     for (const marker of page.markers) {
       if (page.noindex) console.log(`AVISO ${rel(path)}: marcador ${marker} no texto`);
@@ -184,11 +142,7 @@ export default function checkSiteIntegration() {
       'astro:build:done': ({ dir }) => {
         const { errors, pages, urls } = checkSite(fileURLToPath(dir));
         if (errors.length) throw new Error(`\n${errors.join('\n')}`);
-        console.log(`OK: ${pages} pages; ${urls} canonical URLs; local links, anchors and language alternates.`);
-        // Artigo e pacote externo são mantidos à mão; avisa quando divergem (npm run conferir-exemplos).
-        for (const { slug, missing } of checkExamples({ optional: true })) {
-          console.log(`AVISO labs/<assunto>/${slug}: o artigo declara o que Sources/ não tem: ${missing.join('; ')}`);
-        }
+        console.log(`OK: ${pages} pages; ${urls} canonical URLs; local links, anchors and image alt text.`);
       },
     },
   };

@@ -54,32 +54,20 @@ const enabled = import.meta.env.PROD && Boolean(containerId || measurementId);
       const destination = new URL(link.href, location.href);
       if (!['http:', 'https:'].includes(destination.protocol)) return;
       const socialHost = destination.hostname.replace(/^www\./, '');
-      const social = ['github.com', 'linkedin.com'].includes(socialHost);
+      const social = ['github.com', 'linkedin.com', 'instagram.com'].includes(socialHost);
       let kind;
-      if (link.dataset.analyticsKind === 'article') kind = 'article';
-      else if (social) kind = 'social';
+      if (social) kind = 'social';
       else if (link.closest('.site-header')) kind = 'menu';
-      else if (
-        link.matches('.category-badge, .category-all, .area-links a') ||
-        destination.pathname.startsWith('/categories/')
-      )
-        kind = 'category';
-      else if (
-        link.matches('.featured-card, .publication-cover, .publication-title a') ||
-        link.rel === 'prev' ||
-        link.rel === 'next'
-      )
-        kind = 'article';
+      else if (socialHost === 'luanrodrigues.itch.io') kind = 'play';
+      else if (destination.pathname.startsWith('/games/')) kind = 'game';
+      else if (destination.pathname.startsWith('/art/')) kind = 'art';
+      else if (destination.pathname.startsWith('/shop/')) kind = 'shop';
       if (!kind) return;
       const section = link.closest('.site-header')
         ? 'header'
-        : link.closest('.featured-card')
-          ? 'featured'
-          : link.closest('.publications')
-            ? 'article_list'
-            : link.closest('[data-article]')
-              ? 'article'
-              : 'main';
+        : link.closest('.site-footer')
+          ? 'footer'
+          : link.closest('section[id]')?.id || 'main';
       const label = link.dataset.analyticsLabel || link.getAttribute('aria-label') || link.textContent || '';
       const parameters = {
         click_kind: kind,

@@ -1,40 +1,26 @@
-import { areas, areaRoute } from '../lib/areas';
 import { getCollection } from 'astro:content';
-import { getArticles } from '../lib/articles';
-import { features, site, ui } from '../config/site';
-import { pageExists, topicRoute, topics } from '../lib/topics';
+import { site } from '../config/site';
+import { games } from '../data/games';
+import { gameJournalUrl } from '../lib/game-journal';
 
 export const prerender = true;
 
+const staticRoutes = ['/', '/art/', '/games/', '/shop/', '/about/'];
+
 export async function GET() {
-  const [pages, articles] = await Promise.all([
-    getCollection(
-      'sitePages',
-      ({ data }) =>
-        Boolean(data.canonical) &&
-        data.noindex !== true &&
-        data.draft !== true &&
-        (data.isLab !== true || features.lab),
-    ),
-    getArticles(({ data }) => !data.draft),
-  ]);
+  const journal = await getCollection('gameJournal', ({ data }) => !data.draft);
   const locations = [
-    ...areas.map(({ id }) => ({ url: `${site.origin}${areaRoute(id)}`, date: undefined as Date | undefined })),
-    { url: `${site.origin}${ui.articlesUrl}`, date: undefined as Date | undefined },
-    { url: `${site.origin}/art/`, date: undefined as Date | undefined },
-    { url: `${site.origin}/shop/`, date: undefined as Date | undefined },
-    ...pages.map(({ data }) => ({ url: data.canonical!, date: undefined as Date | undefined })),
-    ...articles.map(({ data }) => ({ url: data.canonical, date: data.updated ?? data.published })),
+    ...staticRoutes.map((path) => ({ path, date: undefined as Date | undefined })),
+    ...games.flatMap((game) => [
+      { path: `/games/${game.slug}/`, date: undefined as Date | undefined },
+      { path: `/games/${game.slug}/journal/`, date: undefined as Date | undefined },
+    ]),
+    ...journal.map((entry) => ({ path: gameJournalUrl(entry), date: entry.data.date })),
   ];
-  const subjects = topics
-    .filter((topic) => pageExists(articles, topic))
-    .map((topic) => ({ url: `${site.origin}${topicRoute(topic)}`, date: undefined as Date | undefined }));
-  locations.push(...subjects);
-  const unique = [...new Map(locations.map((location) => [location.url, location])).values()];
-  const urls = unique
+  const urls = locations
     .map(
-      ({ url, date }) =>
-        `  <url><loc>${escapeXml(url)}</loc>${date ? `<lastmod>${date.toISOString().slice(0, 10)}</lastmod>` : ''}</url>`,
+      ({ path, date }) =>
+        `  <url><loc>${escapeXml(site.origin + path)}</loc>${date ? `<lastmod>${date.toISOString().slice(0, 10)}</lastmod>` : ''}</url>`,
     )
     .join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;

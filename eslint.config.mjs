@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist/', '.astro/', 'node_modules/', 'public/', 'contents/', 'examples/'],
+    ignores: ['dist/', '.astro/', 'node_modules/', 'public/', 'contents/'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -13,7 +13,7 @@ export default tseslint.config(
   {
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off', // os plugins do Markdown tipam nós hast como any
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
     },
   },

@@ -1,0 +1,42 @@
+---
+import { products } from '../../data/shop';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { headingLevel: Heading = 'h3' } = Astro.props;
+---
+
+<div class="grid" style="--grid-min: 260px; --grid-gap: 28px">
+  {products.map((product) => (
+    <article class="card product">
+      <div class:list={['panel', 'panel--flat', 'dots', `panel--${product.panel}`, 'product__art']}>
+        <Icon name={product.kind} size={150} />
+      </div>
+      <div class="card__body">
+        <span class="badge">Coming soon</span>
+        <Heading class="product__name">{product.name}</Heading>
+        <p>{product.description}</p>
+      </div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .product {
+    box-shadow: var(--shadow-m);
+  }
+
+  .product__art {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    color: var(--ink);
+  }
+
+  .product__name {
+    font-size: var(--display-s);
+  }
+</style>

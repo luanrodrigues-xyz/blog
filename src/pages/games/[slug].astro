@@ -1,75 +1,222 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import GameIllustration from '../../components/games/GameIllustration.astro';
-import { getCollection } from 'astro:content';
-import { gameJournalUrl } from '../../lib/game-journal';
-import { games, type Game } from '../../data/games';
+import GameArt from '../../components/games/GameArt.astro';
+import JournalList from '../../components/games/JournalList.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { games, gameUrl, type Game } from '../../data/games';
+import { keyArt } from '../../data/art';
+import { publishedJournal } from '../../lib/game-journal';
+import { site } from '../../config/site';
+
 export function getStaticPaths() {
-  return games.map((game) => ({ params: {slug: game.slug}, props: {game} }));
+  return games.map((game, index) => ({
+    params: { slug: game.slug },
+    props: { game, next: games[(index + 1) % games.length] },
+  }));
 }
-const { game } = Astro.props as { game: Game };
-const journal = (await getCollection('gameJournal', ({ data }) => !data.draft && data.game === game.slug))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const latestEntries = journal.slice(0, 3);
+
+const { game, next } = Astro.props as { game: Game; next: Game };
+const journal = await publishedJournal(game.slug);
+const toneColours = ['orange', 'peach', 'khaki'];
+const hasKeyArt = game.slug === 'deploy-ou-ruina';
 ---
-<BaseLayout title={game.title} description={game.description} language="en" isListingPage>
-  <article class="game-detail">
-    <p class="game-detail__breadcrumb"><a href="/games/">Games</a> / {game.status}</p>
-    <h1>{game.title}</h1>
-    <p class="game-detail__lead">{game.tagline}</p>
-    <GameIllustration game={game} />
-    <div class="game-detail__links">
-      {game.playUrl && <a href={game.playUrl} target="_blank" rel="noopener noreferrer">Play game ↗</a>}
-      {game.sourceUrl && <a href={game.sourceUrl} target="_blank" rel="noopener noreferrer">Source code ↗</a>}
-      <a href="/games/">All games →</a>
+
+<BaseLayout title={game.title} description={game.description}>
+  <section class="section section--plum" aria-labelledby="game-title">
+    <div class="shell split">
+      <div class="stack">
+        <a class="eyebrow game__crumb" href="/games/">
+          Games / {game.title}
+        </a>
+        <h1 class="display-xl" id="game-title">
+          {game.title}
+        </h1>
+        <p class="bubble bubble--left">{game.tagline}</p>
+        <p class="lead">{game.description}</p>
+        <div class="btn-group" style="align-items: center">
+          <span class:list={['badge', `badge--${game.tone}`]}>{game.status}</span>
+          <ul class="chips" aria-label="Technologies">
+            {game.technologies.map((technology) => (
+              <li class="chip">{technology}</li>
+            ))}
+          </ul>
+        </div>
+        {(game.playUrl || game.sourceUrl) && (
+          <div class="btn-group">
+            {game.playUrl && (
+              <a class="btn btn--primary" href={game.playUrl} rel="noopener noreferrer" target="_blank">
+                <Icon name="play" /> Play on itch.io
+              </a>
+            )}
+            {game.sourceUrl && (
+              <a class="btn" href={game.sourceUrl} rel="noopener noreferrer" target="_blank">
+                Source code
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+      {hasKeyArt ? (
+        <figure class="panel panel--hero" style="transform: rotate(-1deg)">
+          <Image
+            src={keyArt.image}
+            alt={keyArt.alt}
+            widths={[480, 800]}
+            sizes="(max-width: 900px) calc(100vw - 32px), 560px"
+            loading="eager"
+          />
+        </figure>
+      ) : (
+        <div class="game__art">
+          <GameArt game={game} />
+        </div>
+      )}
     </div>
-    {game.slug === 'tessora' && (
-      <section class="game-detail__section game-detail__play" aria-labelledby="play-tessora-heading">
-        <h2 id="play-tessora-heading">Play Tessora</h2>
-        <p>Play directly in the browser, or open the game on itch.io for a larger view.</p>
-        <div class="game-detail__embed">
+  </section>
+
+  {game.slug === 'tessora' && (
+    <section class="section section--concrete" id="play" aria-labelledby="play-title">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Insert coin</span>
+            <h2 class="display-l" id="play-title">
+              Play Tessora
+            </h2>
+          </div>
+          <p>Play directly in the browser, or open the game on itch.io for a larger view.</p>
+        </div>
+        <div class="panel game__embed">
           <iframe
             title="Play Tessora on itch.io"
-            src="https://itch.io/embed-upload/20356147?color=333333"
+            src="https://itch.io/embed-upload/20356147?color=1f1512"
             width="960"
             height="620"
             allowfullscreen
             loading="lazy"
             referrerpolicy="strict-origin-when-cross-origin"
           >
-            <a href="https://luanrodrigues.itch.io/tessora">Play Tessora on itch.io</a>
-          </iframe>
+              <a href="https://luanrodrigues.itch.io/tessora">Play Tessora on itch.io</a>
+            </iframe>
         </div>
-        <p class="game-detail__embed-note">
-          On a small screen? <a href="https://luanrodrigues.itch.io/tessora" target="_blank" rel="noopener noreferrer">Open Tessora on itch.io ↗</a>
-        </p>
-      </section>
-    )}
-    <section class="game-detail__overview" aria-label="About the game">
-      <p>{game.description}</p>
-      <p class="game-detail__stack">{game.technologies.join(' · ')}</p>
+      </div>
     </section>
-    <section class="game-detail__section" aria-labelledby="journal-title">
-      <h2 id="journal-title">Development journal ({journal.length})</h2>
-      {latestEntries.length > 0 ? (
-        <>
-          <ol class="game-journal__list">
-            {latestEntries.map((entry) => (
-              <li class="game-journal__item">
-                <div class="game-journal__meta">
-                  <time datetime={entry.data.date.toISOString().slice(0, 10)}>{entry.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</time>
-                  {entry.data.version && <span>{entry.data.version}</span>}
-                </div>
-                <h3><a href={gameJournalUrl(entry)}>{entry.data.title}</a></h3>
-                <p>{entry.data.summary}</p>
-              </li>
-            ))}
-          </ol>
-          {journal.length > 3 && <a href={`/games/${game.slug}/journal/`}>View all updates →</a>}
-        </>
-      ) : (
-        <p class="game-journal__empty">Development updates will appear here as new versions are published.</p>
-      )}
-    </section>
-  </article>
+  )}
+
+  <section class="section" id="how-it-plays" aria-labelledby="mechanics-title">
+    <div class="shell">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">How it plays</span>
+          <h2 class="display-l" id="mechanics-title">
+            Three panels, one idea
+          </h2>
+        </div>
+      </div>
+      <ol class="grid game__mechanics" style="--grid-min: 280px; --grid-gap: 24px">
+        {game.mechanics.map((mechanic, index) => (
+          <li class="panel panel--raised game__mechanic">
+            <span
+              class="numbered"
+              style={`background: var(--${toneColours[index % toneColours.length]})`}
+              aria-hidden="true"
+            >
+              {index + 1}
+            </span>
+            <h3>{mechanic.title}</h3>
+            <p>{mechanic.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--concrete" id="journal" aria-labelledby="journal-title">
+    <div class="shell split" style="align-items: flex-start">
+      <div class="stack" style="flex-basis: 320px">
+        <span class="eyebrow">Dev journal</span>
+        <h2 class="display-l" id="journal-title">
+          Where it stands
+        </h2>
+        <p class="lead">{game.development}</p>
+        {journal.length > 3 && <a href={`/games/${game.slug}/journal/`}>All {journal.length} updates →</a>}
+      </div>
+      <div style="flex: 2 1 520px">
+        <JournalList
+          entries={journal.slice(0, 3)}
+          empty="Development updates will appear here as new versions are published."
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section dots" aria-labelledby="next-title">
+    <div
+      class="shell"
+      style="flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center"
+    >
+      <h2 class="display-l" id="next-title">
+        Keep playing
+      </h2>
+      <div class="btn-group">
+        <a class="btn btn--primary" href={site.instagram}>
+          Follow on Instagram
+        </a>
+        <a class="btn" href={gameUrl(next)}>
+          Next: {next.title} <Icon name="arrow" />
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .game__crumb {
+    text-decoration: none;
+  }
+
+  .game__crumb:hover {
+    text-decoration: underline;
+  }
+
+  .game__art {
+    transform: rotate(-1deg);
+  }
+
+  .game__art :global(.panel) {
+    border-width: var(--line-heavy);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .game__embed {
+    aspect-ratio: 960 / 620;
+    background: var(--ink);
+    box-shadow: var(--shadow-l);
+  }
+
+  .game__embed iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .game__mechanics {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .game__mechanic {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: 28px;
+  }
+
+  .game__mechanic h3 {
+    font-size: var(--display-s);
+    line-height: 1.05;
+  }
+</style>

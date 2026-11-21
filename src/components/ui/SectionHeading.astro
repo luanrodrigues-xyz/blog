@@ -1,0 +1,21 @@
+---
+/** "// LABEL" + display title on the left; an optional intro or link (the default slot) on the right. */
+interface Props {
+  eyebrow: string;
+  title: string;
+  id?: string;
+  as?: 'h1' | 'h2';
+}
+
+const { eyebrow, title, id, as: Heading = 'h2' } = Astro.props;
+---
+
+<div class="section-heading">
+  <div>
+    <span class="eyebrow">{eyebrow}</span>
+    <Heading class="display-l" id={id}>
+      {title}
+    </Heading>
+  </div>
+  <slot />
+</div>
