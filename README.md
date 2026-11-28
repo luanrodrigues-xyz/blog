@@ -3,7 +3,7 @@
 Meu site pessoal e portfólio de Reynio, Unsealed e Tessora, com uma seção de artigos e notas de desenvolvimento.
 Feito com Astro, Markdown e MDX.
 
-Estou migrando o projeto do GitLab para o GitHub, com publicação pelo GitHub Pages.
+O site é publicado pelo GitHub Pages.
 
 [Site](https://luanrodrigues.xyz) · [YouTube](https://www.youtube.com/@iosgamecraft) · [GitHub](https://github.com/luanrodrigues-xyz) · [LinkedIn](https://www.linkedin.com/in/luanrodrigues-xyz/)
 
