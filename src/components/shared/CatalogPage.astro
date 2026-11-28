@@ -20,23 +20,25 @@ const articles = area
 
 <BaseLayout
   title={selected ? `${selected.label} articles` : 'All articles'}
-  description={selected?.description ?? 'Technical articles on iOS, web, and backend development, newest first.'}
+  description={selected?.description ?? 'Articles and development notes by Luan Rodrigues, newest first.'}
   language={interfaceLanguage}
   isListingPage
 >
   <div class="listing-page">
     <header class="page-header listing-head" lang={interfaceLanguage}>
       <h1>{selected ? `${selected.label} articles` : 'All articles'}</h1>
-      <p class="lead">{selected?.description ?? 'Browse the latest articles, or filter by iOS, Web, and Backend.'}</p>
+      <p class="lead">{selected?.description ?? 'Development notes, experiments and articles.'}</p>
     </header>
-    <section class="catalog-categories" aria-label="Development areas">
-      <AreaLinks articles={content.articles} active={area} showAll />
-    </section>
+    {content.articles.length > 0 && (
+      <section class="catalog-categories" aria-label="Development areas">
+        <AreaLinks articles={content.articles} active={area} showAll />
+      </section>
+    )}
     {articles.length > 0 ? (
       <ArticleList articles={articles} />
     ) : (
       <p lang={interfaceLanguage}>
-        No articles published yet. <a href="/articles/">Browse all articles →</a>
+        No articles published yet. {area && <a href="/articles/">Browse all articles →</a>}
       </p>
     )}
   </div>

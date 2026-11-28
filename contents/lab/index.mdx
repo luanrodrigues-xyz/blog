@@ -7,9 +7,6 @@ ogType: "website"
 isLab: true
 ---
 
-import ProjectGrid from '../../src/components/lab/ProjectGrid.astro';
-import ProjectCard from '../../src/components/lab/ProjectCard.astro';
-
 <header class="page-header">
   <h1>Lab</h1>
   <p class="lead">
@@ -18,12 +15,4 @@ import ProjectCard from '../../src/components/lab/ProjectCard.astro';
   </p>
 </header>
 
-<ProjectGrid>
-  <ProjectCard
-    title="GitHub Users"
-    description="A SwiftUI app to search GitHub users and browse their profiles, built to exercise pagination failing mid-way, cancelled requests, refresh without wiping what is already on screen, and the same image requested by more than one view at once."
-    href="https://github.com/luanrodrigues-xyz/GitHubUsers"
-    tags={["SwiftUI", "MVVM", "Swift Concurrency", "Swift Testing", "Image Caching"]}
-    accent="orange"
-  />
-</ProjectGrid>
+<p>No projects listed here yet.</p>
