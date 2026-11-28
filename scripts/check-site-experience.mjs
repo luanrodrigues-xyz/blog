@@ -48,10 +48,7 @@ try {
   const routes = [
     '/',
     '/about/',
-    '/projects/',
-    '/projects/reynio/',
-    '/projects/unsealed/',
-    '/projects/tessora/',
+    '/lab/',
     '/articles/',
     '/articles/frontend/',
     '/articles/ios/',
@@ -81,8 +78,9 @@ try {
         assert.equal(state.overflow, false, `${width} ${theme} ${route}: page overflow`);
         assert.equal(state.h1, 1, route);
         if (route === '/') {
-          const featured = await page.$$eval('.project-showcase a', (links) => links.map((a) => a.getAttribute('href')));
-          assert.deepEqual(featured, ['/projects/reynio/', '/projects/unsealed/', '/projects/tessora/']);
+          assert.equal(await page.$eval('.topic-card', (links) => links.length), 8);
+          assert.ok(await page.$('.site-header a[href="/lab/"]'));
+          assert.equal(await page.$('.site-header a[href="/projects/"]'), null);
           assert.ok(await page.$('.site-header a[href="/articles/"]'));
         }
         if (state.toc) {

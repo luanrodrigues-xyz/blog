@@ -1,8 +1,8 @@
 ---
 title: "Luan Rodrigues"
-heroTitle: "Independent games and creative tools."
-intro: "I build Reynio, a native 2D animation editor, and two independent games: Unsealed and Tessora."
-description: "Independent games, creative tools and software engineering articles by Luan Rodrigues. Discover Reynio, Unsealed and Tessora."
+heroTitle: "From code to pixels."
+intro: "Notes and experiments on computer graphics, systems programming and game development."
+description: "A technical notebook about C++, TypeScript, WebAssembly, Swift, Metal, SDL3 and computational geometry."
 language: "en"
 isPortuguese: false
 canonical: "https://luanrodrigues.xyz/"

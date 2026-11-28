@@ -1,111 +1,73 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import AreaLinks from '../shared/AreaLinks.astro';
 import { homeContent } from '../../lib/home';
-import { interfaceLanguage, ui } from '../../config/site';
-
+import { areaRoute, focusAreas } from '../../lib/areas';
 import LatestArticleCard from './LatestArticleCard.astro';
-import { featuredProjects, projectPath, projectsPath } from '../../lib/projects';
-
-interface Props {
-  entry: CollectionEntry<'sitePages'>;
-}
-
+interface Props { entry: CollectionEntry<'sitePages'>; }
 const { entry } = Astro.props;
-const text = ui;
-const { articles, latest } = await homeContent();
+const { latest } = await homeContent();
+const tech = ['C++', 'TypeScript', 'WebAssembly', 'Swift', 'Metal', 'SDL3'];
+const lab = [
+  { title: 'Raster Playground', description: 'Tile-based canvas invalidation.', href: '/lab/#raster' },
+  { title: 'Polygon Lab', description: 'Signed area and winding.', href: '/lab/#polygon' },
+];
 ---
 
 <section class="home-intro">
+  <p class="eyebrow">PERSONAL ENGINEERING NOTEBOOK</p>
   <h1>{entry.data.heroTitle}</h1>
-  <p class="lead">{entry.data.intro ?? entry.data.description}</p>
-  {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
+  <p class="lead">{entry.data.intro}</p>
+  <ul class="tech-list" aria-label="Technologies">
+    {tech.map((name) => <li>{name}</li>)}
+  </ul>
 </section>
 
-<section class="home-projects" aria-labelledby="projects-title">
+<section class="home-section" aria-labelledby="latest-title">
   <header class="notes-head">
-    <h2 id="projects-title">Featured projects</h2>
-    <a href={projectsPath}>All projects →</a>
+    <h2 id="latest-title">Latest articles</h2>
+    <a href="/articles/">All articles →</a>
   </header>
-  {(['tools', 'games'] as const).map((category) => (
-    <div class="project-group">
-      <h3>{category === 'tools' ? 'Main product' : 'Games'}</h3>
-      <div class:list={["project-showcase", { "flagship-showcase": category === "tools" }]}>
-        {featuredProjects.filter((project) => project.category === category).map((project) => (
-          <a class="showcase-card" href={projectPath(project.slug)}>
-            <span class="showcase-kind">{project.kind}</span>
-            <h4>{project.title} <span aria-hidden="true">↗</span></h4>
-            <p>{project.summary}</p>
-            <span class="showcase-status">{project.status}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  ))}
+  {latest.length ? (
+    <div class="home-grid">{latest.map((article, index) => <LatestArticleCard article={article} priority={index === 0} />)}</div>
+  ) : <p>New study notes and experiments will appear here.</p>}
 </section>
 
-{latest.length > 0 && (
-  <section class="home-featured" aria-labelledby="featured-title">
-    <header class="notes-head" lang={interfaceLanguage}>
-      <h2 id="featured-title">Latest articles</h2>
-    </header>
-    <div class="featured-grid">
-      {latest.map((article, index) => (
-        <LatestArticleCard article={article} priority={index === 0} />
-      ))}
-    </div>
-  </section>
-)}
+<section class="home-section" aria-labelledby="topics-title">
+  <header class="notes-head"><h2 id="topics-title">Explore by topic</h2></header>
+  <div class="home-grid">
+    {focusAreas.map((area, index) => (
+      <a class="topic-card" href={areaRoute(area.id)}>
+        <span class="topic-index">0{index + 1}</span>
+        <h3>{area.label}</h3>
+        <p>{area.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
 
-{articles.length > 0 && (
-  <section class="home-topics" aria-labelledby="home-topics-title">
-    <h2 id="home-topics-title">Explore by area</h2>
-    <AreaLinks articles={articles} />
-  </section>
-)}
-
-<p class="home-all-articles" lang={interfaceLanguage}>
-  <a href={text.articlesUrl}>{articles.length ? text.allArticles : text.articles} →</a>
-</p>
+<section class="home-section" aria-labelledby="lab-title">
+  <header class="notes-head"><h2 id="lab-title">Lab</h2><a href="/lab/">All experiments →</a></header>
+  <div class="home-grid">
+    {lab.map((item) => (
+      <a class="topic-card" href={item.href}>
+        <span class="topic-index">INTERACTIVE</span>
+        <h3>{item.title}</h3><p>{item.description}</p>
+      </a>
+    ))}
+  </div>
+</section>
 
 <style>
-  .home-projects { margin-bottom: var(--space-12); }
-  .project-group + .project-group { margin-top: var(--space-6); }
-  .project-group h3 { margin: 0 0 var(--space-3); font-size: 1rem; color: var(--fg-muted); }
-  .project-showcase { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
-  .flagship-showcase { grid-template-columns: minmax(0, 1fr); }
-  .flagship-showcase .showcase-card { padding: var(--space-8); }
-  .flagship-showcase .showcase-card h4 { font-size: clamp(1.6rem, 4vw, 2rem); }
-  .showcase-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--canvas); text-decoration: none; color: var(--fg); min-width: 0; }
-  .showcase-card:hover { border-color: var(--action); }
-  .showcase-kind, .showcase-status { color: var(--fg-muted); font: .75rem/1.4 var(--font-mono); }
-  .showcase-card h4 { display: flex; justify-content: space-between; gap: .5rem; margin: 0; font: 700 1.4rem/1.25 var(--font-heading); }
-  .showcase-card h4 span { color: var(--action); font-size: 1rem; }
-  .showcase-card p { margin: 0; color: var(--fg-muted); line-height: 1.6; flex: 1; }
-  @media (max-width: 599px) { .project-showcase { grid-template-columns: minmax(0, 1fr); } }
-
-  .home-featured {
-    margin-bottom: var(--space-10);
-  }
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-  @media (max-width: 599px) {
-    .featured-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  .home-topics {
-    margin-bottom: var(--space-10);
-  }
-  .home-topics h2 {
-    margin: 0 0 var(--space-4);
-    font-size: 1.3rem;
-    letter-spacing: -0.02em;
-  }
-  .home-all-articles {
-    margin: 0 0 var(--space-12);
-  }
+  .eyebrow { font: 600 .72rem/1.5 var(--font-mono); letter-spacing: .09em; color: var(--fg-muted); }
+  .tech-list { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 1.5rem 0 0; }
+  .tech-list li { border: 1px solid var(--border); border-radius: var(--radius-m); padding: .3rem .65rem; font: .78rem/1.5 var(--font-mono); color: var(--fg-muted); }
+  .home-section { margin-bottom: var(--space-10); }
+  .home-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .topic-card { min-width: 0; display: block; padding: 1.15rem; border: 1px solid var(--border); border-radius: var(--radius-m); color: var(--fg); background: var(--canvas); text-decoration: none; }
+  .topic-card:hover { border-color: var(--action); text-decoration: none; }
+  .topic-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .topic-index { font: .75rem/1.4 var(--font-mono); color: var(--fg-muted); }
+  .topic-card h3 { font: 700 1.1rem/1.3 var(--font-heading); margin: .55rem 0; }
+  .topic-card p { font-size: .875rem; line-height: 1.5; color: var(--fg-muted); margin: 0; }
+  @media (max-width: 599px) { .home-grid { grid-template-columns: minmax(0, 1fr); } }
 </style>

@@ -1,6 +1,6 @@
 # luanrodrigues.xyz
 
-Meu site pessoal e portfólio de Reynio, Unsealed e Tessora, com uma seção de artigos e notas de desenvolvimento.
+Caderno público de engenharia: computação gráfica, programação de sistemas, jogos, WebAssembly, geometria computacional e performance.
 Feito com Astro, Markdown e MDX.
 
 O site é publicado pelo GitHub Pages.
@@ -32,6 +32,11 @@ npm run lint      # ESLint
 - `src/`: componentes, rotas, estilos e configuração do site.
 - `scripts/` e `tests/`: ferramentas e testes.
 - `docs/`: documentação do site.
+
+## Linha editorial
+
+- [Plano editorial e experimentos](docs/editorial.md)
+- O laboratório é acessível em `/lab/`.
 
 ## Documentação
 

@@ -1,18 +1,21 @@
 ---
 title: "Lab"
-description: "Small apps I build to go deeper into problems that are hard to show in an article alone: pagination, caching, concurrency, and state that has to survive a bad network."
+description: "Interactive experiments in rasterization, geometry, systems programming and game development."
 language: "en"
 canonical: "https://luanrodrigues.xyz/lab/"
 ogType: "website"
 isLab: true
 ---
 
+import GraphicsLab from '../../src/components/lab/GraphicsLab.astro';
+
 <header class="page-header">
   <h1>Lab</h1>
-  <p class="lead">
-    Small apps I build to go deeper into problems that are hard to show in an article alone:
-    pagination, caching, concurrency, and state that has to survive a bad network.
-  </p>
+  <p class="lead">Small, reproducible experiments for understanding the mechanics behind graphics and games.</p>
 </header>
 
-<p>No projects listed here yet.</p>
+<GraphicsLab />
+
+## Future experiments
+
+Physics Sandbox (fixed timestep and collision response) and Shader Playground (portable shader examples) are planned. They are not yet implemented.

@@ -13,7 +13,7 @@ export const site = {
 
 /** Feature flags: seções ainda em preparação ficam fora da navegação e não geram página. */
 export const features = {
-  lab: false,
+  lab: true,
 };
 
 export const languages = ['pt-BR', 'en'] as const;

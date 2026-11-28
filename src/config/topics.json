@@ -2,6 +2,78 @@
   "_comment": "Single source of truth for categories. tile uses one of the 12 Apple colors from src/styles/colors.css. sort accepts readingOrder or date. glyph contains SVG paths using viewBox 24. hidden removes the category from public cards.",
   "topics": [
     {
+      "slug": "systems",
+      "pt": "Programação de sistemas",
+      "en": "Systems Programming",
+      "tile": "blue",
+      "sort": "date",
+      "summary": {
+        "pt": "Memória, concorrência, ownership e interoperabilidade em código nativo.",
+        "en": "C++20, ownership, memory layout, concurrency and native interoperability."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
+      "slug": "graphics",
+      "pt": "Computação gráfica",
+      "en": "Computer Graphics",
+      "tile": "purple",
+      "sort": "date",
+      "summary": {
+        "pt": "Pipelines de GPU, rasterização, shaders, Metal e Swift.",
+        "en": "GPU pipelines, rasterization, shaders, Metal and Swift."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
+      "slug": "games",
+      "pt": "Desenvolvimento de jogos",
+      "en": "Game Development",
+      "tile": "green",
+      "sort": "date",
+      "summary": {
+        "pt": "SDL3, física, colisões, câmeras e game loops.",
+        "en": "SDL3, game loops, physics, collisions and cameras."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
+      "slug": "wasm",
+      "pt": "WebAssembly",
+      "en": "WebAssembly",
+      "tile": "indigo",
+      "sort": "date",
+      "summary": {
+        "pt": "C++, Emscripten, TypeScript e execução no navegador.",
+        "en": "C++, Emscripten, TypeScript and the browser runtime."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
+      "slug": "geometry",
+      "pt": "Geometria computacional",
+      "en": "Computational Geometry",
+      "tile": "teal",
+      "sort": "date",
+      "summary": {
+        "pt": "Polígonos, interseções, transformações e precisão numérica.",
+        "en": "Polygons, intersections, transformations and numerical precision."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
+      "slug": "performance",
+      "pt": "Engenharia de performance",
+      "en": "Performance Engineering",
+      "tile": "orange",
+      "sort": "date",
+      "summary": {
+        "pt": "Profiling, benchmarks, largura de banda de memória e cache.",
+        "en": "Profiling, benchmarks, memory bandwidth and cache locality."
+      },
+      "glyph": "<rect x='4' y='4' width='16' height='16' rx='3'/><path d='M8 12h8M12 8v8'/>"
+    },
+    {
       "slug": "frontend",
       "pt": "Frontend",
       "en": "Frontend",
