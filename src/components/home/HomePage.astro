@@ -58,14 +58,14 @@ const { articles, latest } = await homeContent();
 )}
 
 {articles.length > 0 && (
-<section class="home-topics" aria-labelledby="home-topics-title">
-  <h2 id="home-topics-title">Explore by area</h2>
-  <AreaLinks articles={articles} />
-</section>
+  <section class="home-topics" aria-labelledby="home-topics-title">
+    <h2 id="home-topics-title">Explore by area</h2>
+    <AreaLinks articles={articles} />
+  </section>
 )}
 
 <p class="home-all-articles" lang={interfaceLanguage}>
-  <a href={text.articlesUrl}>{articles.length ? text.allArticles : "Articles"} →</a>
+  <a href={text.articlesUrl}>{articles.length ? text.allArticles : text.articles} →</a>
 </p>
 
 <style>
