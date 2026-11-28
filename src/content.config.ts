@@ -15,7 +15,7 @@ const articles = defineCollection({
     updated: z.coerce.date().optional(),
     topic: z.string(),
     areas: z
-      .array(z.enum(['frontend', 'backend', 'ios']))
+      .array(z.enum(['systems', 'graphics', 'games', 'wasm', 'geometry', 'performance', 'frontend', 'backend', 'ios']))
       .min(1)
       .optional(),
     draft: z.boolean().default(false),

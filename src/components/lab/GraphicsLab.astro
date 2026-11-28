@@ -1,0 +1,101 @@
+---
+import { dirtyTiles, signedArea } from '../../lib/graphics-lab';
+const initial = dirtyTiles(512, 128, 64, 205, 150, 105);
+const polygon = [[32, 145], [120, 30], [220, 100]] as const;
+---
+<graphics-lab>
+  <section id="raster" class="experiment" aria-labelledby="raster-title">
+    <h2 id="raster-title">Raster Playground</h2>
+    <p>A 512 × 512 canvas partitioned into storage tiles. Move the dirty rectangle and change tile size to see which tiles are candidates for updating.</p>
+    <div class="controls">
+      <label>Tile size <select data-tile><option value="64">64 px</option><option value="128" selected>128 px</option><option value="256">256 px</option></select></label>
+      <label>Horizontal position <input data-position type="range" min="0" max="362" value="64" /></label>
+    </div>
+    <svg data-raster viewBox="0 0 512 512" role="img" aria-label="Canvas grid with highlighted dirty tiles">
+      <rect width="512" height="512" class="board" />
+      <g data-cells>{initial.map((cell) => <rect {...cell} class="dirty" />)}</g>
+      <g data-grid>{[128, 256, 384].map((n) => <path d={`M${n} 0V512 M0 ${n}H512`} class="grid-line" />)}</g>
+      <rect data-dirty x="64" y="205" width="150" height="105" class="region" />
+    </svg>
+    <output data-raster-result aria-live="polite">{initial.length} of 16 tiles selected.</output>
+    <p class="note">This is application-level invalidation, not a simulation of a GPU's internal tile memory. The dirty rectangle is conservative; actual work depends on the renderer.</p>
+  </section>
+  <section id="polygon" class="experiment" aria-labelledby="polygon-title">
+    <h2 id="polygon-title">Polygon Lab</h2>
+    <p>Move a vertex or reverse the traversal order. The absolute area stays unchanged when winding is reversed, but the signed shoelace area changes sign.</p>
+    <div class="controls">
+      <label>Vertex X <input data-vertex type="range" min="40" max="225" value="120" /></label>
+      <label><input data-reverse type="checkbox" /> Reverse winding</label>
+    </div>
+    <svg viewBox="0 0 252 180" role="img" aria-label="Triangle with a movable vertex">
+      <rect width="252" height="180" class="board" />
+      <polygon data-polygon points="32,145 120,30 220,100" class="shape" />
+      <circle data-vertex-dot cx="120" cy="30" r="4" class="dot" />
+    </svg>
+    <output data-polygon-result aria-live="polite">Signed area: {signedArea(polygon)} px².</output>
+    <p class="note">In these screen coordinates, Y increases downwards, so positive signed area corresponds to clockwise winding. This experiment assumes a simple polygon.</p>
+  </section>
+</graphics-lab>
+<style>
+  graphics-lab { display: block; }
+  .experiment { margin: 1.5rem 0 2rem; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--border); border-radius: var(--radius-m); }
+  .experiment h2 { margin-top: 0; }
+  .experiment p { color: var(--fg-muted); line-height: 1.6; }
+  .controls { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+  label { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; font-size: .875rem; }
+  input[type="range"] { width: 9rem; max-width: 100%; }
+  select { font: inherit; color: var(--fg); background: var(--canvas); border: 1px solid var(--border); padding: .35rem; border-radius: .25rem; }
+  svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 1rem auto; border: 1px solid var(--border); }
+  .board { fill: var(--canvas); }
+  .dirty { fill: #3b82f6; fill-opacity: .25; }
+  .grid-line { stroke: var(--fg-muted); stroke-width: 1; opacity: .6; }
+  .region { fill: none; stroke: #3b82f6; stroke-width: 3; stroke-dasharray: 8 4; }
+  .shape { fill: #3b82f6; fill-opacity: .25; stroke: #3b82f6; stroke-width: 2; }
+  .dot { fill: #3b82f6; }
+  output { display: block; font: .85rem/1.5 var(--font-mono); margin: 1rem 0; }
+  .note { font-size: .85rem; }
+</style>
+<script>
+  import { dirtyTiles, signedArea, type Point } from '../../lib/graphics-lab';
+  class GraphicsLab extends HTMLElement {
+    connectedCallback() {
+      const tile = this.querySelector<HTMLSelectElement>('[data-tile]')!;
+      const pos = this.querySelector<HTMLInputElement>('[data-position]')!;
+      const vertex = this.querySelector<HTMLInputElement>('[data-vertex]')!;
+      const reverse = this.querySelector<HTMLInputElement>('[data-reverse]')!;
+      const ns = 'http://www.w3.org/2000/svg';
+      const raster = () => {
+        const t = Number(tile.value), x = Number(pos.value);
+        const cells = dirtyTiles(512, t, x, 205, 150, 105);
+        const group = this.querySelector('[data-cells]')!;
+        group.replaceChildren(...cells.map(cell => {
+          const r = document.createElementNS(ns, 'rect');
+          for (const [key, value] of Object.entries(cell)) r.setAttribute(key, String(value));
+          r.setAttribute('fill', '#3b82f6'); r.setAttribute('fill-opacity', '.25');
+          return r;
+        }));
+        const lines = this.querySelector('[data-grid]')!;
+        lines.replaceChildren(...Array.from({ length: 512 / t - 1 }, (_, i) => {
+          const n = (i + 1) * t, p = document.createElementNS(ns, 'path');
+          p.setAttribute('d', 'M' + n + ' 0V512 M0 ' + n + 'H512');
+          p.setAttribute('stroke', 'currentColor'); p.setAttribute('opacity', '.4');
+          return p;
+        }));
+        this.querySelector('[data-dirty]')!.setAttribute('x', String(x));
+        this.querySelector('[data-raster-result]')!.textContent = cells.length + ' of ' + (512 / t) ** 2 + ' tiles selected.';
+      };
+      const geometry = () => {
+        const x = Number(vertex.value);
+        const points: Point[] = [[32, 145], [x, 30], [220, 100]];
+        if (reverse.checked) points.reverse();
+        this.querySelector('[data-polygon]')!.setAttribute('points', points.map(p => p.join(',')).join(' '));
+        this.querySelector('[data-vertex-dot]')!.setAttribute('cx', String(x));
+        const a = signedArea(points);
+        this.querySelector('[data-polygon-result]')!.textContent = 'Signed area: ' + a + ' px² · Absolute area: ' + Math.abs(a) + ' px².';
+      };
+      tile.onchange = raster; pos.oninput = raster; vertex.oninput = geometry; reverse.onchange = geometry;
+      raster(); geometry();
+    }
+  }
+  if (!customElements.get('graphics-lab')) customElements.define('graphics-lab', GraphicsLab);
+</script>

@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { articleAreas, areaRoute } from '../src/lib/areas';
 
 describe('development areas', () => {
+  it('maps new graphics and systems topics without falling back to iOS', () => {
+    expect(articleAreas({ data: { topic: 'graphics' } }).map(({ id }) => id)).toEqual(['graphics']);
+    expect(articleAreas({ data: { topic: 'wasm' } }).map(({ id }) => id)).toEqual(['wasm']);
+  });
   it('keeps frontend articles out of the iOS area', () => {
     expect(articleAreas({ data: { topic: 'frontend' } }).map(({ id }) => id)).toEqual(['frontend']);
     expect(areaRoute('frontend')).toBe('/articles/frontend/');

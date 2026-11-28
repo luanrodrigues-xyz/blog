@@ -20,7 +20,7 @@ individual tem uma rota por idioma, decidida pelo `language` do seu front matter
 
 Cada versão tem canonical próprio.
 O título HTML dos artigos usa o título editorial sem sufixo de marca, para reduzir
-o comprimento nos resultados de busca. A Home usa `Luan Rodrigues | iOS Developer`;
+o comprimento nos resultados de busca. A Home usa `Luan Rodrigues | From code to pixels`;
 as demais páginas mantêm o sufixo com o nome do site.
 Versões publicadas no mesmo bundle são pareadas automaticamente e
 recebem alternates recíprocos. O cabeçalho exibe um botão para English ou Português quando a tradução está
@@ -69,18 +69,7 @@ como descrito em [Analytics](analytics.md).
 
 ## Navegação e leitura
 
-A Home apresenta engenharia de software para iOS e web. Seus destaques e áreas
-incluem artigos publicados de todas as áreas, incluindo web, iOS e Java backend. As rotas `/articles/frontend/`, `/articles/backend/` e
-`/articles/ios/` continuam disponíveis. Os identificadores `frontend` (web) e `ios`
-(mobile nativo) são preservados em `src/lib/areas.ts` e no front matter.
-
-A Home mostra os 4 artigos publicados mais recentes de todas as áreas
-(`HOME_LATEST_COUNT` em `src/lib/home.ts`), na ordem de data usada pelo catálogo,
-sem seleção manual por slug. Rascunhos não participam dos destaques nem das categorias.
-Home e catálogo usam iOS, Web e Backend como áreas principais; filtros sem artigos
-publicados ficam ocultos. O catálogo tem uma lista cronológica única, com filtros
-por área. As URLs de assuntos (`/categories/<slug>/`) continuam disponíveis para
-consulta e preservam suas ordens configuradas. Não há página Projects vazia.
+A Home apresenta computação gráfica, programação de sistemas, desenvolvimento de jogos, WebAssembly, geometria computacional e performance. As seis novas áreas são definidas em `src/lib/areas.ts` e `src/config/topics.json`. Rotas e assuntos antigos permanecem compatíveis, mas só aparecem nos filtros quando têm conteúdo. A Home mostra os quatro artigos publicados mais recentes, os seis tópicos e dois experimentos do Lab. A seção comercial de projetos foi retirada. A página `/lab/` é habilitada por feature flag e usa componentes Astro interativos.
 
 Artigos com pelo menos três seções H2 recebem um índice recolhível, gerado no build,
 antes do corpo. Blocos de código mostram linguagem e cópia como melhoria progressiva;

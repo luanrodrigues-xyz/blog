@@ -7,8 +7,8 @@ interface Props {
   showAll?: boolean;
 }
 const { articles, active, showAll = false } = Astro.props;
-const visibleAreas = ['ios', 'frontend', 'backend'].flatMap((id) => {
-  const area = areas.find((item) => item.id === id)!;
+const visibleAreas = areas.flatMap((area) => {
+  const { id } = area;
   const count = articles.filter((article) => articleAreas(article).some((item) => item.id === id)).length;
   return count > 0 ? [{ ...area, count }] : [];
 });
