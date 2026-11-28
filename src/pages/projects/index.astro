@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { featuredProjects, otherProjects, projectPath } from '../../lib/projects';
+import { featuredProjects, projectPath } from '../../lib/projects';
 ---
 
 <BaseLayout
   title="Projects"
-  description="Independent games and creative software by Luan Rodrigues: Reynio, Ruptura and Unsealed."
+  description="Independent games and creative software by Luan Rodrigues: Reynio, Unsealed and Tessora."
   language="en"
 >
   <div class="projects-page">
@@ -16,7 +16,6 @@ import { featuredProjects, otherProjects, projectPath } from '../../lib/projects
     {[
       { title: 'Main product', items: featuredProjects.filter((p) => p.category === 'tools') },
       { title: 'Games', items: featuredProjects.filter((p) => p.category === 'games') },
-      { title: 'Other projects', items: otherProjects },
     ].map((group) => (
       <section class="project-group">
         <h2>{group.title}</h2>
@@ -43,7 +42,7 @@ import { featuredProjects, otherProjects, projectPath } from '../../lib/projects
   .project-entry { display: block; padding: var(--space-8) 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--fg); }
   .project-entry h3 { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: .6rem 0; font: 700 1.6rem/1.3 var(--font-heading); }
   .project-arrow { color: var(--fg-muted); font-size: 1rem; }
-  .project-entry:hover h2, .project-entry:hover .project-arrow { color: var(--action); }
+  .project-entry:hover h3, .project-entry:hover .project-arrow { color: var(--action); }
   .project-entry p { max-width: 38rem; margin: 0; color: var(--fg-muted); line-height: 1.65; }
   .project-kind { color: var(--fg-muted); font: .78rem/1.5 var(--font-mono); }
 </style>

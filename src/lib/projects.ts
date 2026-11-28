@@ -27,19 +27,6 @@ export const projects: Project[] = [
     "focus": "Refining the drawing and animation workflow and validating the tools against traditional animation exercises."
   },
   {
-    "slug": "ruptura",
-    "title": "Ruptura",
-    "kind": "Precision platformer",
-    "category": "games",
-    "featured": true,
-    "summary": "A 2D platformer where recoil, momentum and impact shape how you move.",
-    "stack": "C++20 · SDL3",
-    "status": "Playable prototype",
-    "platforms": "Desktop prototype",
-    "details": "Brik escapes industrial containment by charging and releasing an impulse, ricocheting and breaking obstacles when the impact is strong enough. The first chamber is playable and has been approved in an internal playtest. The game is built around short challenges and learning through repeated attempts.",
-    "focus": "Closing the architecture of the first chamber and refining movement, collision and level design."
-  },
-  {
     "slug": "unsealed",
     "title": "Unsealed",
     "kind": "Stealth and exploration",
@@ -57,26 +44,13 @@ export const projects: Project[] = [
     "title": "Tessora",
     "kind": "Geometry puzzle",
     "category": "games",
-    "featured": false,
+    "featured": true,
     "summary": "Cut, move and rotate pieces to reconstruct shapes, with more than one valid solution.",
     "stack": "TypeScript · React · PixiJS",
-    "status": "In development",
+    "status": "Public beta",
     "platforms": "Web",
-    "details": "The puzzle rules validate the union of pieces against a target instead of relying on a fixed assembly. The game includes twenty registered levels, precise cuts, snapping and geometric validation.",
+    "details": "The puzzle rules validate the union of pieces against a target instead of relying on a fixed assembly. The game includes twenty registered levels, precise cuts, snapping and geometric validation. A public beta is available.",
     "focus": "Testing the puzzle experience and touch interaction on real devices."
-  },
-  {
-    "slug": "deploy-ou-ruina",
-    "title": "Deploy ou Ruína",
-    "kind": "Satirical 2D game",
-    "category": "games",
-    "featured": false,
-    "summary": "A game about work, technology and everyday absurdity, with exploration and dialogue.",
-    "stack": "Swift 6 · SpriteKit · SwiftUI",
-    "status": "Internal alpha",
-    "platforms": "iPhone",
-    "details": "Carlos Silva tries to find stability in Silicon City. The current native iPhone project includes job applications, freelance contracts, survival expenses and exploration of the first street. It shares its fictional world with the comic series.",
-    "focus": "Refining the existing gameplay and visual direction before expanding the city."
   }
 ];
 

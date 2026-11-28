@@ -21,6 +21,11 @@ function article(id: string, topic: string, day: number, draft = false, areas?: 
 describe('home selection', () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it('supports an empty editorial collection', async () => {
+    vi.mocked(getArticles).mockResolvedValue([]);
+    expect(await homeContent()).toEqual({ articles: [], latest: [], categories: [] });
+  });
+
   it('features all areas by date and excludes drafts', async () => {
     vi.mocked(getArticles).mockResolvedValue([
       article('mobile', 'swiftui', 4),
