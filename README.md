@@ -1,6 +1,6 @@
 # luanrodrigues.xyz
 
-Meu site pessoal, com artigos e exemplos sobre iOS, web e Java backend.
+Meu site pessoal e portfólio de Reynio, Unsealed e Tessora, com uma seção de artigos e notas de desenvolvimento.
 Feito com Astro, Markdown e MDX.
 
 Estou migrando o projeto do GitLab para o GitHub, com publicação pelo GitHub Pages.

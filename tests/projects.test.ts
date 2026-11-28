@@ -3,10 +3,10 @@ import { featuredProjects, otherProjects, projectPath, projectRoutes, projects }
 
 describe('project catalog', () => {
   it('features only the three featured projects in order', () => {
-    expect(featuredProjects.map(({ slug }) => slug)).toEqual(['reynio', 'ruptura', 'unsealed']);
-    expect(projects.some(({ slug }) => slug === 'vetra')).toBe(false);
-    expect(projectRoutes).not.toContain('/projects/vetra/');
-    expect(otherProjects.map(({ slug }) => slug)).toEqual(['tessora', 'deploy-ou-ruina']);
+    expect(featuredProjects.map(({ slug }) => slug)).toEqual(['reynio', 'unsealed', 'tessora']);
+    expect(projects.map(({ slug }) => slug)).toEqual(['reynio', 'unsealed', 'tessora']);
+    expect(otherProjects).toEqual([]);
+    expect(projects.find(({ slug }) => slug === 'tessora')?.status).toBe('Public beta');
   });
 
   it('keeps every project route unique and represented in the sitemap source', () => {
