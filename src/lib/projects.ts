@@ -27,19 +27,6 @@ export const projects: Project[] = [
     "focus": "Refining the drawing and animation workflow and validating the tools against traditional animation exercises."
   },
   {
-    "slug": "vetra",
-    "title": "Vetra",
-    "kind": "Game development tool",
-    "category": "tools",
-    "featured": true,
-    "summary": "A native vector asset editor for game developers, from drawing to runtime export.",
-    "stack": "C++20 · Swift 6 · Metal",
-    "status": "In development",
-    "platforms": "macOS",
-    "details": "Vetra brings vector asset creation, assembly and animation into a single application. The current priority is Draw, with geometry, layer editing and deterministic export to game runtimes. Assemble and Motion remain planned milestones; they are not presented as released features.",
-    "focus": "Finishing and validating Draw, including editing, rendering, runtime export and performance."
-  },
-  {
     "slug": "ruptura",
     "title": "Ruptura",
     "kind": "Precision platformer",

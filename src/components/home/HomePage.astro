@@ -29,8 +29,8 @@ const { articles, latest } = await homeContent();
   </header>
   {(['tools', 'games'] as const).map((category) => (
     <div class="project-group">
-      <h3>{category === 'tools' ? 'Creative tools' : 'Games'}</h3>
-      <div class="project-showcase">
+      <h3>{category === 'tools' ? 'Main product' : 'Games'}</h3>
+      <div class:list={["project-showcase", { "flagship-showcase": category === "tools" }]}>
         {featuredProjects.filter((project) => project.category === category).map((project) => (
           <a class="showcase-card" href={projectPath(project.slug)}>
             <span class="showcase-kind">{project.kind}</span>
@@ -71,6 +71,9 @@ const { articles, latest } = await homeContent();
   .project-group + .project-group { margin-top: var(--space-6); }
   .project-group h3 { margin: 0 0 var(--space-3); font-size: 1rem; color: var(--fg-muted); }
   .project-showcase { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .flagship-showcase { grid-template-columns: minmax(0, 1fr); }
+  .flagship-showcase .showcase-card { padding: var(--space-8); }
+  .flagship-showcase .showcase-card h4 { font-size: clamp(1.6rem, 4vw, 2rem); }
   .showcase-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--canvas); text-decoration: none; color: var(--fg); min-width: 0; }
   .showcase-card:hover { border-color: var(--action); }
   .showcase-kind, .showcase-status { color: var(--fg-muted); font: .75rem/1.4 var(--font-mono); }

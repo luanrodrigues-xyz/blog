@@ -50,7 +50,6 @@ try {
     '/about/',
     '/projects/',
     '/projects/reynio/',
-    '/projects/vetra/',
     '/projects/ruptura/',
     '/projects/unsealed/',
     '/projects/tessora/',
@@ -83,7 +82,7 @@ try {
         assert.equal(state.h1, 1, route);
         if (route === '/') {
           const featured = await page.$eval('.project-showcase a', (links) => links.map((a) => a.getAttribute('href')));
-          assert.deepEqual(featured, ['/projects/reynio/', '/projects/vetra/', '/projects/ruptura/', '/projects/unsealed/']);
+          assert.deepEqual(featured, ['/projects/reynio/', '/projects/ruptura/', '/projects/unsealed/']);
           assert.ok(await page.$('.site-header a[href="/articles/"]'));
         }
         if (route.includes('/articles/pt/')) {

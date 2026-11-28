@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { featuredProjects, otherProjects, projectPath, projectRoutes, projects } from '../src/lib/projects';
 
 describe('project catalog', () => {
-  it('features only the four primary products in order', () => {
-    expect(featuredProjects.map(({ slug }) => slug)).toEqual(['reynio', 'vetra', 'ruptura', 'unsealed']);
+  it('features only the three featured projects in order', () => {
+    expect(featuredProjects.map(({ slug }) => slug)).toEqual(['reynio', 'ruptura', 'unsealed']);
+    expect(projects.some(({ slug }) => slug === 'vetra')).toBe(false);
+    expect(projectRoutes).not.toContain('/projects/vetra/');
     expect(otherProjects.map(({ slug }) => slug)).toEqual(['tessora', 'deploy-ou-ruina']);
   });
 

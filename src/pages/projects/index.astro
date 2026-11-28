@@ -5,7 +5,7 @@ import { featuredProjects, otherProjects, projectPath } from '../../lib/projects
 
 <BaseLayout
   title="Projects"
-  description="Independent games and creative software by Luan Rodrigues: Reynio, Vetra, Ruptura and Unsealed."
+  description="Independent games and creative software by Luan Rodrigues: Reynio, Ruptura and Unsealed."
   language="en"
 >
   <div class="projects-page">
@@ -14,7 +14,7 @@ import { featuredProjects, otherProjects, projectPath } from '../../lib/projects
       <p class="lead">Independent games and creative software. Here is what I am building and where each project currently stands.</p>
     </header>
     {[
-      { title: 'Creative tools', items: featuredProjects.filter((p) => p.category === 'tools') },
+      { title: 'Main product', items: featuredProjects.filter((p) => p.category === 'tools') },
       { title: 'Games', items: featuredProjects.filter((p) => p.category === 'games') },
       { title: 'Other projects', items: otherProjects },
     ].map((group) => (
