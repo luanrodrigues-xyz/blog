@@ -48,6 +48,13 @@ try {
   const routes = [
     '/',
     '/about/',
+    '/projects/',
+    '/projects/reynio/',
+    '/projects/vetra/',
+    '/projects/ruptura/',
+    '/projects/unsealed/',
+    '/projects/tessora/',
+    '/projects/deploy-ou-ruina/',
     '/articles/',
     '/articles/frontend/',
     '/articles/ios/',
@@ -61,7 +68,8 @@ try {
       await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
       await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: theme }]);
       for (const route of routes) {
-        await page.goto(origin + route, { waitUntil: 'load' });
+        const response = await page.goto(origin + route, { waitUntil: 'load' });
+        assert.equal(response?.status(), 200, route);
         await page.waitForFunction(() => Boolean(document.documentElement.dataset.theme));
         const state = await page.evaluate(() => ({
           overflow: document.documentElement.scrollWidth > innerWidth,
@@ -73,6 +81,11 @@ try {
         }));
         assert.equal(state.overflow, false, `${width} ${theme} ${route}: page overflow`);
         assert.equal(state.h1, 1, route);
+        if (route === '/') {
+          const featured = await page.$eval('.project-showcase a', (links) => links.map((a) => a.getAttribute('href')));
+          assert.deepEqual(featured, ['/projects/reynio/', '/projects/vetra/', '/projects/ruptura/', '/projects/unsealed/']);
+          assert.ok(await page.$('.site-header a[href="/articles/"]'));
+        }
         if (route.includes('/articles/pt/')) {
           assert.ok(state.toc);
           assert.ok(state.copy);

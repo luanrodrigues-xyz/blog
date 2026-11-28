@@ -1,9 +1,9 @@
 ---
 title: "Luan Rodrigues"
-heroTitle: "Building games and tools for game development."
-intro: "I'm Luan Rodrigues. I build 2D games, experiment with C++ and work on Vetra, my native game development editor for macOS."
-introDetail: "This is where I document what I'm building, the problems I run into and what changes after testing."
-description: "Games, game development tools, experiments and development notes by Luan Rodrigues. Vetra, Tessora, Ruptura, Unsealed and Deploy ou Ruína."
+heroTitle: "Independent games and creative tools."
+intro: "I'm Luan Rodrigues, a software developer building tools for artists and game developers, and games of my own."
+introDetail: "I also write about software engineering and share the technical decisions behind my projects."
+description: "Independent games, creative tools and software engineering articles by Luan Rodrigues. Discover Reynio, Vetra, Ruptura and Unsealed."
 language: "en"
 isPortuguese: false
 canonical: "https://luanrodrigues.xyz/"

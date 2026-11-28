@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import avatar from '../../../public/brand/swift-decodificado.png';
-import { interfaceLanguage, ui } from '../../config/site';
+import { features, interfaceLanguage, ui } from '../../config/site';
 
 interface Props {
   isArticle?: boolean;
@@ -10,7 +10,7 @@ interface Props {
   isLab?: boolean;
 }
 
-const { isAbout = false } = Astro.props;
+const { isArticle = false, isListingPage = false, isAbout = false, isLab = false } = Astro.props;
 const text = ui;
 ---
 
@@ -18,7 +18,7 @@ const text = ui;
   {text.skip}
 </a>
 <header class="site-header shell" lang={interfaceLanguage}>
-  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Games and game development tools.">
+  <a class="wordmark" href={text.homeUrl} aria-label="Luan Rodrigues | Independent games, creative tools and software engineering.">
     <Image
       class="wordmark-avatar"
       src={avatar}
@@ -34,7 +34,18 @@ const text = ui;
     </span>
   </a>
   <nav aria-label={text.navigation}>
-    <a href="/projects/" aria-current={Astro.url.pathname.startsWith('/projects/') ? 'page' : undefined}>Projects</a>
+    <a href="/projects/" aria-current={Astro.url.pathname === '/projects/' ? 'page' : Astro.url.pathname.startsWith('/projects/') ? 'true' : undefined}>Projects</a>
+    <a
+      href={text.articlesUrl}
+      aria-current={Astro.url.pathname === text.articlesUrl ? 'page' : isArticle || isListingPage ? 'true' : undefined}
+    >
+      {text.articles}
+    </a>
+    {features.lab && (
+      <a href={text.labUrl} aria-current={isLab ? 'page' : undefined}>
+        {text.lab}
+      </a>
+    )}
     <a href={text.aboutUrl} aria-current={isAbout ? 'page' : undefined}>
       {text.about}
     </a>
@@ -59,6 +70,11 @@ const text = ui;
 </header>
 
 <style>
+  @media (max-width: 520px) {
+    .site-header .wordmark-text { display: none; }
+    .site-header nav { gap: clamp(.45rem, 2vw, .9rem); }
+  }
+
   .theme-icon-moon {
     display: none;
   }

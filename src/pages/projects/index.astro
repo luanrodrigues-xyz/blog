@@ -1,35 +1,47 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { projects } from '../../lib/projects';
+import { featuredProjects, otherProjects, projectPath } from '../../lib/projects';
 ---
 
 <BaseLayout
   title="Projects"
-  description="Games, tools and ongoing development work: Vetra, Tessora, Ruptura, Unsealed and Deploy ou Ruína."
+  description="Independent games and creative software by Luan Rodrigues: Reynio, Vetra, Ruptura and Unsealed."
   language="en"
 >
   <div class="projects-page">
     <header class="page-header">
       <h1>Projects</h1>
-      <p class="lead">Games, tools and experiments I'm working on. Each project has its own space for technical decisions, development notes and playtests.</p>
+      <p class="lead">Independent games and creative software. Here is what I am building and where each project currently stands.</p>
     </header>
-    <div class="project-list">
-      {projects.map((project) => (
-        <a class="project-entry" href={`/projects/${project.slug}/`}>
-          <span class="project-kind">{project.kind} · {project.stack}</span>
-          <h2>{project.title} <span class="project-arrow" aria-hidden="true">↗</span></h2>
-          <p>{project.summary}</p>
-        </a>
-      ))}
-    </div>
+    {[
+      { title: 'Creative tools', items: featuredProjects.filter((p) => p.category === 'tools') },
+      { title: 'Games', items: featuredProjects.filter((p) => p.category === 'games') },
+      { title: 'Other projects', items: otherProjects },
+    ].map((group) => (
+      <section class="project-group">
+        <h2>{group.title}</h2>
+        <div class="project-list">
+          {group.items.map((project) => (
+            <a class="project-entry" href={projectPath(project.slug)}>
+              <span class="project-kind">{project.kind} · {project.status}</span>
+              <h3>{project.title} <span class="project-arrow" aria-hidden="true">↗</span></h3>
+              <p>{project.summary}</p>
+              <p class="project-kind">{project.stack}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
   </div>
 </BaseLayout>
 
 <style>
+  .project-group { margin-top: var(--space-8); }
+  .project-group h2 { font-size: 1.2rem; }
   .projects-page { padding-bottom: var(--space-12); }
   .project-list { border-top: 1px solid var(--border); }
-  .project-entry { display: block; padding: var(--space-7) 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--fg); }
-  .project-entry h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: .6rem 0; font: 700 1.6rem/1.3 var(--font-heading); }
+  .project-entry { display: block; padding: var(--space-8) 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--fg); }
+  .project-entry h3 { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: .6rem 0; font: 700 1.6rem/1.3 var(--font-heading); }
   .project-arrow { color: var(--fg-muted); font-size: 1rem; }
   .project-entry:hover h2, .project-entry:hover .project-arrow { color: var(--action); }
   .project-entry p { max-width: 38rem; margin: 0; color: var(--fg-muted); line-height: 1.65; }
