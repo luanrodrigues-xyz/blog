@@ -1,3 +1,4 @@
+import { projectRoutes } from '../lib/projects';
 import { areas, areaRoute } from '../lib/areas';
 import { getCollection } from 'astro:content';
 import { getArticles } from '../lib/articles';
@@ -19,6 +20,7 @@ export async function GET() {
     getArticles(({ data }) => !data.draft),
   ]);
   const locations = [
+    ...projectRoutes.map((path) => ({ url: `${site.origin}${path}`, date: undefined as Date | undefined })),
     ...areas.map(({ id }) => ({ url: `${site.origin}${areaRoute(id)}`, date: undefined as Date | undefined })),
     { url: `${site.origin}${ui.articlesUrl}`, date: undefined as Date | undefined },
     ...pages.map(({ data }) => ({ url: data.canonical!, date: undefined as Date | undefined })),
