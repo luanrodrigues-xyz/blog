@@ -5,6 +5,7 @@ import { homeContent } from '../../lib/home';
 import { interfaceLanguage, ui } from '../../config/site';
 
 import LatestArticleCard from './LatestArticleCard.astro';
+import { featuredProjects, projectPath, projectsPath } from '../../lib/projects';
 
 interface Props {
   entry: CollectionEntry<'sitePages'>;
@@ -19,6 +20,28 @@ const { articles, latest } = await homeContent();
   <h1>{entry.data.heroTitle}</h1>
   <p class="lead">{entry.data.intro ?? entry.data.description}</p>
   {entry.data.introDetail && <p class="lead">{entry.data.introDetail}</p>}
+</section>
+
+<section class="home-projects" aria-labelledby="projects-title">
+  <header class="notes-head">
+    <h2 id="projects-title">Featured projects</h2>
+    <a href={projectsPath}>All projects →</a>
+  </header>
+  {(['tools', 'games'] as const).map((category) => (
+    <div class="project-group">
+      <h3>{category === 'tools' ? 'Creative tools' : 'Games'}</h3>
+      <div class="project-showcase">
+        {featuredProjects.filter((project) => project.category === category).map((project) => (
+          <a class="showcase-card" href={projectPath(project.slug)}>
+            <span class="showcase-kind">{project.kind}</span>
+            <h4>{project.title} <span aria-hidden="true">↗</span></h4>
+            <p>{project.summary}</p>
+            <span class="showcase-status">{project.status}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
 </section>
 
 {latest.length > 0 && (
@@ -44,6 +67,18 @@ const { articles, latest } = await homeContent();
 </p>
 
 <style>
+  .home-projects { margin-bottom: var(--space-12); }
+  .project-group + .project-group { margin-top: var(--space-6); }
+  .project-group h3 { margin: 0 0 var(--space-3); font-size: 1rem; color: var(--fg-muted); }
+  .project-showcase { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .showcase-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6); border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--canvas); text-decoration: none; color: var(--fg); min-width: 0; }
+  .showcase-card:hover { border-color: var(--action); }
+  .showcase-kind, .showcase-status { color: var(--fg-muted); font: .75rem/1.4 var(--font-mono); }
+  .showcase-card h4 { display: flex; justify-content: space-between; gap: .5rem; margin: 0; font: 700 1.4rem/1.25 var(--font-heading); }
+  .showcase-card h4 span { color: var(--action); font-size: 1rem; }
+  .showcase-card p { margin: 0; color: var(--fg-muted); line-height: 1.6; flex: 1; }
+  @media (max-width: 599px) { .project-showcase { grid-template-columns: minmax(0, 1fr); } }
+
   .home-featured {
     margin-bottom: var(--space-10);
   }

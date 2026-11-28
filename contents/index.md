@@ -1,9 +1,9 @@
 ---
 title: "Luan Rodrigues"
-heroTitle: "Building software for iOS and the web."
-intro: "I'm Luan Rodrigues, a software developer working with Swift, React, and TypeScript."
-introDetail: "I write about application architecture, interfaces, state, and working with APIs in iOS and web apps."
-description: "Luan Rodrigues, iOS Developer working with Swift, SwiftUI and UIKit since 2019. Technical articles and examples on iOS and web development."
+heroTitle: "Independent games and creative tools."
+intro: "I'm Luan Rodrigues, a software developer building tools for artists and game developers, and games of my own."
+introDetail: "I also write about software engineering and share the technical decisions behind my projects."
+description: "Independent games, creative tools and software engineering articles by Luan Rodrigues. Discover Reynio, Vetra, Ruptura and Unsealed."
 language: "en"
 isPortuguese: false
 canonical: "https://luanrodrigues.xyz/"
@@ -11,5 +11,3 @@ ogType: "website"
 isHome: true
 alternates: [{"language":"en","url":"https://luanrodrigues.xyz/"}]
 ---
-
-
